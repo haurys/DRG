@@ -1,0 +1,42 @@
+[
+  {
+    "player_id": "P1",
+    "profile": "Balanced",
+    "description": "Balances Effort, Energy, and remaining distance."
+  },
+  {
+    "player_id": "P2",
+    "profile": "Aggressive",
+    "description": "Prefers Race/Push and high Effort while Energy permits."
+  },
+  {
+    "player_id": "P3",
+    "profile": "Energy Conservative",
+    "description": "Prefers Easy/Steady and recovery cards at low Energy."
+  },
+  {
+    "player_id": "P4",
+    "profile": "Course Planner",
+    "description": "Reserves high Effort for difficult current/upcoming terrain."
+  },
+  {
+    "player_id": "P5",
+    "profile": "Pack Runner",
+    "description": "Prefers matching the nearest runner pace."
+  },
+  {
+    "player_id": "P6",
+    "profile": "Opportunist",
+    "description": "Prefers immediately useful recovery and strong Effort combinations."
+  },
+  {
+    "player_id": "P7",
+    "profile": "Front Runner",
+    "description": "Prefers the fastest sustainable pace while leading or close to lead."
+  },
+  {
+    "player_id": "P8",
+    "profile": "Adaptive",
+    "description": "Weights Energy, position, difficulty, and distance remaining dynamically."
+  }
+]

@@ -1,0 +1,3259 @@
+{
+  "summary": {
+    "schema_version": "1.0",
+    "audit_type": "read-only",
+    "physical_cards": 108,
+    "unique_designs": 89,
+    "family_physical_counts": {
+      "Training": 20,
+      "Gear": 20,
+      "Fuel": 22,
+      "Event": 30,
+      "Condition": 16
+    },
+    "family_unique_design_counts": {
+      "Training": 12,
+      "Gear": 13,
+      "Fuel": 22,
+      "Event": 30,
+      "Condition": 12
+    },
+    "energy_physical_counts": {
+      "unknown/null": 80,
+      "positive": 28
+    },
+    "energy_unique_counts": {
+      "unknown/null": 61,
+      "positive": 28
+    },
+    "energy_by_family": {
+      "Training": {
+        "unique_designs": {
+          "unknown/null": 12
+        },
+        "physical_cards": {
+          "unknown/null": 20
+        }
+      },
+      "Gear": {
+        "unique_designs": {
+          "unknown/null": 13
+        },
+        "physical_cards": {
+          "unknown/null": 20
+        }
+      },
+      "Fuel": {
+        "unique_designs": {
+          "positive": 20,
+          "unknown/null": 2
+        },
+        "physical_cards": {
+          "positive": 20,
+          "unknown/null": 2
+        }
+      },
+      "Event": {
+        "unique_designs": {
+          "unknown/null": 22,
+          "positive": 8
+        },
+        "physical_cards": {
+          "unknown/null": 22,
+          "positive": 8
+        }
+      },
+      "Condition": {
+        "unique_designs": {
+          "unknown/null": 12
+        },
+        "physical_cards": {
+          "unknown/null": 16
+        }
+      }
+    },
+    "effect_unique_counts": {
+      "no_effect": 26,
+      "fully_executable_effect": 0,
+      "partially_executable_effect": 0,
+      "text_only_effect": 63,
+      "rules_review": 64
+    },
+    "effect_physical_counts": {
+      "no_effect": 27,
+      "fully_executable_effect": 0,
+      "partially_executable_effect": 0,
+      "text_only_effect": 81,
+      "rules_review": 83
+    },
+    "status_unique_counts": {
+      "ENERGY MISSING": 61,
+      "PARTIAL": 64,
+      "RULES REVIEW": 64,
+      "TEXT ONLY": 63,
+      "CONFLICT": 2,
+      "READY": 25
+    },
+    "status_physical_counts": {
+      "ENERGY MISSING": 80,
+      "PARTIAL": 83,
+      "RULES REVIEW": 83,
+      "TEXT ONLY": 81,
+      "CONFLICT": 3,
+      "READY": 25
+    },
+    "canonical_input_hashes": {
+      "race_cards_json": "abe3330610c4803598d20f6ef3cc97b3653aa569ad4a504e54f9733515dc8f13",
+      "engine": "c72be8e30e24759b62c9be01fc1a64c260417e5657ad082bfa5e73ec8e66fa0d",
+      "config": "bdde079628600d3e01feabd567f7e7a467ed94f056cb6c9997a2422c87cf31ef"
+    }
+  },
+  "designs": [
+    {
+      "design_id": "RD-001",
+      "physical_copy_ids": [
+        "TR-001",
+        "TR-002"
+      ],
+      "title": "Long Run",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "-",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field?"
+    },
+    {
+      "design_id": "RD-002",
+      "physical_copy_ids": [
+        "TR-003"
+      ],
+      "title": "Base Miles",
+      "family": "Training",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Easy +1 Effort",
+      "effect_text": "Easy +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-003",
+      "physical_copy_ids": [
+        "TR-004"
+      ],
+      "title": "Negative Split",
+      "family": "Training",
+      "quantity": 1,
+      "effort": 8,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Race +1 Effort",
+      "effect_text": "Race +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-004",
+      "physical_copy_ids": [
+        "TR-005",
+        "TR-006"
+      ],
+      "title": "Tempo Run",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Steady +1 Effort",
+      "effect_text": "Steady +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-005",
+      "physical_copy_ids": [
+        "TR-007",
+        "TR-008"
+      ],
+      "title": "Intervals",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 8,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Push +1 Effort",
+      "effect_text": "Push +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-006",
+      "physical_copy_ids": [
+        "TR-009",
+        "TR-010"
+      ],
+      "title": "Hill Repeats",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Incline +1 Effort",
+      "effect_text": "Incline +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-007",
+      "physical_copy_ids": [
+        "TR-011",
+        "TR-012"
+      ],
+      "title": "Strength Training",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Gut Check +1",
+      "effect_text": "Gut Check +1",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-008",
+      "physical_copy_ids": [
+        "TR-013",
+        "TR-014"
+      ],
+      "title": "Pacing Practice",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Steady +1 Effort",
+      "effect_text": "Steady +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-009",
+      "physical_copy_ids": [
+        "TR-015",
+        "TR-016"
+      ],
+      "title": "Trail Training",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Trail +1 Effort",
+      "effect_text": "Trail +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-010",
+      "physical_copy_ids": [
+        "TR-017"
+      ],
+      "title": "Form Drills",
+      "family": "Training",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Flat +1 Effort",
+      "effect_text": "Flat +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-011",
+      "physical_copy_ids": [
+        "TR-018"
+      ],
+      "title": "Downhill Practice",
+      "family": "Training",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Descent +1 Effort",
+      "effect_text": "Descent +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-012",
+      "physical_copy_ids": [
+        "TR-019",
+        "TR-020"
+      ],
+      "title": "Mental Toughness",
+      "family": "Training",
+      "quantity": 2,
+      "effort": 9,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Gut Check +2",
+      "effect_text": "Gut Check +2",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-013",
+      "physical_copy_ids": [
+        "GE-001",
+        "GE-002"
+      ],
+      "title": "Running Shoes",
+      "family": "Gear",
+      "quantity": 2,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Asphalt +1 Effort",
+      "effect_text": "Asphalt +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "CONFLICT",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-014",
+      "physical_copy_ids": [
+        "GE-003",
+        "GE-004"
+      ],
+      "title": "Running Socks",
+      "family": "Gear",
+      "quantity": 2,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Blister Treat -2",
+      "effect_text": "Blister Treat -2",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-015",
+      "physical_copy_ids": [
+        "GE-005"
+      ],
+      "title": "Trail Shoes",
+      "family": "Gear",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Trail +2 Effort",
+      "effect_text": "Trail +2 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-016",
+      "physical_copy_ids": [
+        "GE-006",
+        "GE-007"
+      ],
+      "title": "Running Cap",
+      "family": "Gear",
+      "quantity": 2,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Heat effects -1 Energy",
+      "effect_text": "Heat effects -1 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-017",
+      "physical_copy_ids": [
+        "GE-008"
+      ],
+      "title": "Tech Shirt",
+      "family": "Gear",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Heat effects -1 Energy",
+      "effect_text": "Heat effects -1 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-018",
+      "physical_copy_ids": [
+        "GE-009"
+      ],
+      "title": "Running Shorts",
+      "family": "Gear",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Steady +1 Effort",
+      "effect_text": "Steady +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-019",
+      "physical_copy_ids": [
+        "GE-010",
+        "GE-011"
+      ],
+      "title": "Sunglasses",
+      "family": "Gear",
+      "quantity": 2,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Sun effects ignored",
+      "effect_text": "Sun effects ignored",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-020",
+      "physical_copy_ids": [
+        "GE-012",
+        "GE-013"
+      ],
+      "title": "Hydration Belt",
+      "family": "Gear",
+      "quantity": 2,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Water +1 Energy",
+      "effect_text": "Water +1 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-021",
+      "physical_copy_ids": [
+        "GE-014",
+        "GE-015"
+      ],
+      "title": "Anti-Chafe",
+      "family": "Gear",
+      "quantity": 2,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Ignore first Hot Spot",
+      "effect_text": "Ignore first Hot Spot",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-022",
+      "physical_copy_ids": [
+        "GE-016",
+        "GE-017"
+      ],
+      "title": "GPS Watch",
+      "family": "Gear",
+      "quantity": 2,
+      "effort": 8,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Pace +1 Effort once/Round",
+      "effect_text": "Pace +1 Effort once/Round",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-023",
+      "physical_copy_ids": [
+        "GE-018"
+      ],
+      "title": "Pace Band",
+      "family": "Gear",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Gut Check +1",
+      "effect_text": "Gut Check +1",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-024",
+      "physical_copy_ids": [
+        "GE-019"
+      ],
+      "title": "Compression Sleeves",
+      "family": "Gear",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Cramp Treat -2",
+      "effect_text": "Cramp Treat -2",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-025",
+      "physical_copy_ids": [
+        "GE-020"
+      ],
+      "title": "Insoles",
+      "family": "Gear",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Concrete +1 Effort",
+      "effect_text": "Concrete +1 Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-026",
+      "physical_copy_ids": [
+        "FU-001"
+      ],
+      "title": "Energy Gel",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 3,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-027",
+      "physical_copy_ids": [
+        "FU-002"
+      ],
+      "title": "Energy Gel",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-028",
+      "physical_copy_ids": [
+        "FU-003"
+      ],
+      "title": "Energy Gel",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-029",
+      "physical_copy_ids": [
+        "FU-004"
+      ],
+      "title": "Energy Chews",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-030",
+      "physical_copy_ids": [
+        "FU-005"
+      ],
+      "title": "Energy Chews",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-031",
+      "physical_copy_ids": [
+        "FU-006"
+      ],
+      "title": "Banana",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 3,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-032",
+      "physical_copy_ids": [
+        "FU-007"
+      ],
+      "title": "Banana",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-033",
+      "physical_copy_ids": [
+        "FU-008"
+      ],
+      "title": "Snack Bar",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-034",
+      "physical_copy_ids": [
+        "FU-009"
+      ],
+      "title": "Snack Bar",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-035",
+      "physical_copy_ids": [
+        "FU-010"
+      ],
+      "title": "Water Bottle",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 2,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-036",
+      "physical_copy_ids": [
+        "FU-011"
+      ],
+      "title": "Water Bottle",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-037",
+      "physical_copy_ids": [
+        "FU-012"
+      ],
+      "title": "Water Bottle",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-038",
+      "physical_copy_ids": [
+        "FU-013"
+      ],
+      "title": "Sports Drink",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 3,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-039",
+      "physical_copy_ids": [
+        "FU-014"
+      ],
+      "title": "Sports Drink",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-040",
+      "physical_copy_ids": [
+        "FU-015"
+      ],
+      "title": "Sports Drink",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-041",
+      "physical_copy_ids": [
+        "FU-016"
+      ],
+      "title": "Electrolytes",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": 1,
+      "energy_source_status": "explicit signed lightning value separable from remaining Effect text",
+      "source_effect_text": "+1 Energy; Treat Dehydrated",
+      "effect_text": "Treat Dehydrated",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Energy; INCOMPLETE for Effect",
+      "execution_status": [
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-042",
+      "physical_copy_ids": [
+        "FU-017"
+      ],
+      "title": "Electrolytes",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": 1,
+      "energy_source_status": "explicit signed lightning value separable from remaining Effect text",
+      "source_effect_text": "+1 Energy; Treat Dehydrated",
+      "effect_text": "Treat Dehydrated",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Energy; INCOMPLETE for Effect",
+      "execution_status": [
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-043",
+      "physical_copy_ids": [
+        "FU-018"
+      ],
+      "title": "Electrolytes",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 8,
+      "printed_energy": 1,
+      "energy_source_status": "explicit signed lightning value separable from remaining Effect text",
+      "source_effect_text": "+1 Energy; Treat Dehydrated",
+      "effect_text": "Treat Dehydrated",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Energy; INCOMPLETE for Effect",
+      "execution_status": [
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-044",
+      "physical_copy_ids": [
+        "FU-019"
+      ],
+      "title": "Salt Tabs",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Treat Cramp",
+      "effect_text": "Treat Cramp",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-045",
+      "physical_copy_ids": [
+        "FU-020"
+      ],
+      "title": "Salt Tabs",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Treat Cramp",
+      "effect_text": "Treat Cramp",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-046",
+      "physical_copy_ids": [
+        "FU-021"
+      ],
+      "title": "Orange Slice",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 3,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-047",
+      "physical_copy_ids": [
+        "FU-022"
+      ],
+      "title": "Gummy Bears",
+      "family": "Fuel",
+      "quantity": 1,
+      "effort": 8,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-048",
+      "physical_copy_ids": [
+        "EV-001"
+      ],
+      "title": "Headwind",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Target -1 Pace Effort",
+      "effect_text": "Target -1 Pace Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-049",
+      "physical_copy_ids": [
+        "EV-002"
+      ],
+      "title": "Headwind",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Target -1 Pace Effort",
+      "effect_text": "Target -1 Pace Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-050",
+      "physical_copy_ids": [
+        "EV-003"
+      ],
+      "title": "Tailwind",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+1 movement",
+      "effect_text": "+1 movement",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-051",
+      "physical_copy_ids": [
+        "EV-004"
+      ],
+      "title": "Tailwind",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+1 movement",
+      "effect_text": "+1 movement",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-052",
+      "physical_copy_ids": [
+        "EV-005"
+      ],
+      "title": "Sudden Rain",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+1 Difficulty next mile",
+      "effect_text": "+1 Difficulty next mile",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-053",
+      "physical_copy_ids": [
+        "EV-006"
+      ],
+      "title": "Hot Spell",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "-1 Energy at Push",
+      "effect_text": "-1 Energy at Push",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-054",
+      "physical_copy_ids": [
+        "EV-007"
+      ],
+      "title": "Cool Breeze",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-055",
+      "physical_copy_ids": [
+        "EV-008"
+      ],
+      "title": "Sun Break",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 3,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+1 Pace Effort",
+      "effect_text": "+1 Pace Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-056",
+      "physical_copy_ids": [
+        "EV-009"
+      ],
+      "title": "Congestion",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Target -1 movement",
+      "effect_text": "Target -1 movement",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-057",
+      "physical_copy_ids": [
+        "EV-010"
+      ],
+      "title": "Congestion",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Target -1 movement",
+      "effect_text": "Target -1 movement",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-058",
+      "physical_copy_ids": [
+        "EV-011"
+      ],
+      "title": "Potholes",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Target chooses -1 movement or -1 Energy",
+      "effect_text": "Target chooses -1 movement or -1 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-059",
+      "physical_copy_ids": [
+        "EV-012"
+      ],
+      "title": "Potholes",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Target chooses -1 movement or -1 Energy",
+      "effect_text": "Target chooses -1 movement or -1 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-060",
+      "physical_copy_ids": [
+        "EV-013"
+      ],
+      "title": "Clear Road",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+1 movement",
+      "effect_text": "+1 movement",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-061",
+      "physical_copy_ids": [
+        "EV-014"
+      ],
+      "title": "Tight Turn",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "-1 Pace Effort",
+      "effect_text": "-1 Pace Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-062",
+      "physical_copy_ids": [
+        "EV-015"
+      ],
+      "title": "Crowd Support",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-063",
+      "physical_copy_ids": [
+        "EV-016"
+      ],
+      "title": "Crowd Support",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-064",
+      "physical_copy_ids": [
+        "EV-017"
+      ],
+      "title": "Pace Buddy",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Gain Pack +1",
+      "effect_text": "Gain Pack +1",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-065",
+      "physical_copy_ids": [
+        "EV-018"
+      ],
+      "title": "High Five",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 3,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "You + Nearby runner +1 Energy each",
+      "effect_text": "You + Nearby runner +1 Energy each",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-066",
+      "physical_copy_ids": [
+        "EV-019"
+      ],
+      "title": "Friendly Rival",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 7,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+1 Pace Effort",
+      "effect_text": "+1 Pace Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-067",
+      "physical_copy_ids": [
+        "EV-020"
+      ],
+      "title": "Helpful Runner",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Give card; +1 Energy",
+      "effect_text": "Give card; +1 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-068",
+      "physical_copy_ids": [
+        "EV-021"
+      ],
+      "title": "Second Wind",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 8,
+      "printed_energy": 3,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+3 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +3 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-069",
+      "physical_copy_ids": [
+        "EV-022"
+      ],
+      "title": "Second Wind",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 9,
+      "printed_energy": 3,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+3 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +3 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-070",
+      "physical_copy_ids": [
+        "EV-023"
+      ],
+      "title": "Perfect Rhythm",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 8,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+2 Pace Effort",
+      "effect_text": "+2 Pace Effort",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-071",
+      "physical_copy_ids": [
+        "EV-024"
+      ],
+      "title": "Feeling Good",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": 2,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+2 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +2 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-072",
+      "physical_copy_ids": [
+        "EV-025"
+      ],
+      "title": "Goose Chase",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 8,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Choose +1 movement or -1 Energy",
+      "effect_text": "Choose +1 movement or -1 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "CONFLICT",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-073",
+      "physical_copy_ids": [
+        "EV-026"
+      ],
+      "title": "Porta-Potty",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 4,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Stop; +2 Energy",
+      "effect_text": "Stop; +2 Energy",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-074",
+      "physical_copy_ids": [
+        "EV-027"
+      ],
+      "title": "Dog Escort",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 6,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "+1 movement",
+      "effect_text": "+1 movement",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-075",
+      "physical_copy_ids": [
+        "EV-028"
+      ],
+      "title": "Funny Sign",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 3,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-076",
+      "physical_copy_ids": [
+        "EV-029"
+      ],
+      "title": "Free Donut",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 2,
+      "printed_energy": 1,
+      "energy_source_status": "explicit standalone signed lightning value",
+      "source_effect_text": "+1 Energy",
+      "effect_text": null,
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode applies +1 Energy.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH",
+      "execution_status": [
+        "READY"
+      ],
+      "rules_review": null
+    },
+    {
+      "design_id": "RD-077",
+      "physical_copy_ids": [
+        "EV-030"
+      ],
+      "title": "Wrong Playlist",
+      "family": "Event",
+      "quantity": 1,
+      "effort": 5,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Change Pace one step",
+      "effect_text": "Change Pace one step",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Effort Mode available. Energy/Effect Mode unavailable because energy is null. Effect text is not executed.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply?"
+    },
+    {
+      "design_id": "RD-078",
+      "physical_copy_ids": [
+        "CO-001",
+        "CO-002"
+      ],
+      "title": "Cramp",
+      "family": "Condition",
+      "quantity": 2,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Push unavailable; Treat 4",
+      "effect_text": "Push unavailable; Treat 4",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-079",
+      "physical_copy_ids": [
+        "CO-003"
+      ],
+      "title": "Tight Calf",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Push costs +1 Energy; Treat 3",
+      "effect_text": "Push costs +1 Energy; Treat 3",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-080",
+      "physical_copy_ids": [
+        "CO-004"
+      ],
+      "title": "Dead Legs",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Race/Push -1 Effort; Treat 5",
+      "effect_text": "Race/Push -1 Effort; Treat 5",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-081",
+      "physical_copy_ids": [
+        "CO-005",
+        "CO-006"
+      ],
+      "title": "Blister",
+      "family": "Condition",
+      "quantity": 2,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Push costs +1 Energy; Treat 3",
+      "effect_text": "Push costs +1 Energy; Treat 3",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-082",
+      "physical_copy_ids": [
+        "CO-007",
+        "CO-008"
+      ],
+      "title": "Hot Spot",
+      "family": "Condition",
+      "quantity": 2,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Race/Push -1 Effort; Treat 2",
+      "effect_text": "Race/Push -1 Effort; Treat 2",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-083",
+      "physical_copy_ids": [
+        "CO-009"
+      ],
+      "title": "Sore Feet",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Concrete/Asphalt +1 Difficulty; Treat 4",
+      "effect_text": "Concrete/Asphalt +1 Difficulty; Treat 4",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-084",
+      "physical_copy_ids": [
+        "CO-010",
+        "CO-011"
+      ],
+      "title": "Dehydrated",
+      "family": "Condition",
+      "quantity": 2,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Steady/Race/Push +1 Energy; Water or Treat 5",
+      "effect_text": "Steady/Race/Push +1 Energy; Water or Treat 5",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-085",
+      "physical_copy_ids": [
+        "CO-012"
+      ],
+      "title": "Nausea",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Fuel gives -1 Energy; Treat 4",
+      "effect_text": "Fuel gives -1 Energy; Treat 4",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-086",
+      "physical_copy_ids": [
+        "CO-013"
+      ],
+      "title": "Stomach Trouble",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Fuel unavailable; Aid or Treat 5",
+      "effect_text": "Fuel unavailable; Aid or Treat 5",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-087",
+      "physical_copy_ids": [
+        "CO-014"
+      ],
+      "title": "Side Stitch",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Race/Push -1 Effort; Treat 3",
+      "effect_text": "Race/Push -1 Effort; Treat 3",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-088",
+      "physical_copy_ids": [
+        "CO-015"
+      ],
+      "title": "Twisted Ankle",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Maximum Pace: Steady; Aid or Treat 7",
+      "effect_text": "Maximum Pace: Steady; Aid or Treat 7",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    },
+    {
+      "design_id": "RD-089",
+      "physical_copy_ids": [
+        "CO-016"
+      ],
+      "title": "Heat Exhaustion",
+      "family": "Condition",
+      "quantity": 1,
+      "effort": null,
+      "printed_energy": null,
+      "energy_source_status": "missing from available source data",
+      "source_effect_text": "Maximum Pace: Easy; Aid or Treat 8",
+      "effect_text": "Maximum Pace: Easy; Aid or Treat 8",
+      "effect_semantics": null,
+      "current_structured_effect": {
+        "effect_type": null,
+        "effect_value": null,
+        "effect_target": null,
+        "effect_duration": null,
+        "effect_timing": null
+      },
+      "current_simulator_behavior": "Auto-places on draw and draws replacement; consequence/treatment not executed; simulator-only cap/overflow assumption applies.",
+      "source": [
+        "CARDS.docx (2026-08-28)",
+        "data/race_cards.json (Foundation v1)",
+        "2026-09-23/24 explicit anatomy and mode decisions"
+      ],
+      "source_confidence": "HIGH for Effort/text; MISSING for Energy",
+      "execution_status": [
+        "ENERGY MISSING",
+        "TEXT ONLY",
+        "PARTIAL",
+        "RULES REVIEW"
+      ],
+      "rules_review": "What signed Energy value is printed in the separate Energy field? What complete trigger, timing, target, duration, persistence, stacking, and removal semantics apply? How are consequence, treatment, stacking, duration, maximum-active, and overflow rules resolved?"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "seed": 20260924,
+  "player_count": 8,
+  "race_format": "marathon",
+  "starting_hand": 7,
+  "max_voluntary_plays": 2,
+  "exchange_limit": 3,
+  "starting_energy": 15,
+  "pace": {
+    "Easy": {
+      "modifier": 0,
+      "energy_cost": 0
+    },
+    "Steady": {
+      "modifier": 1,
+      "energy_cost": -1
+    },
+    "Race": {
+      "modifier": 2,
+      "energy_cost": -1
+    },
+    "Push": {
+      "modifier": 3,
+      "energy_cost": -2
+    }
+  },
+  "movement_model": "A",
+  "movement_formula_assumption": "total_effort + pace_modifier - current_difficulty",
+  "difficulty_transition_rule": "stop at each Difficulty boundary; carry positive excess Movement Result; adjust by new Difficulty minus previous Difficulty",
+  "condition_draw_rule": "no active-condition maximum; reveal/place immediately and continue replacement draw",
+  "deck_exhaustion_rule": "shuffle eligible discard into draw pile with seeded RNG; exclude every card still in play",
+  "gut_check_thresholds": {
+    "10": 25,
+    "18": 30,
+    "23": 35
+  },
+  "finish_resolution": "positive legal movement beyond 26.0/13.0 completes the 0.2/0.1 Finish extension; same-round tiebreak at Round End",
+  "milestone_resolution": "Water and Aid apply named Condition remedies; Gut Checks use Hand Effort",
+  "will_resolution": "single-use fallback for otherwise-legal unaffordable Pace",
+  "pack_resolution_assumption": "deterministic AI consents to the nearest legal same-Pace group at Round Start; Pack preserves 1 Pace Energy",
+  "effect_resolution": "mandatory Event effects execute by canonical timing and scope",
+  "energy_floor_assumption": 0,
+  "max_turns_per_runner": 400,
+  "training_slots": 2,
+  "gear_slots": 2
+}

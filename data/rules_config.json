@@ -1,0 +1,104 @@
+{
+  "schema_version": "2.0",
+  "gut_check": {
+    "method": "HAND_EFFORT",
+    "failure_energy": 2,
+    "marathon": {
+      "10": 25,
+      "18": 30,
+      "23": 35
+    },
+    "half": {
+      "6": 9,
+      "11": 11
+    },
+    "modifiers": {
+      "Strength Training": 1,
+      "Strength": 1,
+      "Mental Toughness": 2,
+      "Pace Band": 1
+    }
+  },
+  "condition_severity": {
+    "minimum": 0,
+    "penalties_active_when": "effective_severity > 0",
+    "numeric_effects": {
+      "Hot Spot": "Race/Push: -Effective Severity Effort",
+      "Side Stitch": "Race/Push: -Effective Severity Effort",
+      "Dead Legs": "Race/Push: -Effective Severity Effort",
+      "Sore Feet": "Concrete/Asphalt: +Effective Severity Difficulty"
+    },
+    "suppression": {
+      "Running Socks:Blister": 2,
+      "Compression:Cramp": 2,
+      "Recovery Sleeves:Tight Calf": 1
+    },
+    "remedies_set_current_to_zero": [
+      "Electrolytes:Dehydrated",
+      "Water:Dehydrated",
+      "Salt Tabs:Cramp",
+      "Aid:Stomach Trouble",
+      "Aid:Heat Exhaustion"
+    ],
+    "removal_exception": "Aid:Twisted Ankle"
+  },
+  "training_difficulty": {
+    "Hill Repeats": {
+      "Incline": -2,
+      "Steep Incline": -1
+    },
+    "Downhill Practice": {
+      "Descent": -2,
+      "Steep Descent": -1
+    }
+  },
+  "course_events": {
+    "Sudden Rain": {
+      "difficulty": 1,
+      "duration_rounds": 4,
+      "stacking": true
+    }
+  },
+  "deck_recycle": {
+    "enabled": true,
+    "rng": "seeded",
+    "source": "eligible_discard_only",
+    "exclude_in_play": true
+  },
+  "pre_race": {
+    "move_limit": 3,
+    "trade_cost_per_participant": 1,
+    "deck_exchange_cost": 1
+  },
+  "movement": {
+    "direct_movement_miles": 0.25,
+    "separate_from_base": true,
+    "boundary_uses_effective_difficulty": true
+  },
+  "preparation_slots": {
+    "training": 2,
+    "equipped_gear": 2,
+    "attached_gear_uses_normal_slot": false,
+    "equipped_footwear_limit": 1
+  },
+  "training_resistance_on_acquisition": {
+    "Long Run": {
+      "Dead Legs": 2
+    },
+    "Base Miles": {
+      "Dead Legs": 1,
+      "Tight Calf": 1
+    },
+    "Strength Training": {
+      "Cramp": 1,
+      "Tight Calf": 1
+    },
+    "Pacing Practice": {
+      "Side Stitch": 2
+    },
+    "Form Drills": {
+      "Hot Spot": 1,
+      "Sore Feet": 1
+    }
+  }
+}
