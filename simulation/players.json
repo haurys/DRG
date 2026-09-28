@@ -2,41 +2,41 @@
   {
     "player_id": "P1",
     "profile": "Balanced",
-    "description": "Balances Effort, Energy, and remaining distance."
+    "description": "Uses the shared finish-time objective with balanced secondary resource preferences."
   },
   {
     "player_id": "P2",
     "profile": "Aggressive",
-    "description": "Prefers Race/Push and high Effort while Energy permits."
+    "description": "Favors faster legal Pace at comparable forward progress."
   },
   {
     "player_id": "P3",
     "profile": "Energy Conservative",
-    "description": "Prefers Easy/Steady and recovery cards at low Energy."
+    "description": "Favors a small Energy reserve at comparable forward progress."
   },
   {
     "player_id": "P4",
     "profile": "Course Planner",
-    "description": "Reserves high Effort for difficult current/upcoming terrain."
+    "description": "Favors visible Course preparation when its future benefit repays current Movement cost."
   },
   {
     "player_id": "P5",
     "profile": "Pack Runner",
-    "description": "Prefers matching the nearest runner pace."
+    "description": "Favors legal Pack opportunities at comparable forward progress."
   },
   {
     "player_id": "P6",
     "profile": "Opportunist",
-    "description": "Prefers immediately useful recovery and strong Effort combinations."
+    "description": "Favors immediately useful Event Energy at comparable forward progress."
   },
   {
     "player_id": "P7",
     "profile": "Front Runner",
-    "description": "Prefers the fastest sustainable pace while leading or close to lead."
+    "description": "Favors faster legal Pace at comparable forward progress."
   },
   {
     "player_id": "P8",
     "profile": "Adaptive",
-    "description": "Weights Energy, position, difficulty, and distance remaining dynamically."
+    "description": "Uses the shared public-position and remaining-distance score."
   }
 ]
