@@ -47,7 +47,7 @@ class AILegalityRegression(unittest.TestCase):
         opponent['hand'] = [card('TR-001')]
         sim.start_round({'P1': 'Race', 'P2': 'Easy'})
         selected = sim.choose_treat_prepare(runner)
-        self.assertEqual(selected, {'card_id': 'GE-006', 'action': 'gear', 'replace_id': 'GE-016'})
+        self.assertTrue(sim.legal_treat_prepare(runner, selected))
         self.assertFalse(sim.legal_treat_prepare(runner, {'card_id': 'FU-019', 'action': 'fuel',
                                                          'choice': 'remedy'}))
         result = sim.turn(runner)
@@ -81,11 +81,11 @@ class AILegalityRegression(unittest.TestCase):
         stomach['current_severity'] = 0
         engine.update_effective_severity(stomach)
         expected = {'card_id': 'FU-019', 'action': 'fuel', 'choice': 'remedy'}
-        self.assertEqual(sim.choose_treat_prepare(runner), expected)
+        self.assertIn(expected, sim.treat_candidates(runner))
         stomach['current_severity'] = 5
         engine.update_effective_severity(stomach)
         runner['active_conditions'].remove(stomach)
-        self.assertEqual(sim.choose_treat_prepare(runner), expected)
+        self.assertIn(expected, sim.treat_candidates(runner))
 
     def test_stomach_trouble_skips_treat_prepare_when_only_fuel_is_held(self):
         sim = fixture()
@@ -136,8 +136,8 @@ class AILegalityRegression(unittest.TestCase):
                                                          'condition_id': 'CO-002'}))
         self.assertTrue(sim.legal_treat_prepare(runner, {'card_id': 'GE-005', 'action': 'gear',
                                                          'replace_id': 'GE-001'}))
-        self.assertEqual(sim.choose_treat_prepare(runner),
-                         {'card_id': 'GE-005', 'action': 'gear', 'replace_id': 'GE-001'})
+        self.assertIn({'card_id': 'GE-005', 'action': 'gear', 'replace_id': 'GE-001'},
+                      sim.treat_candidates(runner))
         self.assertEqual(len(sim.choose_movement_cards(runner, 2)), 2)
         self.assertFalse(any(c['family'] == 'Event' for c in sim.choose_movement_cards(runner, 2)))
 

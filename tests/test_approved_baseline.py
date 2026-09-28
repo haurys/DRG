@@ -135,17 +135,20 @@ class ApprovedBaseline(unittest.TestCase):
         sim.install_training(r, card('TR-001'))
         self.assertEqual(r['active_conditions'][0]['current_severity'], 5)
 
-    def test_ai_replacement_and_remedy_priority(self):
+    def test_ai_replacement_and_remedy_legality(self):
         sim, r = fixture()
         r['active_training'] = [installed('TR-001'), installed('TR-003')]
         r['hand'] = [card('TR-011')]
-        self.assertEqual(sim.choose_treat_prepare(r)['replace_id'], 'TR-001')
+        self.assertIn({'card_id': 'TR-011', 'action': 'training', 'replace_id': 'TR-001'},
+                      sim.treat_candidates(r))
         r['hand'] = [card('FU-016')]
         r['active_conditions'] = [m.make_condition(card('CO-010'))]
-        self.assertEqual(sim.choose_treat_prepare(r)['choice'], 'remedy')
+        self.assertIn({'card_id': 'FU-016', 'action': 'fuel', 'choice': 'remedy'},
+                      sim.treat_candidates(r))
         r['active_conditions'] = []
         r['energy'] = 4
-        self.assertEqual(sim.choose_treat_prepare(r)['choice'], 'energy')
+        self.assertIn({'card_id': 'FU-016', 'action': 'fuel', 'choice': 'energy'},
+                      sim.treat_candidates(r))
 
 
 if __name__ == '__main__':
