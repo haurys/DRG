@@ -1,6 +1,6 @@
 # DRG current Rules Review and playtest registers
 
-This register applies to the 2026-09-25 [canonical playtest rules](DRG-Canonical-Playtest-Rules.md). The original Phase 2A audit and earlier `rules/Rules-Review.md` are historical; questions explicitly answered by the current designer prompts are **closed/superseded**, not reopened. `RULES REVIEW` means no authoritative answer; `PLAYTEST VALUE` means a configurable numeric value is intentionally provisional; `BALANCE WATCH` means observe without changing.
+This register applies to the 2026-09-30 frozen Race Card [canonical playtest rules](DRG-Canonical-Playtest-Rules.md). The original Phase 2A audit and earlier `rules/Rules-Review.md` are historical; questions explicitly answered by the current designer prompts are **closed/superseded**, not reopened. `RULES REVIEW` means no authoritative answer; `PLAYTEST VALUE` means a configurable numeric value is intentionally provisional; `BALANCE WATCH` means observe without changing.
 
 ## Simulation-blocking source/data questions
 
@@ -17,9 +17,8 @@ This register applies to the 2026-09-25 [canonical playtest rules](DRG-Canonical
 
 ## PLAYTEST VALUES (configurable; do not rebalance here)
 
-- Porta-Potty maximum 0.5 mile; Dead Legs persistent for current playtest.
-- The frozen Movement Model A conversion and normal two-mile cap, Pace modifiers/costs, start/max Energy 15, Water +1, Aid +2, Pack preserve 1 are the current executable **playtest baselines**. Their numeric tuning is not made permanent by this document.
-- Deterministic AI valuation, trade offers, policy tie-breaks, and (if designer permits) deck recycling are simulation-policy assumptions, not hidden game rules. Never treat them as a source for canonical card semantics.
+- The frozen 108-card inventory and its Effort-band Energy costs, printed Effects, swaps, and Gut Check modifiers are authoritative for this pass.
+- Existing Movement Model A, normal two-mile cap, Pace costs, starting/max Energy 15, Pack preservation, Course and milestones are unchanged. Deterministic AI and RR-13 grouping remain simulator policies, not physical-card semantics.
 
 ## BALANCE WATCH (not defects)
 
@@ -27,4 +26,4 @@ Competitive marathon target ~25–35 rounds, center ~30; average effective movem
 
 ## Current implementation status
 
-The canonical data, configuration, engine rule path, and focused deterministic tests implement the resolved pre-simulation freeze. RR-11, RR-13, RR-16, and RR-17 remain non-blocking and require documented PLAYTEST ASSUMPTIONS when the single integrated marathon is run.
+The 2026-09-30 redesign supersedes old card text. RR-11, RR-13, RR-16, and RR-17 remain non-blocking where the redesign did not explicitly resolve them. No new simulation was run in this implementation pass.

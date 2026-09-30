@@ -63,7 +63,7 @@ class ApprovedBaseline(unittest.TestCase):
         self.assertEqual(sum(e['card']['title'] in m.FOOTWEAR for e in r['equipped_gear']), 1)
         self.assertIn('GE-001', [c['id'] for c in sim.discard])
 
-    def test_fuel_all_titles_one_recovery_and_choices(self):
+    def test_fuel_all_titles_two_recovery_and_choices(self):
         for cid in [c['id'] for c in CARDS.values() if c['family'] == 'Fuel']:
             with self.subTest(cid=cid):
                 sim, r = fixture()
@@ -71,10 +71,10 @@ class ApprovedBaseline(unittest.TestCase):
                 c = card(cid)
                 r['hand'] = [c]
                 plan = {'action': 'fuel', 'card_id': cid,
-                        'choice': 'energy' if c['title'] in ('Electrolytes', 'Salt Tabs') else None}
+                        'choice': 'energy' if c['title'] in ('Electrolytes', 'Salt Tabs', 'Banana', 'Water Bottle') else None}
                 self.assertTrue(sim.legal_treat_prepare(r, plan))
                 sim.resolve_treat_prepare(r, plan)
-                self.assertEqual(r['energy'], 5)
+                self.assertEqual(r['energy'], 6)
                 self.assertEqual(sim.discard[-1]['id'], cid)
         for cid, condition_id, title in [('FU-016', 'CO-010', 'Dehydrated'),
                                           ('FU-019', 'CO-001', 'Cramp')]:
@@ -98,14 +98,14 @@ class ApprovedBaseline(unittest.TestCase):
         r['energy'] = 4
         r['hand'] = [card('FU-001')]
         r['active_conditions'] = [m.make_condition(card('CO-012'))]
-        sim.resolve_treat_prepare(r, {'action': 'fuel', 'card_id': 'FU-001'})
-        self.assertEqual(r['energy'], 4)  # Nausea removes the one recovered Energy.
+        self.assertFalse(sim.legal_treat_prepare(r, {'action': 'fuel', 'card_id': 'FU-001'}))
+        with self.assertRaisesRegex(ValueError, 'illegal Treat/Prepare'):
+            sim.resolve_treat_prepare(r, {'action': 'fuel', 'card_id': 'FU-001'})
         r['hand'] = [card('FU-019')]
         r['active_conditions'] = [m.make_condition(card('CO-013'))]
-        self.assertFalse(sim.legal_treat_prepare(r, {'action': 'fuel', 'card_id': 'FU-019', 'choice': 'energy'}))
-        self.assertIsNone(sim.choose_treat_prepare(r))
+        self.assertTrue(sim.legal_treat_prepare(r, {'action': 'fuel', 'card_id': 'FU-019', 'choice': 'energy'}))
 
-    def test_acquisition_only_stacking_floor_and_no_rebound(self):
+    def test_acquisition_and_installation_reductions_floor_and_do_not_rebound(self):
         cases = [(['TR-001'], 'CO-004', 3), (['TR-003'], 'CO-004', 4),
                  (['TR-003'], 'CO-003', 2), (['TR-011'], 'CO-001', 3),
                  (['TR-011'], 'CO-003', 2), (['TR-013'], 'CO-014', 1),
@@ -133,7 +133,8 @@ class ApprovedBaseline(unittest.TestCase):
         sim, r = fixture()
         r['active_conditions'] = [m.make_condition(card('CO-004'))]
         sim.install_training(r, card('TR-001'))
-        self.assertEqual(r['active_conditions'][0]['current_severity'], 5)
+        self.assertEqual(r['active_conditions'][0]['current_severity'], 3)
+        self.assertTrue(any(e['type'] == 'CONDITION_SEVERITY_CHANGE' for e in sim.events))
 
     def test_ai_replacement_and_remedy_legality(self):
         sim, r = fixture()

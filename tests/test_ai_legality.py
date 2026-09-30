@@ -42,8 +42,8 @@ class AILegalityRegression(unittest.TestCase):
                                                'GE-013', 'FU-010', 'FU-019')]
         runner['equipped_gear'] = [{'card': card('GE-016'), 'remaining_turns': None},
                                    {'card': card('GE-002'), 'remaining_turns': None}]
-        runner['active_conditions'] = [condition('CO-013'), condition('CO-002'),
-                                       condition('CO-012')]
+        runner['active_conditions'] = [condition('CO-012'), condition('CO-002'),
+                                       condition('CO-011')]
         opponent['hand'] = [card('TR-001')]
         sim.start_round({'P1': 'Race', 'P2': 'Easy'})
         selected = sim.choose_treat_prepare(runner)
@@ -58,11 +58,11 @@ class AILegalityRegression(unittest.TestCase):
         self.assertIn('TURN_END', types)
         self.assertFalse(any(event['type'] == 'FUEL_USE' for event in sim.events))
 
-    def test_stomach_trouble_filters_every_fuel_treat_prepare_candidate(self):
+    def test_nausea_filters_every_fuel_treat_prepare_candidate(self):
         sim = fixture()
         runner = sim.runners[0]
         runner['energy'] = 5
-        runner['active_conditions'] = [condition('CO-013'), condition('CO-002'),
+        runner['active_conditions'] = [condition('CO-012'), condition('CO-002'),
                                        condition('CO-010')]
         for fuel in (c for c in CARDS.values() if c['family'] == 'Fuel'):
             with self.subTest(card=fuel['id']):
@@ -71,26 +71,26 @@ class AILegalityRegression(unittest.TestCase):
                                                                   'action': 'fuel'}))
                 self.assertIsNone(sim.choose_treat_prepare(runner))
 
-    def test_fuel_remedy_restored_when_stomach_trouble_removed_or_zero(self):
+    def test_fuel_remedy_restored_when_nausea_removed_or_zero(self):
         sim = fixture()
         runner = sim.runners[0]
-        stomach = condition('CO-013')
-        runner['active_conditions'] = [stomach, condition('CO-002')]
+        nausea = condition('CO-012')
+        runner['active_conditions'] = [nausea, condition('CO-002')]
         runner['hand'] = [card('FU-019')]
         self.assertIsNone(sim.choose_treat_prepare(runner))
-        stomach['current_severity'] = 0
-        engine.update_effective_severity(stomach)
+        nausea['current_severity'] = 0
+        engine.update_effective_severity(nausea)
         expected = {'card_id': 'FU-019', 'action': 'fuel', 'choice': 'remedy'}
         self.assertIn(expected, sim.treat_candidates(runner))
-        stomach['current_severity'] = 5
-        engine.update_effective_severity(stomach)
-        runner['active_conditions'].remove(stomach)
+        nausea['current_severity'] = 4
+        engine.update_effective_severity(nausea)
+        runner['active_conditions'].remove(nausea)
         self.assertIn(expected, sim.treat_candidates(runner))
 
-    def test_stomach_trouble_skips_treat_prepare_when_only_fuel_is_held(self):
+    def test_nausea_skips_treat_prepare_when_only_fuel_is_held(self):
         sim = fixture()
         runner = sim.runners[0]
-        runner['active_conditions'] = [condition('CO-013'), condition('CO-002')]
+        runner['active_conditions'] = [condition('CO-012'), condition('CO-002')]
         runner['hand'] = [card('FU-019')]
         sim.start_round({'P1': 'Race'})
         sim.turn(runner)
@@ -118,10 +118,11 @@ class AILegalityRegression(unittest.TestCase):
         target['staged_events'] = [{'card': card('EV-009'), 'source': 'P1',
                                     'target': 'P2', 'staged_round': 1, 'activate_round': 2}]
         self.assertIsNone(sim.event_target(source))
-        self.assertEqual([c['id'] for c in sim.choose_movement_cards(source, 2)], ['TR-001'])
+        self.assertFalse(any(any(c['id'] == 'EV-002' and c['use_mode'] == 'EFFECT' for c in pair)
+                             for pair in sim.movement_candidates(source, 2)))
         target['staged_events'] = []
-        self.assertEqual([c['id'] for c in sim.choose_movement_cards(source, 2)],
-                         ['EV-002', 'TR-001'])
+        self.assertTrue(any(any(c['id'] == 'EV-002' and c['use_mode'] == 'EFFECT' for c in pair)
+                            for pair in sim.movement_candidates(source, 2)))
 
     def test_attachment_slots_footwear_and_card_limits(self):
         sim = fixture()
@@ -141,7 +142,7 @@ class AILegalityRegression(unittest.TestCase):
         self.assertEqual(len(sim.choose_movement_cards(runner, 2)), 2)
         self.assertFalse(any(c['family'] == 'Event' for c in sim.choose_movement_cards(runner, 2)))
 
-    def test_event_budget_and_helpful_runner_full_hand_fallback(self):
+    def test_event_budget_and_helpful_runner_full_hand_is_eligible(self):
         sim = fixture(2)
         giver, recipient = sim.runners
         giver['hand'] = [card('EV-020'), card('EV-022'), card('TR-001')]
@@ -151,8 +152,11 @@ class AILegalityRegression(unittest.TestCase):
         self.assertLessEqual(len(selected), 2)
         self.assertLessEqual(sum(c['family'] == 'Event' for c in selected), 1)
         sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
-        sim.turn(giver, {'treat_prepare': None, 'movement_cards': ['EV-020']})
+        recipient['energy'] = 5
+        sim.turn(giver, {'treat_prepare': None, 'movement_cards': ['EV-020'],
+                         'card_modes': ['EFFECT']})
         self.assertEqual(len(recipient['hand']), 7)
+        self.assertEqual(recipient['energy'], 6)
         self.assertFalse(any(e['type'] == 'HELPFUL_RUNNER_TRANSFER' for e in sim.events))
         self.assertTrue(any(e['type'] == 'DISCARD' and e['payload']['card'] == 'EV-020'
                             for e in sim.events))

@@ -28,7 +28,7 @@ At each boundary stop and immediately recalculate Effective Difficulty. Complete
 | Marathon | 4, 8, 12, 16, 20, 24 | 8, 16, 24 | 10→25; 18→30; 23→35 (**PLAYTEST VALUES**) |
 | Half | 3, 6, 9 | 6 | 6→9; 11→11 |
 
-At a Gut Check, sum printed Effort on every Race card remaining in hand and add active Strength +1, Mental Toughness +2, and Pace Band +1. Committed Movement cards are absent; empty hand equals zero. No card is consumed. Pass at or above threshold; failure costs 2 Energy; continue remaining legal Movement.
+At a Gut Check, sum printed Effort on every Race card remaining in hand and add active Strength +1, Mental Toughness +3, and Pace Band +2. Committed Movement cards are absent; empty hand equals zero. No card is consumed. Pass at or above threshold; failure costs 2 Energy; continue remaining legal Movement.
 
 ## Finish
 

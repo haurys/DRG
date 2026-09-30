@@ -1,20 +1,116 @@
-# DRG Race cards — canonical playtest index
+# Race cards — frozen redesign
 
-This is the **current designer-rule inventory**, not a claim that the older engine JSON has been updated. Each family file holds the per-design/current effect and all known physical copy IDs. The legacy per-copy inventory [`data/Race-Cards.md`](data/Race-Cards.md) and [`data/race_cards.json`](data/race_cards.json) are **historical baseline only** where superseded. See [Superseded Rules](DRG-Superseded-Rules.md) and [Rules Review](DRG-Rules-Review.md).
+Exactly 108 physical IDs: Training 20, Gear 20, Fuel 22, Event 30, Condition 16.
 
-| Family | Copies | Current design count | Detailed current inventory |
-|---|---:|---:|---|
-| Training | 20 | 12 | [DRG-Training.md](DRG-Training.md), TR-001–020. |
-| Gear | 20 | 18 | [DRG-Gear.md](DRG-Gear.md): 15 surviving old IDs and 5 currently unassigned new designs. |
-| Fuel | 22 | 10 named families / 22 Effort variants | [DRG-Fuel.md](DRG-Fuel.md), FU-001–022. |
-| Event | 30 | 24 titles / 30 printed Effort variants | [DRG-Events.md](DRG-Events.md), EV-001–030. |
-| Condition | 16 | 12 | [DRG-Conditions.md](DRG-Conditions.md), CO-001–016. |
-| **Total** | **108** | — | Counts include every physical slot. |
+Movement cost: Effort 1–3 = 0; 4–6 = ⚡ (1); 7+ = ⚡⚡ (2). Condition cards print Severity, not Effort.
 
-Normal cards have family, title, printed Effort, a **separate** signed printed Energy field **where independently established**, and optional effect. An Energy gain/cost in effect text is not proof of a separate printed Energy symbol. Unknown Energy remains `null`/unknown, never zero. Training/Gear/Fuel in Movement use **only Effort**; in Treat/Prepare use only their installation/equip/consumption effect. Event in Movement uses **Effort and mandatory Effect**; Event does not enter Treat/Prepare and is limited to one per turn. Conditions have Base/Current/Effective **Severity**, no Effort; they activate when drawn, enter the active area, and prompt replacement draw. Source `CARDS.docx` did not provide a dedicated signed-Energy column; current Fuel/Event gain amounts are effect semantics unless separate printed fields are confirmed.
-
-Frozen replacements: GE-004 Cushioned Shoes E6; GE-007 Tempo Shoes E7; GE-011 Carbon Racers E8; GE-015 Lightweight Singlet E5; GE-017 Recovery Sleeves E5. Event replacements/clarifications: EV-014 Good Line E4; EV-017 Tough Decision E6 cycles up to two; EV-005 Sudden Rain lasts four rounds; EV-018 High Five uses Pack-or-self scope; EV-020 transfers itself with a next-round replay lock.
-
-Visual design decisions: Training Blue `#2878B5`; Gear Orange `#E87524`; Fuel Green `#3D9140`; Event Purple `#7553A6`; Condition Red `#C83C3C`; DRG logo black only; card titles preferably at most three words. Simple solid rounded monochrome-compatible family icons: approved Training shape rotated clockwise 90°, running-equipment-inspired Gear (not mechanical cog), single-droplet Fuel, rounded four-point-star Event, thick-plus Condition. No standard suit symbols. Race cards 2.5 × 3.5 inches portrait; Effort prominent and Energy visually separate; Condition large number means Severity, **not Effort**.
-
-Current physical Gear distribution of Running Shoes ×2, Hydration Belt ×2, and sixteen other designs ×1 **does** reconcile to 20. The five new Gear designs' Effort values and physical-copy IDs are not supplied. Do not repurpose superseded duplicate IDs without a mapping decision. Their absence blocks a fully executable 108-copy deck.
+| ID | Family | Title | Effort / Severity | Movement cost | Effect |
+|---|---|---|---:|---:|---|
+| TR-001 | Training | Long Run | 7 | ⚡⚡ (2) | ▶▶: No -⚡; Dead Legs: -2 |
+| TR-002 | Training | Long Run | 7 | ⚡⚡ (2) | ▶▶: No -⚡; Dead Legs: -2 |
+| TR-003 | Training | Base Miles | 6 | ⚡ (1) | ▷: +⚡; Dead Legs/Tight Calf: -1 |
+| TR-004 | Training | Negative Split | 8 | ⚡⚡ (2) | ▶▶: +⚡ |
+| TR-005 | Training | Tempo Run | 6 | ⚡ (1) | ▶: +⚡ |
+| TR-006 | Training | Tempo Run | 6 | ⚡ (1) | ▶: +⚡ |
+| TR-007 | Training | Intervals | 8 | ⚡⚡ (2) | ▶▶▶: +⚡ |
+| TR-008 | Training | Intervals | 8 | ⚡⚡ (2) | ▶▶▶: +⚡ |
+| TR-009 | Training | Hill Repeats | 7 | ⚡⚡ (2) | Incline: -2; Steep Incline: -1 |
+| TR-010 | Training | Hill Repeats | 7 | ⚡⚡ (2) | Incline: -2; Steep Incline: -1 |
+| TR-011 | Training | Strength Training | 5 | ⚡ (1) | Gut Check: +1; Cramp/Tight Calf: -1 |
+| TR-012 | Training | Strength Training | 5 | ⚡ (1) | Gut Check: +1; Cramp/Tight Calf: -1 |
+| TR-013 | Training | Pacing Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
+| TR-014 | Training | Pacing Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
+| TR-015 | Training | Trail Training | 5 | ⚡ (1) | Trail: +⚡ |
+| TR-016 | Training | Trail Training | 5 | ⚡ (1) | Trail: +⚡ |
+| TR-017 | Training | Form Drills | 4 | ⚡ (1) | Flat: +⚡; Hot Spot/Sore Feet: -1 |
+| TR-018 | Training | Downhill Practice | 5 | ⚡ (1) | Descent: -2; Steep Descent: -1 |
+| TR-019 | Training | Mental Toughness | 9 | ⚡⚡ (2) | Gut Check: +3 |
+| TR-020 | Training | Mental Toughness | 9 | ⚡⚡ (2) | Gut Check: +3 |
+| GE-001 | Gear | Running Shoes | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
+| GE-002 | Gear | Running Shoes | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
+| GE-003 | Gear | Running Socks | 4 | ⚡ (1) | Blister: -2 |
+| GE-004 | Gear | Cushioned Shoes | 6 | ⚡ (1) | ▶: +⚡ |
+| GE-005 | Gear | Trail Shoes | 7 | ⚡⚡ (2) | Trail: +⚡⚡ |
+| GE-006 | Gear | Running Cap | 5 | ⚡ (1) | No -⚡ for Heat/Rain |
+| GE-007 | Gear | Tempo Shoes | 7 | ⚡⚡ (2) | ▶/▶▶: +⚡ (5 Rounds) |
+| GE-008 | Gear | Tech Shirt | 4 | ⚡ (1) | No -⚡ for Cold/Heat |
+| GE-009 | Gear | Running Shorts | 5 | ⚡ (1) | ▶: +⚡ |
+| GE-010 | Gear | Sunglasses | 4 | ⚡ (1) | No -⚡ |
+| GE-011 | Gear | Carbon Racers | 8 | ⚡⚡ (2) | ▶▶/▶▶▶: +⚡⚡ (3 Rounds) |
+| GE-012 | Gear | Hydration Belt | 6 | ⚡ (1) | +⚡ |
+| GE-013 | Gear | Running Jacket | 6 | ⚡ (1) | No -⚡ for Cold/Rain/Wind |
+| GE-014 | Gear | Anti-Chafe | 5 | ⚡ (1) | Prevent Hot Spot |
+| GE-015 | Gear | Singlet | 5 | ⚡ (1) | No -⚡ Heat |
+| GE-016 | Gear | GPS Watch | 8 | ⚡⚡ (2) | +⚡ (2 Rounds) |
+| GE-017 | Gear | Recovery Sleeves | 5 | ⚡ (1) | Tight Calf: -1 |
+| GE-018 | Gear | Pace Band | 6 | ⚡ (1) | Gut Check: +2 |
+| GE-019 | Gear | Compression Sleeves | 5 | ⚡ (1) | Cramp: -2 |
+| GE-020 | Gear | Insoles | 6 | ⚡ (1) | Concrete: +⚡ |
+| FU-001 | Fuel | Energy Gel | 3 | — | +⚡⚡ |
+| FU-002 | Fuel | Energy Gel | 5 | ⚡ (1) | +⚡⚡ |
+| FU-003 | Fuel | Energy Gel | 7 | ⚡⚡ (2) | +⚡⚡ |
+| FU-004 | Fuel | Energy Chews | 4 | ⚡ (1) | +⚡⚡ |
+| FU-005 | Fuel | Energy Chews | 6 | ⚡ (1) | +⚡⚡ |
+| FU-006 | Fuel | Banana | 3 | — | +⚡⚡ or Tight Calf: -2 |
+| FU-007 | Fuel | Banana | 5 | ⚡ (1) | +⚡⚡ or Tight Calf: -2 |
+| FU-008 | Fuel | Snack Bar | 4 | ⚡ (1) | +⚡⚡ |
+| FU-009 | Fuel | Snack Bar | 7 | ⚡⚡ (2) | +⚡⚡ |
+| FU-010 | Fuel | Water Bottle | 2 | — | +⚡⚡ or Heat Exhaustion: -2 |
+| FU-011 | Fuel | Water Bottle | 4 | ⚡ (1) | +⚡⚡ or Heat Exhaustion: -2 |
+| FU-012 | Fuel | Water Bottle | 6 | ⚡ (1) | +⚡⚡ or Heat Exhaustion: -2 |
+| FU-013 | Fuel | Sports Drink | 3 | — | +⚡⚡ |
+| FU-014 | Fuel | Sports Drink | 5 | ⚡ (1) | +⚡⚡ |
+| FU-015 | Fuel | Sports Drink | 7 | ⚡⚡ (2) | +⚡⚡ |
+| FU-016 | Fuel | Electrolytes | 4 | ⚡ (1) | +⚡⚡ or Remedy Dehydrated |
+| FU-017 | Fuel | Electrolytes | 6 | ⚡ (1) | +⚡⚡ or Remedy Dehydrated |
+| FU-018 | Fuel | Electrolytes | 8 | ⚡⚡ (2) | +⚡⚡ or Remedy Dehydrated |
+| FU-019 | Fuel | Salt Tabs | 5 | ⚡ (1) | +⚡⚡ or Remedy Cramp |
+| FU-020 | Fuel | Salt Tabs | 7 | ⚡⚡ (2) | +⚡⚡ or Remedy Cramp |
+| FU-021 | Fuel | Orange Slice | 3 | — | +⚡⚡ |
+| FU-022 | Fuel | Gummy Bears | 8 | ⚡⚡ (2) | +⚡⚡ |
+| EV-001 | Event | Headwind | 5 | ⚡ (1) | Runner -→ |
+| EV-002 | Event | Headwind | 7 | ⚡⚡ (2) | Runner -→ |
+| EV-003 | Event | Tailwind | 4 | ⚡ (1) | +→ |
+| EV-004 | Event | Tailwind | 6 | ⚡ (1) | +→ |
+| EV-005 | Event | Sudden Rain | 5 | ⚡ (1) | Difficulty +1 (4 Rounds) |
+| EV-006 | Event | Hot Spell | 6 | ⚡ (1) | -⚡ (1 Round) |
+| EV-007 | Event | Cool Breeze | 4 | ⚡ (1) | +⚡ |
+| EV-008 | Event | Sun Break | 3 | — | +→ |
+| EV-009 | Event | Congestion | 4 | ⚡ (1) | -→ |
+| EV-010 | Event | Cold Snap | 6 | ⚡ (1) | -⚡ (1 Round) |
+| EV-011 | Event | Potholes | 5 | ⚡ (1) | Runner -→ or -⚡ |
+| EV-012 | Event | Potholes | 7 | ⚡⚡ (2) | Runner -→ or -⚡ |
+| EV-013 | Event | Clear Road | 7 | ⚡⚡ (2) | +→ |
+| EV-014 | Event | Good Line | 4 | ⚡ (1) | Ignore Difficulty |
+| EV-015 | Event | Crowd Support | 5 | ⚡ (1) | +⚡; Runner +⚡ |
+| EV-016 | Event | Crowd Support | 7 | ⚡⚡ (2) | +⚡; Runner +⚡ |
+| EV-017 | Event | Tough Decision | 6 | ⚡ (1) | Cycle 2 Cards |
+| EV-018 | Event | High Five | 3 | — | +⚡; Runner +⚡ |
+| EV-019 | Event | Friendly Rival | 7 | ⚡⚡ (2) | +→; Runner +→ |
+| EV-020 | Event | Helpful Runner | 5 | ⚡ (1) | Runner +⚡ |
+| EV-021 | Event | Second Wind | 8 | ⚡⚡ (2) | +⚡⚡⚡ |
+| EV-022 | Event | Second Wind | 9 | ⚡⚡ (2) | +⚡⚡⚡ |
+| EV-023 | Event | Perfect Rhythm | 10 | ⚡⚡ (2) | ++→ |
+| EV-024 | Event | Feeling Good | 6 | ⚡ (1) | +⚡⚡ |
+| EV-025 | Event | Wild Goose Chase | 8 | ⚡⚡ (2) | Runner -→ or -⚡ |
+| EV-026 | Event | Porta-Potty | 4 | ⚡ (1) | -→; +⚡⚡ |
+| EV-027 | Event | Dog Escort | 6 | ⚡ (1) | +→ |
+| EV-028 | Event | Funny Sign | 3 | — | +⚡ |
+| EV-029 | Event | Free Donut | 2 | — | +⚡ |
+| EV-030 | Event | Untied Lace | 5 | ⚡ (1) | Runner -→; No Pack (1 Round) |
+| CO-001 | Condition | Cramp | 4 | — | No ▶▶▶ |
+| CO-002 | Condition | Cramp | 4 | — | No ▶▶▶ |
+| CO-003 | Condition | Tight Calf | 3 | — | ▶▶▶: -⚡ |
+| CO-004 | Condition | Dead Legs | 5 | — | ▶▶/▶▶▶: -→ |
+| CO-005 | Condition | Blister | 3 | — | ▶▶▶: -⚡ |
+| CO-006 | Condition | Blister | 3 | — | ▶▶▶: -⚡ |
+| CO-007 | Condition | Hot Spot | 2 | — | ▶▶/▶▶▶: -→ |
+| CO-008 | Condition | Hot Spot | 2 | — | ▶▶/▶▶▶: -→ |
+| CO-009 | Condition | Sore Feet | 4 | — | Concrete/Asphalt: +2 |
+| CO-010 | Condition | Dehydrated | 5 | — | ▶/▶▶/▶▶▶: -⚡ |
+| CO-011 | Condition | Cold Chills | 5 | — | ▶▶/▶▶▶: -⚡ |
+| CO-012 | Condition | Nausea | 4 | — | No Fuel Allowed |
+| CO-013 | Condition | Gashed Knee | 5 | — | -→ |
+| CO-014 | Condition | Side Stitch | 3 | — | ▶▶/▶▶▶: -→ |
+| CO-015 | Condition | Twisted Ankle | 7 | — | Max ▶ |
+| CO-016 | Condition | Heat Exhaustion | 8 | — | Max ▷ |

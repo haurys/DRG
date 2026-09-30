@@ -51,7 +51,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         second['hand'] = [card('TR-001')]
         sim.start_round({'P1': 'Push', 'P2': 'Push'})
         result = sim.turn(first, {'treat_prepare': {'card_id': 'TR-009', 'action': 'training'},
-                                  'movement_cards': ['EV-003']})
+                                  'movement_cards': ['EV-003'], 'card_modes': ['EFFECT']})
         payment = event_payloads(sim, 'PACE_PAYMENT', 'P1')[-1]
         boundary = event_payloads(sim, 'MOVE_BOUNDARY', 'P1')[-1]
         self.assertIn('Pack', payment['preservation_sources'])
@@ -79,14 +79,14 @@ class IntegratedRaceLoop(unittest.TestCase):
         runner = sim.runners[0]
         runner['equipped_gear'] = [{'card': card('GE-008'), 'remaining_turns': 4},
                                    {'card': card('GE-012'), 'remaining_turns': None}]
-        sim.round = 2
+        sim.round = 1
         sim.global_events = [{'card': card('EV-006'), 'source': 'P1', 'staged_round': 1,
                               'activate_round': 2, 'expiry_round': 2}]
-        cost = sim.pace_cost(runner, 'Push')
-        self.assertEqual(cost['global_extra'], 1)
-        self.assertEqual(cost['heat_preservation_sources'], ['Tech Shirt'])
-        self.assertEqual(cost['final'], 2)
         runner['energy'] = 5
+        sim.start_round({'P1': 'Push'})
+        self.assertEqual(runner['energy'], 5)
+        self.assertEqual(event_payloads(sim, 'GLOBAL_WEATHER', 'P1')[-1]['protected_by'], 'Tech Shirt')
+        self.assertEqual(sim.pace_cost(runner, 'Push')['final'], 2)
         sim.resolve_milestones(runner, 15, 16)
         self.assertEqual(runner['energy'], 6)
 
@@ -124,7 +124,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         self.assertEqual(blister['effective_severity'], 1)
         self.assertEqual(event_payloads(sim, 'GEAR_RELOCATE', 'P1')[-1]['card_play_budget'], 0)
 
-    def test_fuel_remedy_and_effort_treatment_execute_in_turn_path(self):
+    def test_fuel_remedy_and_training_install_reduction_execute_in_turn_path(self):
         sim = make_sim(1)
         runner = sim.runners[0]
         dehydrated = m.make_condition(card('CO-010'))
@@ -135,7 +135,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         sim.turn(runner, {'treat_prepare': {'card_id': 'FU-016', 'action': 'fuel', 'choice': 'remedy'},
                           'movement_cards': ['TR-001']})
         self.assertIsNone(sim.condition_by_title(runner, 'Dehydrated'))
-        self.assertEqual(runner['energy'], 5)
+        self.assertEqual(runner['energy'], 3)  # E7 Movement card costs 2 after remedy.
 
         second = make_sim(1)
         target = second.runners[0]
@@ -143,10 +143,13 @@ class IntegratedRaceLoop(unittest.TestCase):
         target['active_conditions'] = [cramp]
         target['hand'] = [card('TR-011'), card('TR-001')]
         second.start_round({'P1': 'Race'})
-        second.turn(target, {'treat_prepare': {'card_id': 'TR-011', 'action': 'treat',
-                                               'condition_id': 'CO-001'},
+        self.assertFalse(second.legal_treat_prepare(target, {'card_id': 'TR-011', 'action': 'treat',
+                                                             'condition_id': 'CO-001'}))
+        second.turn(target, {'treat_prepare': {'card_id': 'TR-011', 'action': 'training',
+                                               'replace_id': None},
                              'movement_cards': ['TR-001']})
-        self.assertIsNone(second.condition_by_title(target, 'Cramp'))
+        self.assertEqual(second.condition_by_title(target, 'Cramp')['current_severity'],
+                         max(0, cramp['base_severity'] - 1))
 
     def test_gut_check_uses_live_hand_training_and_gear(self):
         sim = make_sim(1)
@@ -161,8 +164,8 @@ class IntegratedRaceLoop(unittest.TestCase):
         check = [payload['gut_check'] for payload in event_payloads(sim, 'MILESTONE', 'P1')
                  if payload['kind'] == 'Gut Check'][0]
         self.assertEqual(check['hand_effort'], 22)
-        self.assertEqual(check['modifiers'], 3)
-        self.assertEqual(check['total'], 25)
+        self.assertEqual(check['modifiers'], 5)
+        self.assertEqual(check['total'], 27)
         self.assertTrue(check['passed'])
 
     def test_all_events_have_integrated_coverage_classification(self):
@@ -170,11 +173,13 @@ class IntegratedRaceLoop(unittest.TestCase):
         sim = make_sim(1)
         runner = sim.runners[0]
         runner['pace'] = 'Race'
-        self.assertEqual(sim.event_current_effects(runner, [card('EV-003')])[1], 1)
-        self.assertEqual(sim.event_current_effects(runner, [card('EV-008')])[0], 1)
-        self.assertEqual(sim.event_current_effects(runner, [card('EV-019')])[0], 1)
-        self.assertTrue(sim.event_current_effects(runner, [card('EV-014')])[2])
-        self.assertEqual(sim.event_current_effects(runner, [card('EV-026')])[3], 2)
+        effects = lambda cid: sim.event_current_effects(runner, [{**card(cid), 'use_mode': 'EFFECT'}])
+        self.assertEqual(effects('EV-003')[1], 1)
+        self.assertEqual(effects('EV-008')[1], 1)
+        self.assertEqual(effects('EV-019')[1], 1)
+        self.assertTrue(effects('EV-014')[2])
+        self.assertEqual(effects('EV-026')[1], -1)
+        self.assertEqual(sim.event_current_effects(runner, [card('EV-003')])[1], 0)
         self.assertEqual(set(m.AFTER_ENERGY), {'EV-007', 'EV-015', 'EV-016', 'EV-021', 'EV-022',
                                                'EV-024', 'EV-028', 'EV-029'})
 
@@ -184,52 +189,65 @@ class IntegratedRaceLoop(unittest.TestCase):
         first['hand'] = [card('EV-001')]
         second['hand'] = [card('TR-001')]
         staged.start_round({'P1': 'Easy', 'P2': 'Easy'})
-        staged.turn(first, {'treat_prepare': None, 'movement_cards': ['EV-001'], 'event_target': 'P2'})
+        staged.turn(first, {'treat_prepare': None, 'movement_cards': ['EV-001'],
+                            'card_modes': ['EFFECT'], 'event_target': 'P2'})
         self.assertEqual(second['staged_events'][0]['card']['id'], 'EV-001')
         staged.end_round()
         staged.start_round({'P1': 'Race', 'P2': 'Race'})
         staged.turn(second, {'treat_prepare': None, 'movement_cards': ['TR-001']})
-        self.assertEqual(event_payloads(staged, 'MOVE', 'P2')[-1]['event_effort_bonus'], -1)
+        self.assertEqual(event_payloads(staged, 'MOVE', 'P2')[-1]['direct_requested'], -1)
         self.assertFalse(second['staged_events'])
 
         course = make_sim(1)
         course.runners[0]['hand'] = [card('EV-005')]
         course.start_round({'P1': 'Easy'})
-        course.turn(course.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-005']})
+        course.turn(course.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-005'],
+                                        'card_modes': ['EFFECT']})
         self.assertEqual(course.course_events[0]['remaining_duration'], 4)
 
         global_sim = make_sim(1)
         global_sim.runners[0]['hand'] = [card('EV-006')]
         global_sim.start_round({'P1': 'Easy'})
-        global_sim.turn(global_sim.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-006']})
+        global_sim.turn(global_sim.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-006'],
+                                                'card_modes': ['EFFECT']})
         global_sim.end_round()
         global_sim.start_round({'P1': 'Push'})
-        self.assertEqual(global_sim.pace_cost(global_sim.runners[0], 'Push')['global_extra'], 1)
+        self.assertEqual(global_sim.runners[0]['energy'], 14)
+        self.assertEqual(event_payloads(global_sim, 'GLOBAL_WEATHER', 'P1')[-1]['actual_loss'], 1)
+        self.assertEqual(global_sim.pace_cost(global_sim.runners[0], 'Push')['final'], 2)
 
         after = make_sim(2)
         after.runners[0]['energy'] = 5
         after.runners[0]['hand'] = [card('EV-007')]
         after.start_round({'P1': 'Easy', 'P2': 'Easy'})
-        after.turn(after.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-007']})
+        after.turn(after.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-007'],
+                                      'card_modes': ['EFFECT']})
         self.assertEqual(after.runners[0]['energy'], 6)
+        self.assertLess(next(e['sequence'] for e in after.events
+                             if e['type'] == 'ENERGY_CHANGE' and e['payload']['source'] == 'Cool Breeze'),
+                        next(e['sequence'] for e in after.events if e['type'] == 'MOVE'))
 
         transfer = make_sim(2)
         transfer.runners[0]['energy'] = 5
+        transfer.runners[1]['energy'] = 5
         transfer.runners[0]['hand'] = [card('EV-020')]
         transfer.start_round({'P1': 'Easy', 'P2': 'Easy'})
-        transfer.turn(transfer.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-020']})
-        received = next(item for item in transfer.runners[1]['hand'] if item['id'] == 'EV-020')
-        self.assertEqual(received['earliest_replay_round'], 2)
-        self.assertEqual(transfer.runners[0]['energy'], 6)
+        transfer.turn(transfer.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-020'],
+                                            'card_modes': ['EFFECT']})
+        self.assertFalse(any(item['id'] == 'EV-020' for item in transfer.runners[1]['hand']))
+        self.assertIn('EV-020', [item['id'] for item in transfer.discard])
+        self.assertEqual(transfer.runners[0]['energy'], 5)
+        self.assertEqual(transfer.runners[1]['energy'], 6)
 
-    def test_high_five_uses_pack_snapshot_and_round_end_award(self):
+    def test_high_five_uses_pack_snapshot_and_immediate_award(self):
         sim = make_sim(2)
         for runner in sim.runners:
             runner['energy'] = 5
         sim.runners[0]['hand'] = [card('EV-018')]
         sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
-        sim.turn(sim.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-018']})
-        self.assertEqual([runner['energy'] for runner in sim.runners], [5, 5])
+        sim.turn(sim.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-018'],
+                                  'card_modes': ['EFFECT']})
+        self.assertEqual([runner['energy'] for runner in sim.runners], [6, 6])
         sim.end_round()
         self.assertEqual([runner['energy'] for runner in sim.runners], [6, 6])
 

@@ -12,40 +12,39 @@ GUT_CHECK_THRESHOLDS = {'marathon': {10: 25, 18: 30, 23: 35}, 'half': {6: 9, 11:
 CONDITION_DEFS = {
     'Cramp': (4, False), 'Tight Calf': (3, True), 'Dead Legs': (5, True),
     'Blister': (3, True), 'Hot Spot': (2, True), 'Sore Feet': (4, True),
-    'Dehydrated': (5, False), 'Nausea': (4, False), 'Stomach Trouble': (5, False),
+    'Dehydrated': (5, False), 'Nausea': (4, False), 'Gashed Knee': (5, False),
     'Side Stitch': (3, False), 'Twisted Ankle': (7, True), 'Heat Exhaustion': (8, False),
+    'Cold Chills': (5, False),
 }
-TRAINING_DURATION = {'Negative Split': 3, 'Intervals': 3}
-GEAR_DURATION = {'Tempo Shoes': 5, 'Carbon Racers': 3, 'Tech Shirt': 4,
-                 'Anti-Chafe': 4, 'Lightweight Singlet': 5}
+TRAINING_DURATION = {}
+GEAR_DURATION = {'Tempo Shoes': 5, 'Carbon Racers': 3, 'GPS Watch': 2}
 FOOTWEAR = {'Running Shoes', 'Cushioned Shoes', 'Trail Shoes', 'Tempo Shoes', 'Carbon Racers'}
 ATTACHMENT = {'Running Socks': ('Blister', 2), 'Compression Sleeves': ('Cramp', 2),
-              'Compression': ('Cramp', 2), 'Recovery Sleeves': ('Tight Calf', 1)}
+              'Recovery Sleeves': ('Tight Calf', 1)}
 TRAINING_RESISTANCE = {
     'Long Run': {'Dead Legs': 2},
     'Base Miles': {'Dead Legs': 1, 'Tight Calf': 1},
     'Strength Training': {'Cramp': 1, 'Tight Calf': 1},
-    'Strength': {'Cramp': 1, 'Tight Calf': 1},
     'Pacing Practice': {'Side Stitch': 2},
     'Form Drills': {'Hot Spot': 1, 'Sore Feet': 1},
 }
-OTHER_EVENTS = {'EV-001', 'EV-002', 'EV-009', 'EV-010', 'EV-011', 'EV-012', 'EV-025', 'EV-030'}
-DIRECT_PLUS = {'EV-003', 'EV-004', 'EV-013', 'EV-027'}
+OTHER_EVENTS = {'EV-001', 'EV-002', 'EV-011', 'EV-012', 'EV-019', 'EV-025', 'EV-030'}
+DIRECT_PLUS = {'EV-003', 'EV-004', 'EV-008', 'EV-013', 'EV-019', 'EV-023', 'EV-027'}
 AFTER_ENERGY = {'EV-007': 1, 'EV-015': 1, 'EV-016': 1, 'EV-021': 3, 'EV-022': 3,
                 'EV-024': 2, 'EV-028': 1, 'EV-029': 1}
 EVENT_COVERAGE = {
     'EV-001': 'NEXT_ROUND_OTHER', 'EV-002': 'NEXT_ROUND_OTHER',
     'EV-003': 'CURRENT_DIRECT', 'EV-004': 'CURRENT_DIRECT', 'EV-005': 'COURSE',
-    'EV-006': 'GLOBAL_NEXT_ROUND', 'EV-007': 'AFTER_ENERGY', 'EV-008': 'CURRENT_EFFORT',
-    'EV-009': 'NEXT_ROUND_OTHER', 'EV-010': 'NEXT_ROUND_OTHER',
+    'EV-006': 'SELF_NEXT_ROUND', 'EV-007': 'ENERGY_GAIN', 'EV-008': 'CURRENT_DIRECT',
+    'EV-009': 'CURRENT_DIRECT_LOSS', 'EV-010': 'SELF_NEXT_ROUND',
     'EV-011': 'NEXT_ROUND_OTHER_CHOICE', 'EV-012': 'NEXT_ROUND_OTHER_CHOICE',
     'EV-013': 'CURRENT_DIRECT', 'EV-014': 'CURRENT_IGNORE_DIFFICULTY',
-    'EV-015': 'AFTER_ENERGY', 'EV-016': 'AFTER_ENERGY', 'EV-017': 'AFTER_CYCLE',
-    'EV-018': 'AFTER_PACK_ENERGY', 'EV-019': 'CURRENT_EFFORT',
-    'EV-020': 'AFTER_TRANSFER', 'EV-021': 'AFTER_ENERGY', 'EV-022': 'AFTER_ENERGY',
-    'EV-023': 'PRINTED_EFFORT_ONLY', 'EV-024': 'AFTER_ENERGY',
-    'EV-025': 'NEXT_ROUND_OTHER', 'EV-026': 'CURRENT_CAP_AFTER_ENERGY',
-    'EV-027': 'CURRENT_DIRECT', 'EV-028': 'AFTER_ENERGY', 'EV-029': 'AFTER_ENERGY',
+    'EV-015': 'IMMEDIATE_ENERGY_SELF_OTHER', 'EV-016': 'IMMEDIATE_ENERGY_SELF_OTHER', 'EV-017': 'AFTER_CYCLE',
+    'EV-018': 'IMMEDIATE_PACK_ENERGY', 'EV-019': 'CURRENT_DIRECT_OTHER',
+    'EV-020': 'OTHER_ENERGY', 'EV-021': 'ENERGY_GAIN', 'EV-022': 'ENERGY_GAIN',
+    'EV-023': 'CURRENT_DIRECT', 'EV-024': 'IMMEDIATE_ENERGY',
+    'EV-025': 'NEXT_ROUND_OTHER', 'EV-026': 'CURRENT_DIRECT_ENERGY_GAIN',
+    'EV-027': 'CURRENT_DIRECT', 'EV-028': 'IMMEDIATE_ENERGY', 'EV-029': 'IMMEDIATE_ENERGY',
     'EV-030': 'NEXT_ROUND_OTHER',
 }
 
@@ -67,12 +66,30 @@ def movement(result):
     return (result + 1) // 2
 
 
+def movement_energy_cost(card):
+    """The physical card's printed expenditure applies only to Movement use."""
+    effort = card.get('effort')
+    if effort is None:
+        raise ValueError('Condition cannot be used for Movement')
+    return 0 if effort <= 3 else 1 if effort <= 6 else 2
+
+
+def card_effort(card):
+    return (card.get('effort') or 0) if card.get('use_mode', 'MOVEMENT') == 'MOVEMENT' else 0
+
+
+def active_effect_cards(cards):
+    return [card for card in cards if card.get('use_mode', 'MOVEMENT') == 'EFFECT']
+
+
 def calculate_total_effort(cards, modes):
-    return sum((card.get('effort') or 0) for card, mode in zip(cards, modes) if mode == 'EFFORT')
+    return sum((card.get('effort') or 0) for card, mode in zip(cards, modes)
+               if mode in ('MOVEMENT', 'EFFORT'))
 
 
 def make_condition(card):
     base, persistent = CONDITION_DEFS[card['title']]
+    assert card.get('severity') == base and card.get('effort') is None
     return {'id': card['id'], 'title': card['title'], 'base_severity': base,
             'current_severity': base, 'suppression': 0, 'effective_severity': base,
             'persistent': persistent, 'attachments': []}
@@ -89,10 +106,13 @@ def set_suppression(condition, amount):
 
 
 def apply_remedy(condition, remedy):
-    if condition['title'] == 'Twisted Ankle' and remedy == 'Aid':
-        return None
+    if remedy == 'Aid' and condition['title'] in ('Twisted Ankle', 'Heat Exhaustion'):
+        condition['current_severity'] = max(0, condition['current_severity'] -
+                                            (3 if condition['title'] == 'Twisted Ankle' else 4))
+        update_effective_severity(condition)
+        return condition if condition['persistent'] or condition['current_severity'] else None
     allowed = {('Dehydrated', 'Electrolytes'), ('Dehydrated', 'Water'), ('Cramp', 'Salt Tabs'),
-               ('Stomach Trouble', 'Aid'), ('Heat Exhaustion', 'Aid')}
+               ('Nausea', 'Aid'), ('Gashed Knee', 'Aid')}
     if (condition['title'], remedy) not in allowed:
         return condition
     condition['current_severity'] = 0
@@ -103,28 +123,30 @@ def apply_remedy(condition, remedy):
 def condition_effects(condition, pace=None, surface=None):
     severity = condition.get('effective_severity', 0)
     title = condition['title']
-    result = {'effort_penalty': 0, 'difficulty_penalty': 0, 'extra_energy': 0,
+    result = {'effort_penalty': 0, 'difficulty_penalty': 0, 'direct_movement': 0, 'extra_energy': 0,
               'max_pace': None, 'push_available': True, 'fuel_available': True,
               'fuel_energy_penalty': 0}
     if severity <= 0:
         return result
     if title in ('Hot Spot', 'Side Stitch', 'Dead Legs') and pace in ('Race', 'Push'):
-        result['effort_penalty'] = severity
+        result['direct_movement'] = -1
+    if title == 'Gashed Knee':
+        result['direct_movement'] = -1
     if title == 'Sore Feet' and surface in ('Concrete', 'Asphalt'):
-        result['difficulty_penalty'] = severity
+        result['difficulty_penalty'] = 2
     if title == 'Cramp':
         result['push_available'] = False
     if title in ('Tight Calf', 'Blister') and pace == 'Push':
         result['extra_energy'] = 1
     if title == 'Dehydrated' and pace in ('Steady', 'Race', 'Push'):
         result['extra_energy'] = 1
+    if title == 'Cold Chills' and pace in ('Race', 'Push'):
+        result['extra_energy'] = 1
     if title == 'Twisted Ankle':
         result['max_pace'] = 'Steady'
     if title == 'Heat Exhaustion':
         result['max_pace'] = 'Easy'
     if title == 'Nausea':
-        result['fuel_energy_penalty'] = 1
-    if title == 'Stomach Trouble':
         result['fuel_available'] = False
     return result
 
@@ -136,7 +158,7 @@ def anti_chafe_prevents(title, active):
 def training_difficulty_reduction(title, elevation):
     if title == 'Hill Repeats':
         return {'Incline': 2, 'Steep Incline': 1}.get(elevation, 0)
-    if title in ('Downhill Practice', 'Downhill Training'):
+    if title == 'Downhill Practice':
         return {'Descent': 2, 'Steep Descent': 1}.get(elevation, 0)
     return 0
 
@@ -150,13 +172,17 @@ def effective_difficulty(segment, conditions=(), training=(), course_bonus=0):
 def gut_check(hand, active_training=(), active_gear=(), threshold=0):
     cards = [card for card in hand if card.get('family') != 'Condition']
     hand_effort = sum(card.get('effort') or 0 for card in cards)
-    modifiers = ((1 if 'Strength Training' in active_training or 'Strength' in active_training else 0)
-                 + (2 if 'Mental Toughness' in active_training else 0)
-                 + (1 if 'Pace Band' in active_gear else 0))
+    modifier_sources = ([{'card': title, 'value': value} for title in active_training
+                         for name, value in (('Strength Training', 1), ('Mental Toughness', 3))
+                         if title == name]
+                        + [{'card': 'Pace Band', 'value': 2} for title in active_gear
+                           if title == 'Pace Band'])
+    modifiers = sum(source['value'] for source in modifier_sources)
     total = hand_effort + modifiers
     return {'cards': [{'id': card['id'], 'title': card['title'], 'effort': card.get('effort') or 0}
                       for card in cards],
-            'hand_effort': hand_effort, 'modifiers': modifiers, 'total': total,
+            'hand_effort': hand_effort, 'modifiers': modifiers,
+            'modifier_sources': modifier_sources, 'total': total,
             'threshold': threshold, 'passed': total >= threshold,
             'energy_loss': 0 if total >= threshold else 2}
 
@@ -183,27 +209,6 @@ def tick_course_events(events):
 def course_event_bonus(events, mile):
     return sum(event['difficulty_bonus'] for event in events
                if event['affected_mile'] == mile and event['remaining_duration'] > 0)
-
-
-def high_five_beneficiaries(player_id, pack_members):
-    return list(pack_members) if player_id in pack_members and len(pack_members) > 1 else [player_id]
-
-
-def transfer_helpful_runner(card, owner, recipient, round_number):
-    if len(recipient['hand']) >= 7:
-        return False
-    if card in owner['hand']:
-        owner['hand'].remove(card)
-    recipient['hand'].append(card)
-    owner['energy'] = min(15, owner['energy'] + 1)
-    card['transfer_round'] = round_number
-    card['earliest_replay_round'] = round_number + 1
-    card['owner'] = recipient['player_id']
-    return True
-
-
-def helpful_runner_playable(card, round_number):
-    return round_number >= card.get('earliest_replay_round', 0)
 
 
 def apply_trade(a, b, card_a, card_b, limit=3):
@@ -310,7 +315,7 @@ class Sim:
         self.profiles = load_json(root / 'simulation/players.json')
         self.draw, self.discard, self.course, self.runners = [], [], [], []
         self.finish, self.pending_finishers, self.turn_records = [], [], []
-        self.course_events, self.global_events, self.pending_energy_awards = [], [], []
+        self.course_events, self.global_events = [], []
         self.deck_audit, self.round_pack_snapshot = [], {}
         self.ai_rationale_enabled = True
         self.ai_decisions = []
@@ -327,7 +332,9 @@ class Sim:
         return next(card for card in self.cards if card['id'] == card_id)
 
     def cardview(self, card):
-        return {key: card.get(key) for key in ['id', 'title', 'family', 'effort', 'energy', 'effect_text']}
+        return {key: card.get(key) for key in ['id', 'title', 'family', 'effort', 'severity',
+                                               'movement_energy_cost', 'movement_energy_icon',
+                                               'energy', 'effect_text']}
 
     def build_course(self):
         by_card = {}
@@ -523,7 +530,7 @@ class Sim:
                 runner['attached_gear'].remove(item)
                 item['condition_id'] = None
                 item['amount'] = 0
-                if len(runner['equipped_gear']) < 3 and not (
+                if len(runner['equipped_gear']) < self.cfg['gear_slots'] and not (
                         item['card']['title'] in FOOTWEAR and
                         any(entry['card']['title'] in FOOTWEAR for entry in runner['equipped_gear'])):
                     runner['equipped_gear'].append(item)
@@ -559,6 +566,20 @@ class Sim:
         self.emit('TRAINING_INSTALL', runner['player_id'], {'card': card['id'],
                   'remaining_turns': entry['remaining_turns'],
                   'replaced': replaced['card']['id'] if replaced else None})
+        options = TRAINING_RESISTANCE.get(card['title'], {})
+        matching = [condition for condition in runner['active_conditions']
+                    if condition['title'] in options and condition['current_severity'] > 0]
+        if matching:
+            target = max(matching, key=lambda condition: (condition['effective_severity'], condition['id']))
+            before = target['current_severity']
+            target['current_severity'] = max(0, before - options[target['title']])
+            update_effective_severity(target)
+            self.emit('CONDITION_SEVERITY_CHANGE', runner['player_id'], {'source': card['id'],
+                      'condition': target['id'], 'current_before': before,
+                      'current_after': target['current_severity'],
+                      'effective_after': target['effective_severity']})
+            if target['current_severity'] == 0 and not target['persistent']:
+                self.discard_condition(runner, target, 'Training installation reduction')
 
     def equip_gear(self, runner, card, replace_id=None):
         replaced = None
@@ -630,12 +651,10 @@ class Sim:
     def use_fuel(self, runner, card, choice=None):
         if not self.fuel_available(runner):
             return False
-        effects = [condition_effects(condition) for condition in runner['active_conditions']]
         title = card['title']
-        if title in ('Electrolytes', 'Salt Tabs') and choice not in ('energy', 'remedy'):
+        if title in ('Electrolytes', 'Salt Tabs', 'Banana', 'Water Bottle') and choice not in ('energy', 'remedy', 'severity'):
             raise ValueError('Fuel choice required')
-        recovery = (card.get('energy') or 0) if choice != 'remedy' else 0
-        recovery = max(0, recovery - max((effect['fuel_energy_penalty'] for effect in effects), default=0))
+        recovery = (card.get('energy') or 0) if choice in (None, 'energy') else 0
         old = runner['energy']
         runner['energy'] = min(15, runner['energy'] + recovery)
         if title == 'Electrolytes' and choice == 'remedy':
@@ -646,8 +665,13 @@ class Sim:
             condition = self.condition_by_title(runner, 'Cramp')
             if condition:
                 self.named_remedy(runner, condition, 'Salt Tabs')
+        elif title in ('Banana', 'Water Bottle') and choice == 'severity':
+            target = self.condition_by_title(runner, 'Tight Calf' if title == 'Banana' else 'Heat Exhaustion')
+            if target:
+                self.treat_condition(runner, target, 2)
         self.emit('FUEL_USE', runner['player_id'], {'card': card['id'], 'choice': choice,
-                  'energy_before': old, 'energy_after': runner['energy'], 'recovery': recovery})
+                  'energy_before': old, 'energy_after': runner['energy'],
+                  'recovery': runner['energy'] - old})
         return True
 
     def fuel_available(self, runner):
@@ -668,6 +692,10 @@ class Sim:
                 return plan.get('choice') == 'energy' or (
                     plan.get('choice') == 'remedy' and self.condition_by_title(
                         runner, 'Dehydrated' if card['title'] == 'Electrolytes' else 'Cramp') is not None)
+            if card['title'] in ('Banana', 'Water Bottle'):
+                return plan.get('choice') == 'energy' or (
+                    plan.get('choice') == 'severity' and self.condition_by_title(
+                        runner, 'Tight Calf' if card['title'] == 'Banana' else 'Heat Exhaustion') is not None)
             return plan.get('choice') in (None, 'energy')
         if action == 'training':
             if card['family'] != 'Training':
@@ -693,10 +721,6 @@ class Sim:
             return (card['family'] == 'Gear' and card['title'] in ATTACHMENT
                     and target is not None and target['title'] == ATTACHMENT[card['title']][0]
                     and not target['attachments'])
-        if action == 'treat':
-            return (card['family'] in ('Training', 'Gear') and card.get('effort') is not None
-                    and any(condition['id'] == plan.get('condition_id')
-                            for condition in runner['active_conditions']))
         return False
 
     def choose_treat_prepare(self, runner):
@@ -711,6 +735,10 @@ class Sim:
                     candidates.append({'card_id': card['id'], 'action': 'fuel', 'choice': 'remedy'})
                 if card['title'] == 'Salt Tabs' and self.condition_by_title(runner, 'Cramp'):
                     candidates.append({'card_id': card['id'], 'action': 'fuel', 'choice': 'remedy'})
+                if card['title'] in ('Banana', 'Water Bottle'):
+                    target = 'Tight Calf' if card['title'] == 'Banana' else 'Heat Exhaustion'
+                    if self.condition_by_title(runner, target):
+                        candidates.append({'card_id': card['id'], 'action': 'fuel', 'choice': 'severity'})
         for card in runner['hand']:
             if card['title'] in ATTACHMENT:
                 target = self.condition_by_title(runner, ATTACHMENT[card['title']][0])
@@ -731,12 +759,7 @@ class Sim:
                                   for old in replacements)
             if card['family'] == 'Fuel':
                 candidates.append({'card_id': card['id'], 'action': 'fuel',
-                                   'choice': 'energy' if card['title'] in ('Electrolytes', 'Salt Tabs') else None})
-            if card.get('effort'):
-                for condition in runner['active_conditions']:
-                    if condition['current_severity'] > 0:
-                        candidates.append({'card_id': card['id'], 'action': 'treat',
-                                           'condition_id': condition['id']})
+                                   'choice': 'energy'})
         return [plan for plan in candidates if self.legal_treat_prepare(runner, plan)]
 
     def resolve_treat_prepare(self, runner, plan):
@@ -789,10 +812,6 @@ class Sim:
                 runner['hand'].append(card)
                 raise ValueError('Fuel unavailable')
             self.discard.append(card)
-        elif action == 'treat':
-            condition = next(c for c in runner['active_conditions'] if c['id'] == plan['condition_id'])
-            self.treat_condition(runner, condition, card.get('effort') or 0)
-            self.discard.append(card)
         else:
             runner['hand'].append(card)
             raise ValueError('illegal Treat/Prepare action')
@@ -832,14 +851,55 @@ class Sim:
         return scored, max(scored, key=lambda item: (item['score'], -PACE_ORDER.index(item['pace'])))['pace']
 
     def movement_candidates(self, runner, available_plays):
-        legal = [card for card in runner['hand'] if card.get('effort') is not None
-                 and not (card['id'] == 'EV-020' and not helpful_runner_playable(card, self.round))
-                 and not (card['id'] in OTHER_EVENTS and self.event_target(runner) is None)]
+        legal = [card for card in runner['hand'] if card.get('effort') is not None]
         choices = [()]
         for size in range(1, min(available_plays, len(legal)) + 1):
-            choices.extend(combo for combo in itertools.combinations(legal, size)
-                           if sum(card['family'] == 'Event' for card in combo) <= 1)
+            for combo in itertools.combinations(legal, size):
+                if sum(card['family'] == 'Event' for card in combo) > 1:
+                    continue
+                choices.append(tuple({**card, 'use_mode': 'MOVEMENT'} for card in combo))
+                if any(card['family'] == 'Event' for card in combo):
+                    event = next(card for card in combo if card['family'] == 'Event')
+                    if event['id'] in OTHER_EVENTS and not (
+                            self.beneficial_target(runner) if event['id'] == 'EV-019'
+                            else self.event_target(runner)):
+                        continue
+                    if event['id'] in ('EV-015', 'EV-016', 'EV-020') and not self.beneficial_target(runner):
+                        continue
+                    choices.append(tuple({**card, 'use_mode': 'EFFECT' if card['family'] == 'Event' else 'MOVEMENT'}
+                                         for card in combo))
         return choices
+
+    def energy_gains_on_side(self, runner, side):
+        """Visible trigger check; future evaluation uses current Pace only as a proxy."""
+        gains = []
+        for entry in runner['active_training'] + runner['equipped_gear']:
+            for effect in entry['card'].get('effect_components', []):
+                if effect['type'] != 'energy_gain':
+                    continue
+                if effect.get('trigger') == 'Water':
+                    continue
+                applies = all(not effect.get(field) or value in
+                              (effect[field] if isinstance(effect[field], list) else [effect[field]])
+                              for field, value in [('pace', runner['pace']), ('route', side['route']),
+                                                   ('surface', side['surface']), ('elevation', side['elevation'])])
+                if applies:
+                    gains.append((entry['card']['id'], effect['energy_delta']))
+        return gains
+
+    def installed_energy(self, runner):
+        """Once per runner-turn, on the Movement's starting Course side and locked Pace."""
+        side = self.course[min(runner['quarter_mile_space'] // 4, len(self.course) - 1)]
+        return self.energy_gains_on_side(runner, side)
+
+    def apply_installed_energy(self, runner):
+        for card_id, amount in self.installed_energy(runner):
+            self.apply_energy(runner, amount, f'Installed {card_id}')
+            if self.card(card_id)['title'] == 'GPS Watch':
+                item = next(i for i in runner['equipped_gear'] if i['card']['id'] == card_id)
+                self.emit('GPS_WATCH_TICK', runner['player_id'], {'card': card_id,
+                          'round': self.round, 'nominal_gain': amount,
+                          'remaining_turns_including_current': item['remaining_turns']})
 
     def preview_preparation(self, runner, plan):
         projected = copy.deepcopy(runner)
@@ -854,6 +914,16 @@ class Sim:
                 zone[:] = [item for item in zone if item['card']['id'] != plan['replace_id']]
             zone.append({'card': card, 'remaining_turns':
                          (TRAINING_DURATION if action == 'training' else GEAR_DURATION).get(card['title'])})
+            if action == 'training':
+                options = TRAINING_RESISTANCE.get(card['title'], {})
+                matching = [c for c in projected['active_conditions']
+                            if c['title'] in options and c['current_severity'] > 0]
+                if matching:
+                    target = max(matching, key=lambda c: (c['effective_severity'], c['id']))
+                    target['current_severity'] = max(0, target['current_severity'] - options[target['title']])
+                    update_effective_severity(target)
+                    if target['current_severity'] == 0 and not target['persistent']:
+                        projected['active_conditions'].remove(target)
         elif action == 'attach':
             target = next(c for c in projected['active_conditions'] if c['id'] == plan['condition_id'])
             amount = ATTACHMENT[card['title']][1]
@@ -861,25 +931,26 @@ class Sim:
                                                 'amount': amount, 'remaining_turns': None})
             set_suppression(target, target['suppression'] + amount)
         elif action == 'fuel':
-            if plan.get('choice') == 'remedy':
+            if plan.get('choice') in ('remedy', 'severity'):
                 title = 'Dehydrated' if card['title'] == 'Electrolytes' else 'Cramp'
+                if plan.get('choice') == 'severity':
+                    title = 'Tight Calf' if card['title'] == 'Banana' else 'Heat Exhaustion'
                 target = next(c for c in projected['active_conditions'] if c['title'] == title)
-                if apply_remedy(target, card['title']) is None:
+                if plan.get('choice') == 'severity':
+                    target['current_severity'] = max(0, target['current_severity'] - 2)
+                    update_effective_severity(target)
+                    if target['current_severity'] == 0 and not target['persistent']:
+                        projected['active_conditions'].remove(target)
+                elif apply_remedy(target, card['title']) is None:
                     projected['active_conditions'].remove(target)
             else:
-                nausea = max((condition_effects(c)['fuel_energy_penalty']
-                              for c in projected['active_conditions']), default=0)
-                projected['energy'] = min(15, projected['energy'] + max(0, (card['energy'] or 0) - nausea))
-        elif action == 'treat':
-            target = next(c for c in projected['active_conditions'] if c['id'] == plan['condition_id'])
-            target['current_severity'] = max(0, target['current_severity'] - card['effort'])
-            update_effective_severity(target)
-            if target['current_severity'] == 0 and not target['persistent']:
-                projected['active_conditions'].remove(target)
+                projected['energy'] = min(15, projected['energy'] + (card['energy'] or 0))
         return projected
 
     def preview_payment(self, runner):
         projected = copy.deepcopy(runner)
+        projected['energy'] = min(15, projected['energy'] +
+                                  sum(amount for _, amount in self.installed_energy(projected)))
         cost = self.pace_cost(projected, projected['pace'])['final']
         if cost > projected['energy']:
             if projected['will_available']:
@@ -900,23 +971,20 @@ class Sim:
         index = min(runner['quarter_mile_space'] // 4, len(self.course) - 1)
         segment = self.course[index]
         installed, _ = self.movement_effort_bonus(runner, segment)
-        ids = {c['id'] for c in cards if c['family'] == 'Event'}
-        event_bonus = int(bool(ids & {'EV-008', 'EV-019'}) and runner['pace'] in ('Race', 'Push'))
-        direct = int(bool(ids & DIRECT_PLUS))
+        ids = {c['id'] for c in active_effect_cards(cards) if c['family'] == 'Event'}
+        event_bonus = 0
+        direct = sum(2 if event_id == 'EV-023' else 1 for event_id in ids & DIRECT_PLUS)
+        if 'EV-009' in ids or 'EV-026' in ids:
+            direct -= 1
         staged_energy_cost = 0
-        energy_at_movement = runner['energy']
         for staged in self.active_staged(runner):
             event_id = staged['card']['id']
-            if event_id in ('EV-001', 'EV-002') and runner['pace'] in ('Race', 'Push'):
-                event_bonus -= 1
-            if event_id in ('EV-009', 'EV-010', 'EV-025', 'EV-030'):
+            if event_id == 'EV-019':
+                direct += 1
+            if event_id in ('EV-001', 'EV-002', 'EV-030'):
                 direct -= 1
-            if event_id in ('EV-011', 'EV-012'):
-                if energy_at_movement:
-                    energy_at_movement -= 1
-                    staged_energy_cost += 1
-                else:
-                    direct -= 1
+            if event_id in ('EV-011', 'EV-012', 'EV-025'):
+                direct -= 1
         ignored = 'EV-014' in ids
         rain = (sudden_rain('EV-005', segment['mile'], len(self.course), self.round)
                 if 'EV-005' in ids else None)
@@ -926,12 +994,18 @@ class Sim:
             course_event_bonus(visible_events, s['mile']))) for s in self.course]
         penalty = sum(condition_effects(c, runner['pace'], segment['surface'])['effort_penalty']
                       for c in runner['active_conditions'])
-        result = (sum(c['effort'] for c in cards) + installed + event_bonus
+        direct += sum(condition_effects(c, runner['pace'], segment['surface'])['direct_movement']
+                      for c in runner['active_conditions'])
+        result = (sum(card_effort(c) for c in cards) + installed + event_bonus
                   + self.cfg['pace'][runner['pace']]['modifier'] - penalty
                   - (0 if runner['quarter_mile_space'] >= course_end else difficulties[index]))
         resolved = resolve_movement(runner['quarter_mile_space'], result, difficulties, course_end,
-                                    turn_cap=2 if 'EV-026' in ids else 8, direct_movement=direct)
+                                    turn_cap=8, direct_movement=direct)
         resolved['staged_energy_cost'] = staged_energy_cost
+        resolved['milestone_energy_gain'] = (sum(
+            runner['quarter_mile_space'] < mile * 4 <= resolved['to_space']
+            for mile in MILESTONES[self.cfg['race_format']]['Water'])
+            if 'Hydration Belt' in self.installed_titles(runner, 'gear') else 0)
         return resolved
 
     def plan_score(self, runner, prepared, paid, plan, cards, movement_result):
@@ -956,6 +1030,8 @@ class Sim:
             if duration:
                 horizon *= min(1, duration / 6)
             cost_delta = self.pace_cost(runner, runner['pace'])['final'] - self.pace_cost(prepared, prepared['pace'])['final']
+            energy_delta = sum(amount for _, amount in self.installed_energy(prepared)) - sum(
+                amount for _, amount in self.installed_energy(runner))
             visible = self.course[min(runner['quarter_mile_space'] // 4, len(self.course) - 1):]
             visible = visible[:min(6, len(visible))]
             effort_delta = (sum(self.movement_effort_bonus(prepared, s)[0]
@@ -966,8 +1042,31 @@ class Sim:
             difficulty_delta = (sum(effective_difficulty(s, runner['active_conditions'], old_titles)
                                     - effective_difficulty(s, prepared['active_conditions'], new_titles)
                                     for s in visible) / len(visible)) if visible else 0
+            future_sides = visible[1:]
+            future_energy_delta = (sum(sum(v for _, v in self.energy_gains_on_side(prepared, s))
+                                       - sum(v for _, v in self.energy_gains_on_side(runner, s))
+                                       for s in future_sides) / len(future_sides)) if future_sides else 0
+            # Already-staged next-round weather is public; unseen weather draws are not.
+            water_delta = sum(
+                ('Hydration Belt' in self.installed_titles(prepared, 'gear'))
+                - ('Hydration Belt' in self.installed_titles(runner, 'gear'))
+                for side in future_sides
+                if side['mile'] in MILESTONES[self.cfg['race_format']]['Water'])
+            weather_next = [e for e in self.global_events if e['activate_round'] == self.round + 1
+                            and e['source'] == runner['player_id']]
+            weather_preservation = sum(
+                any(ef['type'] == 'weather_protection' and
+                    {'EV-006': 'Heat', 'EV-010': 'Cold'}.get(event['card']['id']) in ef['weather']
+                    for entry in prepared['equipped_gear'] for ef in entry['card'].get('effect_components', []))
+                - any(ef['type'] == 'weather_protection' and
+                      {'EV-006': 'Heat', 'EV-010': 'Cold'}.get(event['card']['id']) in ef['weather']
+                      for entry in runner['equipped_gear'] for ef in entry['card'].get('effect_components', []))
+                for event in weather_next)
             score += horizon * (max(-3, min(3, effort_delta)) * 2
-                                + max(-3, min(3, difficulty_delta)) * 2 + cost_delta * 2)
+                                + max(-3, min(3, difficulty_delta)) * 2
+                                + cost_delta * 2 + energy_delta * 2
+                                + future_energy_delta * 2 + min(3, water_delta) * 2
+                                + weather_preservation * 2)
             score -= 1 - 0.6 * horizon
             if plan['action'] == 'training':
                 old_resistance = sum(sum(TRAINING_RESISTANCE.get(title, {}).values()) for title in old_titles)
@@ -979,35 +1078,26 @@ class Sim:
                 old_mod = gut_check([], old_titles, self.installed_titles(runner, 'gear'))['modifiers']
                 new_mod = gut_check([], new_titles, self.installed_titles(prepared, 'gear'))['modifiers']
                 score += horizon * (new_mod - old_mod)
-            if setup_card['title'] == 'Hydration Belt':
-                water_ahead = sum(runner['quarter_mile_space'] < mile * 4
-                                  for mile in MILESTONES[self.cfg['race_format']]['Water'])
-                belt_delta = (self.installed_titles(prepared, 'gear').count('Hydration Belt')
-                              - self.installed_titles(runner, 'gear').count('Hydration Belt'))
-                score += horizon * min(2, water_ahead * 0.4) * belt_delta
             if setup_card['title'] == 'Anti-Chafe' and not self.anti_chafe_active(runner):
                 score += horizon * 0.5
-        if plan and plan['action'] in ('fuel', 'treat', 'attach'):
+        if plan and plan['action'] in ('fuel', 'attach'):
             future = {c['id']: c for c in prepared['active_conditions']}
             reduction = sum(max(0, c['effective_severity'] -
                                 (future[c['id']]['effective_severity'] if c['id'] in future else 0))
                             for c in runner['active_conditions'])
             caps_removed = sum(4 for c in runner['active_conditions']
                                if c['effective_severity'] > 0 and c['title'] in
-                               ('Cramp', 'Twisted Ankle', 'Heat Exhaustion', 'Stomach Trouble')
+                               ('Cramp', 'Twisted Ankle', 'Heat Exhaustion', 'Nausea')
                                and (c['id'] not in future or future[c['id']]['effective_severity'] == 0))
             score += min(remaining, 24) / 24 * min(14, 2 * reduction + caps_removed)
         energy = max(0, paid['energy'] - movement_result['staged_energy_cost'])
-        event_gain = sum(AFTER_ENERGY.get(c['id'], 0) for c in cards)
-        if 'EV-026' in {c['id'] for c in cards}:
+        effect_ids = {c['id'] for c in active_effect_cards(cards)}
+        event_gain = sum(AFTER_ENERGY.get(c['id'], 0) for c in active_effect_cards(cards))
+        if 'EV-026' in effect_ids:
             event_gain += 2
-        if 'EV-018' in {c['id'] for c in cards}:
+        if 'EV-018' in effect_ids:
             event_gain += 1
-        if 'EV-020' in {c['id'] for c in cards} and any(
-                other['player_id'] != runner['player_id'] and len(other['hand']) < 7
-                for other in self.runners):
-            event_gain += 1
-        energy = min(15, energy + event_gain)
+        energy = min(15, energy + event_gain + movement_result['milestone_energy_gain'])
         for mile in MILESTONES[self.cfg['race_format']]['Gut Check']:
             if runner['quarter_mile_space'] < mile * 4 <= movement_result['to_space']:
                 hand = [c for c in prepared['hand'] if c not in cards]
@@ -1044,10 +1134,18 @@ class Sim:
             for cards in self.movement_candidates(prepared, allowance):
                 if not cards and prepared['hand']:
                     continue
-                resolved = self.preview_movement(paid, cards)
-                score, turns = self.plan_score(runner, prepared, paid, plan, cards, resolved)
+                cost = sum(movement_energy_cost(card) for card in cards
+                           if card['use_mode'] == 'MOVEMENT')
+                if cost > paid['energy']:
+                    continue
+                after_cards = copy.deepcopy(paid)
+                after_cards['energy'] -= cost
+                resolved = self.preview_movement(after_cards, cards)
+                score, turns = self.plan_score(runner, prepared, after_cards, plan, cards, resolved)
                 candidates.append({'treat_prepare': plan,
                                    'movement_cards': [c['id'] for c in cards],
+                                   'card_modes': [c['use_mode'] for c in cards],
+                                   'movement_energy_cost': cost,
                                    'movement_quarters': resolved['quarter_miles'],
                                    'expected_turns_remaining': turns, 'score': score})
         if not candidates:
@@ -1081,7 +1179,9 @@ class Sim:
             runner['pack_leader'] = None
         pack_number = 0
         for pace in PACE_ORDER:
-            available = sorted((runner for runner in self.runners if not runner['finished'] and runner['pace'] == pace),
+            available = sorted((runner for runner in self.runners if not runner['finished'] and runner['pace'] == pace
+                                and not any(event['card']['id'] == 'EV-030'
+                                            for event in self.active_staged(runner))),
                                key=lambda runner: (-runner['quarter_mile_space'], runner['player_id']))
             while available:
                 leader = available.pop(0)
@@ -1112,11 +1212,27 @@ class Sim:
         for runner in self.runners:
             for event in self.active_staged(runner):
                 self.emit('STAGED_EVENT_ACTIVATE', runner['player_id'], {'card': event['card']['id'],
-                          'source': event['source'], 'target_lock': True})
+                          'source': event['source'], 'target_lock': event.get('target_lock', True)})
         for event in self.global_events:
             if event['activate_round'] == self.round:
                 self.emit('GLOBAL_EVENT_ACTIVATE', payload={'card': event['card']['id'],
                           'source': event['source']})
+                weather = {'EV-006': 'Heat', 'EV-010': 'Cold'}.get(event['card']['id'])
+                if weather:
+                    for runner in self.runners:
+                        if runner['player_id'] != event['source'] or runner['finished']:
+                            continue
+                        protector = next((entry['card']['title'] for entry in runner['equipped_gear']
+                                          if any(effect['type'] == 'weather_protection'
+                                                 and weather in effect['weather']
+                                                 for effect in entry['card'].get('effect_components', []))), None)
+                        before = runner['energy']
+                        if not protector:
+                            self.apply_energy(runner, -1, f'{event["card"]["title"]} weather')
+                        self.emit('GLOBAL_WEATHER', runner['player_id'], {'card': event['card']['id'],
+                                  'weather': weather, 'protected_by': protector,
+                                  'energy_before': before, 'energy_after': runner['energy'],
+                                  'actual_loss': before - runner['energy']})
         for runner in self.runners:
             if runner['finished']:
                 continue
@@ -1147,39 +1263,18 @@ class Sim:
         gear = self.installed_titles(runner, 'gear')
         if pace == 'Race' and 'Long Run' in training:
             sources.append('Long Run')
-        if pace == 'Push' and 'Intervals' in training:
-            sources.append('Intervals')
         if pace == 'Steady' and 'Pacing Practice' in training:
             sources.append('Pacing Practice')
-        if pace == 'Steady' and 'Cushioned Shoes' in gear:
-            sources.append('Cushioned Shoes')
         return sources
 
     def pace_cost(self, runner, pace):
         base = abs(self.cfg['pace'][pace]['energy_cost'])
         condition_extra = sum(condition_effects(condition, pace)['extra_energy']
                               for condition in runner['active_conditions'])
-        staged_extra = sum(1 for event in self.active_staged(runner) if event['card']['id'] == 'EV-025')
-        global_extra = sum(1 for event in self.global_events
-                           if event['activate_round'] == self.round and event['card']['id'] == 'EV-006'
-                           and pace == 'Push')
-        gear = self.installed_titles(runner, 'gear')
-        heat_sources = []
-        heat_reduction = 0
-        if global_extra:
-            if 'Tech Shirt' in gear:
-                heat_reduction = global_extra
-                heat_sources.append('Tech Shirt')
-            else:
-                for title in ('Running Cap', 'Lightweight Singlet'):
-                    if title in gear and heat_reduction < global_extra:
-                        heat_reduction += 1
-                        heat_sources.append(title)
+        staged_extra = 0
         sources = self.pace_preservation(runner, pace)
-        final = max(0, base + condition_extra + staged_extra + global_extra
-                    - heat_reduction - len(sources))
+        final = max(0, base + condition_extra + staged_extra - len(sources))
         return {'base': base, 'condition_extra': condition_extra, 'staged_extra': staged_extra,
-                'global_extra': global_extra, 'heat_preservation_sources': heat_sources,
                 'preservation_sources': sources, 'final': final}
 
     def pay_pace(self, runner):
@@ -1211,95 +1306,93 @@ class Sim:
         return cost, will_used
 
     def movement_effort_bonus(self, runner, segment):
-        pace, bonus, sources = runner['pace'], 0, []
-        for title in self.installed_titles(runner, 'training'):
-            applies = ((title == 'Base Miles' and pace == 'Easy') or
-                       (title == 'Negative Split' and pace == 'Race') or
-                       (title == 'Tempo Run' and pace == 'Steady') or
-                       (title == 'Intervals' and pace == 'Push') or
-                       (title == 'Trail Training' and segment['route'] == 'Trail') or
-                       (title == 'Form Drills' and segment['elevation'] == 'Flat'))
-            if applies:
-                bonus += 1
-                sources.append(title)
-        for title in self.installed_titles(runner, 'gear'):
-            amount = 0
-            if title == 'Running Shoes' and segment['surface'] == 'Asphalt': amount = 1
-            elif title == 'Trail Shoes' and segment['route'] == 'Trail': amount = 2
-            elif title == 'Running Shorts' and pace == 'Steady': amount = 1
-            elif title == 'Tempo Shoes' and pace in ('Steady', 'Race'): amount = 1
-            elif title == 'Carbon Racers' and pace in ('Race', 'Push'): amount = 2
-            elif title == 'GPS Watch' and runner['previous_pace'] != pace: amount = 1
-            elif title == 'Insoles' and segment['surface'] == 'Concrete': amount = 1
-            if amount:
-                bonus += amount
-                sources.append(title)
-        return bonus, sources
+        # The redesigned installed effects produce Energy or Difficulty changes,
+        # never generic Movement Effort.
+        return 0, []
 
     def choose_movement_cards(self, runner, available_plays):
         paid = self.preview_payment(runner)
         choices = self.movement_candidates(runner, available_plays)
         ranked = []
         for cards in choices:
-            resolved = self.preview_movement(paid, cards)
-            score, _ = self.plan_score(runner, runner, paid, None, cards, resolved)
+            cost = sum(movement_energy_cost(c) for c in cards if c['use_mode'] == 'MOVEMENT')
+            if cost > paid['energy']:
+                continue
+            after = copy.deepcopy(paid)
+            after['energy'] -= cost
+            resolved = self.preview_movement(after, cards)
+            score, _ = self.plan_score(runner, runner, after, None, cards, resolved)
             ranked.append((score, resolved['quarter_miles'], tuple(c['id'] for c in cards), cards))
         return list(max(ranked, key=lambda row: row[:3])[-1]) if ranked else []
 
     def event_target(self, source):
-        locked = {event['target'] for runner in self.runners for event in runner['staged_events']}
+        locked = {event['target'] for runner in self.runners for event in runner['staged_events']
+                  if event.get('target_lock', True)}
         candidates = [runner for runner in self.runners if runner is not source and not runner['finished']
                       and not runner['finish_pending']
                       and runner['player_id'] not in locked]
         return sorted(candidates, key=lambda runner: (-runner['quarter_mile_space'],
                                                       runner['player_id']))[0] if candidates else None
 
+    def beneficial_target(self, source):
+        candidates = [runner for runner in self.runners if runner is not source
+                      and not runner['finished'] and not runner['finish_pending']]
+        return sorted(candidates, key=lambda runner: runner['player_id'])[0] if candidates else None
+
     def stage_other_event(self, source, card, target=None):
-        target = target or self.event_target(source)
+        beneficial = card['id'] == 'EV-019'
+        target = target or (self.beneficial_target(source) if beneficial else self.event_target(source))
         if target is None:
             self.emit('EVENT_NO_TARGET', source['player_id'], {'card': card['id']})
             return False
-        if target['staged_events']:
+        if not beneficial and any(event.get('target_lock', True) for event in target['staged_events']):
             raise ValueError('OTHER Target Lock violation')
         entry = {'card': card, 'source': source['player_id'], 'target': target['player_id'],
-                 'staged_round': self.round, 'activate_round': self.round + 1}
+                 'staged_round': self.round, 'activate_round': self.round + 1,
+                 'target_lock': not beneficial}
         target['staged_events'].append(entry)
         self.emit('EVENT_STAGE', source['player_id'], {'card': card['id'], 'target': target['player_id'],
-                  'activate_round': self.round + 1, 'target_lock': True})
+                  'activate_round': self.round + 1, 'target_lock': not beneficial})
         return True
 
     def event_current_effects(self, runner, cards):
-        event_ids = {card['id'] for card in cards if card['family'] == 'Event'}
+        event_ids = {card['id'] for card in active_effect_cards(cards) if card['family'] == 'Event'}
         effort_bonus, direct, ignore_difficulty, cap = 0, 0, False, 8
-        if event_ids & DIRECT_PLUS:
-            direct += 1
-        if 'EV-008' in event_ids and runner['pace'] in ('Race', 'Push'):
-            effort_bonus += 1
-        if 'EV-019' in event_ids and runner['pace'] in ('Race', 'Push'):
-            effort_bonus += 1
+        direct += sum(2 if event_id == 'EV-023' else 1 for event_id in event_ids & DIRECT_PLUS)
+        direct -= int('EV-009' in event_ids) + int('EV-026' in event_ids)
         if 'EV-014' in event_ids:
             ignore_difficulty = True
-        if 'EV-026' in event_ids:
-            cap = 2
         for event in self.active_staged(runner):
             event_id = event['card']['id']
-            if event_id in ('EV-001', 'EV-002') and runner['pace'] in ('Race', 'Push'):
-                effort_bonus -= 1
-            if event_id in ('EV-009', 'EV-010', 'EV-025', 'EV-030'):
+            if event_id == 'EV-019':
+                direct += 1
+            if event_id in ('EV-001', 'EV-002', 'EV-030'):
                 direct -= 1
-            if event_id in ('EV-011', 'EV-012'):
-                if runner['energy'] > 0:
-                    runner['energy'] -= 1
-                    runner['stats']['energy_spent'] += 1
-                    self.emit('EVENT_TARGET_CHOICE', runner['player_id'],
-                              {'card': event_id, 'choice': 'lose 1 Energy'})
-                else:
-                    direct -= 1
+            if event_id in ('EV-011', 'EV-012', 'EV-025'):
+                direct -= 1
         return effort_bonus, direct, ignore_difficulty, cap
 
     def resolve_event_play(self, runner, card, target=None):
         event_id = card['id']
+        if target and (target is runner or target['finished'] or target['finish_pending']):
+            raise ValueError('Event requires a legal other Runner')
+        if event_id == 'EV-018' and target and target['player_id'] not in self.round_pack_snapshot.get(
+                runner['player_id'], []):
+            raise ValueError('High Five recipient must be an eligible Pack member')
+        if event_id in ('EV-015', 'EV-016', 'EV-020') and not (target or self.beneficial_target(runner)):
+            raise ValueError('Event requires another Runner')
         runner['stats']['events_played'] += 1
+        if event_id in ('EV-011', 'EV-012', 'EV-025'):
+            target = target or self.event_target(runner)
+            if target and target['energy'] > 0:
+                if any(event.get('target_lock', True) for event in target['staged_events']):
+                    raise ValueError('OTHER Target Lock violation')
+                self.apply_energy(target, -1, f'{card["title"]} Runner choice')
+                self.emit('EVENT_TARGET_CHOICE', target['player_id'],
+                          {'card': event_id, 'source': runner['player_id'],
+                           'choice': 'lose 1 Energy', 'timing': 'IMMEDIATE'})
+                return 'discard'
+            return 'staged' if self.stage_other_event(runner, card, target) else 'discard'
         if event_id in OTHER_EVENTS:
             return 'staged' if self.stage_other_event(runner, card, target) else 'discard'
         if event_id == 'EV-005':
@@ -1308,13 +1401,37 @@ class Sim:
                 self.course_events.append(rain)
                 self.emit('COURSE_EVENT_APPLY', runner['player_id'], rain)
                 return 'course'
-        if event_id == 'EV-006':
+        if event_id in ('EV-006', 'EV-010'):
             entry = {'card': card, 'source': runner['player_id'], 'staged_round': self.round,
                      'activate_round': self.round + 1, 'expiry_round': self.round + 1}
             self.global_events.append(entry)
             self.emit('GLOBAL_EVENT_STAGE', runner['player_id'], {'card': event_id,
-                      'activate_round': self.round + 1})
+                      'activate_round': self.round + 1, 'scope': 'CURRENT_PLAYER'})
             return 'global'
+        if event_id in AFTER_ENERGY:
+            self.apply_energy(runner, AFTER_ENERGY[event_id], card['title'])
+            if event_id in ('EV-015', 'EV-016'):
+                recipient = target or self.beneficial_target(runner)
+                if recipient:
+                    self.apply_energy(recipient, 1, 'Crowd Support Runner')
+        elif event_id == 'EV-018':
+            members = self.round_pack_snapshot.get(runner['player_id'], [])
+            recipient = target or next((r for r in self.runners if r['player_id'] in members
+                                        and r is not runner and not r['finished']), None)
+            beneficiaries = [runner['player_id']] + ([recipient['player_id']] if recipient else [])
+            self.apply_energy(runner, 1, 'High Five')
+            if recipient:
+                self.apply_energy(recipient, 1, 'High Five')
+            self.emit('HIGH_FIVE', runner['player_id'], {'pack_snapshot': members,
+                      'beneficiaries': beneficiaries, 'timing': 'EFFECT_RESOLUTION'})
+        elif event_id == 'EV-020':
+            recipient = target or self.beneficial_target(runner)
+            if recipient:
+                self.apply_energy(recipient, 1, 'Helpful Runner')
+                self.emit('EVENT_OTHER_ENERGY', runner['player_id'], {'card': event_id,
+                          'recipient': recipient['player_id'], 'amount': 1})
+        elif event_id == 'EV-026':
+            self.apply_energy(runner, 2, 'Porta-Potty')
         return 'discard'
 
     def apply_energy(self, runner, amount, source):
@@ -1331,39 +1448,13 @@ class Sim:
     def after_movement_events(self, runner, played, held_states):
         for card in played:
             event_id = card['id']
-            if event_id in AFTER_ENERGY:
-                self.apply_energy(runner, AFTER_ENERGY[event_id], card['title'])
-            elif event_id == 'EV-017':
+            if event_id == 'EV-017':
                 cycled = tough_decision_cycle(runner['hand'])
                 for old in cycled:
                     runner['hand'].remove(old)
                     self.discard.append(old)
                     self.draw_one(runner, True)
                 self.emit('TOUGH_DECISION', runner['player_id'], {'cycled': [card['id'] for card in cycled]})
-            elif event_id == 'EV-018':
-                members = self.round_pack_snapshot.get(runner['player_id'], [])
-                beneficiaries = high_five_beneficiaries(runner['player_id'], members)
-                for player_id in beneficiaries:
-                    self.pending_energy_awards.append({'player_id': player_id, 'amount': 1,
-                                                       'source': 'High Five', 'played_by': runner['player_id']})
-                self.emit('HIGH_FIVE', runner['player_id'], {'pack_snapshot': members,
-                          'beneficiaries': beneficiaries, 'timing': 'ROUND_END'})
-            elif event_id == 'EV-020':
-                recipients = [item for item in self.runners
-                              if item is not runner and not item['finished'] and not item['finish_pending']
-                              and len(item['hand']) < 7]
-                recipient = sorted(recipients, key=lambda item: item['player_id'])[0] if recipients else None
-                before_energy = runner['energy']
-                if recipient and transfer_helpful_runner(card, runner, recipient, self.round):
-                    runner['stats']['energy_gained'] += runner['energy'] - before_energy
-                    held_states[event_id] = 'transferred'
-                    self.emit('HELPFUL_RUNNER_TRANSFER', runner['player_id'], {
-                        'recipient': recipient['player_id'], 'hand_before': len(recipient['hand']) - 1,
-                        'hand_after': len(recipient['hand']), 'giver_energy_before': before_energy,
-                        'giver_energy_after': runner['energy'],
-                        'earliest_replay_round': self.round + 1})
-            elif event_id == 'EV-026':
-                self.apply_energy(runner, 2, 'Porta-Potty')
 
     def resolve_milestones(self, runner, old_space, new_space):
         for mile in range(old_space // 4 + 1, new_space // 4 + 1):
@@ -1372,12 +1463,13 @@ class Sim:
                 condition = self.condition_by_title(runner, 'Dehydrated')
                 if condition:
                     self.named_remedy(runner, condition, 'Water')
-                if 'Hydration Belt' in self.installed_titles(runner, 'gear'):
-                    self.apply_energy(runner, 1, 'Hydration Belt at Water')
+                for item in runner['equipped_gear']:
+                    if item['card']['title'] == 'Hydration Belt':
+                        self.apply_energy(runner, 1, 'Hydration Belt at Water')
                 self.emit('MILESTONE', runner['player_id'], {'mile': mile, 'kind': 'Water'})
             if mile in MILESTONES[self.cfg['race_format']]['Aid/Fuel']:
                 eligible = [condition for condition in runner['active_conditions']
-                            if condition['title'] in ('Twisted Ankle', 'Heat Exhaustion', 'Stomach Trouble')]
+                            if condition['title'] in ('Twisted Ankle', 'Heat Exhaustion', 'Nausea', 'Gashed Knee')]
                 if eligible:
                     self.named_remedy(runner, max(eligible, key=lambda condition: condition['effective_severity']), 'Aid')
                 self.emit('MILESTONE', runner['player_id'], {'mile': mile, 'kind': 'Aid/Fuel'})
@@ -1400,7 +1492,10 @@ class Sim:
                     self.emit('TRAINING_EXPIRE', runner['player_id'], {'card': item['card']['id']})
         for item in list(runner['equipped_gear']) + list(runner['attached_gear']):
             if item['remaining_turns'] is not None:
+                before = item['remaining_turns']
                 item['remaining_turns'] -= 1
+                self.emit('TEMPORARY_GEAR_TICK', runner['player_id'], {'card': item['card']['id'],
+                          'before': before, 'after': item['remaining_turns']})
                 if item['remaining_turns'] <= 0:
                     self.remove_gear(runner, item)
 
@@ -1408,7 +1503,8 @@ class Sim:
         for event in list(self.active_staged(runner)):
             runner['staged_events'].remove(event)
             self.discard.append(event['card'])
-            self.emit('EVENT_EXPIRE', runner['player_id'], {'card': event['card']['id'], 'target_lock': False})
+            self.emit('EVENT_EXPIRE', runner['player_id'], {'card': event['card']['id'],
+                      'target_lock': False})
 
     def turn(self, runner, script=None):
         script = script or {}
@@ -1431,6 +1527,8 @@ class Sim:
             self.emit('AI_TURN_PLAN', runner['player_id'], {'treat_prepare': plan,
                       'movement_cards': planned_cards, 'predicted_movement_quarters':
                       ai_plan['movement_quarters'], 'score': ai_plan['score'],
+                      'card_modes': ai_plan['card_modes'],
+                      'movement_energy_cost': ai_plan['movement_energy_cost'],
                       'expected_turns_remaining': ai_plan['expected_turns_remaining']})
             if capture is not None:
                 from engine.ai_rationale import describe_decision
@@ -1440,6 +1538,7 @@ class Sim:
         used_plays = self.resolve_treat_prepare(runner, plan)
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
+        self.apply_installed_energy(runner)
         self.pay_pace(runner)
         available = 2 - used_plays
         if 'movement_cards' in script or planned_cards is not None:
@@ -1449,15 +1548,37 @@ class Sim:
             played = [next(card for card in runner['hand'] if card['id'] == card_id) for card_id in ids]
             if sum(card['family'] == 'Event' for card in played) > 1:
                 raise ValueError('more than one Event played')
+            modes = script.get('card_modes', ['MOVEMENT'] * len(played)) if script else ai_plan['card_modes']
         else:
             played = self.choose_movement_cards(runner, available)
+            modes = [card['use_mode'] for card in played]
+            played = [next(real for real in runner['hand'] if real['id'] == card['id']) for card in played]
+        if len(modes) != len(played) or any(mode not in ('MOVEMENT', 'EFFECT') for mode in modes):
+            raise ValueError('invalid card use modes')
+        if any(mode == 'EFFECT' and card['family'] != 'Event' for card, mode in zip(played, modes)):
+            raise ValueError('non-Event Effects use Treat/Prepare')
+        card_cost = sum(movement_energy_cost(card) for card, mode in zip(played, modes)
+                        if mode == 'MOVEMENT')
+        if card_cost > runner['energy']:
+            raise ValueError('Movement Energy unavailable')
         for card in played:
             runner['hand'].remove(card)
+        for card, mode in zip(played, modes):
+            card['use_mode'] = mode
+            if mode == 'MOVEMENT':
+                cost = movement_energy_cost(card)
+                before = runner['energy']
+                runner['energy'] -= cost
+                runner['stats']['energy_spent'] += cost
+                self.emit('MOVEMENT_ENERGY_PAYMENT', runner['player_id'],
+                          {'card': card['id'], 'printed_effort': card['effort'],
+                           'cost': cost, 'before': before, 'after': runner['energy']})
             runner['stats']['cards_played'] += 1
-            runner['stats']['total_effort_used'] += card.get('effort') or 0
-            self.emit('PLAY', runner['player_id'], {'card': self.cardview(card), 'mode': 'MOVEMENT',
-                      'mandatory_event_effect': card['family'] == 'Event'})
-        event_cards = [card for card in played if card['family'] == 'Event']
+            runner['stats']['total_effort_used'] += card_effort(card)
+            self.emit('PLAY', runner['player_id'], {'card': self.cardview(card), 'mode': mode,
+                      'movement_energy_cost': movement_energy_cost(card) if mode == 'MOVEMENT' else 0,
+                      'effect_active': mode == 'EFFECT'})
+        event_cards = [card for card in active_effect_cards(played) if card['family'] == 'Event']
         event_states = {}
         for card in event_cards:
             target = None
@@ -1476,7 +1597,9 @@ class Sim:
         difficulties = [(0 if ignore_difficulty else effective_difficulty(
             course_segment, runner['active_conditions'], training_titles,
             course_event_bonus(self.course_events, course_segment['mile']))) for course_segment in self.course]
-        effort = sum(card.get('effort') or 0 for card in played)
+        direct += sum(condition_effects(c, runner['pace'], segment['surface'])['direct_movement']
+                      for c in runner['active_conditions'])
+        effort = sum(card_effort(card) for card in played)
         start_difficulty = 0 if at_finish_extension else difficulties[start_index]
         result_value = (effort + installed_bonus + event_effort_bonus
                         + self.cfg['pace'][runner['pace']]['modifier'] - condition_penalty
@@ -1490,7 +1613,10 @@ class Sim:
         if resolved['quarter_miles'] == 0:
             runner['stats']['zero_movement_turns'] += 1
         self.emit('MOVE', runner['player_id'], {'formula': 'Effort + installed/Event/Pace - Condition - Effective Difficulty',
-                  'effort_cards': [{'id': card['id'], 'effort': card.get('effort') or 0} for card in played],
+                  'effort_cards': [{'id': card['id'], 'printed_effort': card.get('effort'),
+                                    'used_effort': card_effort(card), 'mode': card['use_mode']}
+                                   for card in played],
+                  'movement_energy_cost': card_cost,
                   'total_effort': effort, 'installed_effort_bonus': installed_bonus,
                   'installed_effort_sources': installed_sources, 'event_effort_bonus': event_effort_bonus,
                   'pace': runner['pace'], 'pace_modifier': self.cfg['pace'][runner['pace']]['modifier'],
@@ -1509,6 +1635,7 @@ class Sim:
         self.after_movement_events(runner, event_cards, event_states)
         for card in played:
             state = event_states.get(card['id'])
+            card.pop('use_mode', None)
             if state in ('staged', 'course', 'global', 'transferred'):
                 continue
             self.discard.append(card)
@@ -1567,10 +1694,6 @@ class Sim:
         self.pending_finishers = [runner for runner in self.pending_finishers if runner not in finishers]
 
     def end_round(self):
-        for award in self.pending_energy_awards:
-            runner = next(item for item in self.runners if item['player_id'] == award['player_id'])
-            self.apply_energy(runner, award['amount'], award['source'])
-        self.pending_energy_awards = []
         self.resolve_same_round_finishers()
         expired_course = [event for event in self.course_events if event['remaining_duration'] == 1]
         self.course_events = tick_course_events(self.course_events)

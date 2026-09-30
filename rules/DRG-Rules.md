@@ -2,24 +2,18 @@
 
 ## Authority
 
-1. The 2026-09-24 Simulation Foundation specification supplied by the designer.
-2. `CARDS.docx` (2026-08-28) for Race inventory and numeric Course data.
-3. `DRG_Initial_Course_Deck_Graphic_Descriptions(1).md` (2026-08-28) for normalized Course naming and setting language.
-
-Later explicit decisions override older discussion. Unknown rules are not canonicalized.
+See [`DRG-Canonical-Playtest-Rules.md`](../DRG-Canonical-Playtest-Rules.md). The 2026-09-30 frozen `RaceCards.docx` table and explicit redesign rulings govern the Race-card inventory and Effects; the explicit rulings resolve table ambiguity. The Course and unchanged race rules retain their existing authority.
 
 ## Encoded
 
-- Seven-card concealed starting hands; Conditions excluded from setup deal.
+- Seven-card concealed starting hands; Conditions auto-enter play by Severity and draw replacement cards.
 - Up to three pre-race exchanges; replacements/acquired cards lock.
-- Draw one and voluntarily play zero to two cards each turn.
-- Effort Mode ignores Energy/Effect. Energy/Effect Mode ignores Effort.
-- Drawn Conditions become active and trigger a replacement draw.
-- Shared Easy/Steady/Race/Push Pace; Turn 1 lock; redeclare from Turn 2.
-- Randomized, oriented visible Course; quarter-mile state.
-- Fixed race-position milestones.
-- Deterministic seeded randomness and chronological events.
-- Movement Model A: one or two Effort-mode cards; Difficulty subtracted once; quarter-mile conversion; stop at each Difficulty boundary, carry positive excess, and adjust by the Difficulty difference; two-mile turn cap.
+- At most two cards per runner-turn and one Event.
+- Non-Condition card MOVEMENT mode uses printed Effort and pays per-card Energy by Effort band: 1–3→0, 4–6→1, 7+→2.
+- Non-Condition card EFFECT mode uses no Effort and pays no card Movement Energy; Training/Gear/Fuel use Treat/Prepare, Events use Movement.
+- Pace icons: `▷`, `▶`, `▶▶`, `▶▶▶`; Movement is `→`; Energy is `⚡`.
+- Pace Energy costs and starting Energy 15 remain unchanged.
+- Deterministic visible Course, quarter-mile state, Difficulty boundary recalculation, Gut Checks, Pack preservation, Will, and simultaneous same-round Finish remain.
 
 ## Source discrepancy report
 

@@ -1,26 +1,28 @@
-# DRG Gear — current playtest inventory
+# Gear — frozen Race Card redesign
 
-APPROVED TEST BASELINE: choose printed Effort during Movement **or** equip/attach/use in Treat/Prepare. Two normal Equipped slots; only one Equipped Footwear. Compatible attached Gear occupies no normal slot, but one physical card has one job: its Equipped benefit is inactive while attached unless expressly stated. Normally one compatible attachment per Condition. Moving existing Gear between Equipped and Attached uses Treat/Prepare but is not a new card play. Temporary(N) counts N runner turns, including installation turn. Temporary suppression rebounds after expiry/removal. The current designer gives **20 physical cards**: Running Shoes ×2, Hydration Belt ×2, every other design ×1.
+20 physical cards. A non-Condition card uses printed Effort and pays its Movement Energy cost **or** resolves its Effect without printed Effort or Movement Energy cost.
 
-| Current title | Qty | Existing source ID, if surviving | Printed Effort | State/effect |
-|---|---:|---|---:|---|
-| Running Shoes | 2 | GE-001–002 | 7 | Equipped Footwear; Asphalt +1 Effort. |
-| Running Socks | 1 | GE-003 | 4 | Attached to Blister: −2 Effective Severity. |
-| Trail Shoes | 1 | GE-005 | 7 | Equipped Footwear; Trail +2 Effort. |
-| Cap | 1 | GE-006 | 5 | Equipped; ignore first Heat-related Energy loss each round. Source title: Running Cap. |
-| Tech Shirt | 1 | GE-008 | 4 | Temporary(4); ignore all Heat-related Energy loss while active. |
-| Running Shorts | 1 | GE-009 | 5 | Equipped; Steady +1 Effort. |
-| Sunglasses | 1 | GE-010 | 4 | Equipped; ignore applicable Sun-related penalty/effect. |
-| Hydration Belt | 2 | GE-012–013 | 6 | Equipped; Water recovery +1 Energy. |
-| Anti-Chafe | 1 | GE-014 | 5 | Temporary(4); prevent Hot Spot while active. |
-| GPS Watch | 1 | GE-016 | 8 | Equipped; if Pace changed at this Round Start, +1 Effort during that runner's Movement this round. |
-| Pace Band | 1 | GE-018 | 6 | Equipped; +1 Gut Check. |
-| Compression | 1 | GE-019 | 5 | Attached to Cramp: −2 Effective Severity. Source title: Compression Sleeves. |
-| Insoles | 1 | GE-020 | 6 | Equipped; Concrete +1 Effort; **not** Condition Severity reduction. |
-| Cushioned Shoes | 1 | GE-004 | 6 | Equipped Footwear; Steady preserve 1 Pace Energy. |
-| Tempo Shoes | 1 | GE-007 | 7 | Temporary(5) Footwear; Steady or Race +1 Effort. |
-| Carbon Racers | 1 | GE-011 | 8 | Temporary(3) Footwear; Race or Push +2 Effort. |
-| Lightweight Singlet | 1 | GE-015 | 5 | Temporary(5); preserve 1 Heat-related Energy loss where applicable. |
-| Recovery Sleeves | 1 | GE-017 | 5 | Attached to Tight Calf: −1 Effective Severity. |
+| ID | Title | Effort / Severity | Movement Energy cost | Effect |
+|---|---|---:|---:|---|
+| GE-001 | Running Shoes | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
+| GE-002 | Running Shoes | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
+| GE-003 | Running Socks | 4 | ⚡ (1) | Blister: -2 |
+| GE-004 | Cushioned Shoes | 6 | ⚡ (1) | ▶: +⚡ |
+| GE-005 | Trail Shoes | 7 | ⚡⚡ (2) | Trail: +⚡⚡ |
+| GE-006 | Running Cap | 5 | ⚡ (1) | No -⚡ for Heat/Rain |
+| GE-007 | Tempo Shoes | 7 | ⚡⚡ (2) | ▶/▶▶: +⚡ (5 Rounds) |
+| GE-008 | Tech Shirt | 4 | ⚡ (1) | No -⚡ for Cold/Heat |
+| GE-009 | Running Shorts | 5 | ⚡ (1) | ▶: +⚡ |
+| GE-010 | Sunglasses | 4 | ⚡ (1) | No -⚡ |
+| GE-011 | Carbon Racers | 8 | ⚡⚡ (2) | ▶▶/▶▶▶: +⚡⚡ (3 Rounds) |
+| GE-012 | Hydration Belt | 6 | ⚡ (1) | +⚡ |
+| GE-013 | Running Jacket | 6 | ⚡ (1) | No -⚡ for Cold/Rain/Wind |
+| GE-014 | Anti-Chafe | 5 | ⚡ (1) | Prevent Hot Spot |
+| GE-015 | Singlet | 5 | ⚡ (1) | No -⚡ Heat |
+| GE-016 | GPS Watch | 8 | ⚡⚡ (2) | +⚡ (2 Rounds) |
+| GE-017 | Recovery Sleeves | 5 | ⚡ (1) | Tight Calf: -1 |
+| GE-018 | Pace Band | 6 | ⚡ (1) | Gut Check: +2 |
+| GE-019 | Compression Sleeves | 5 | ⚡ (1) | Cramp: -2 |
+| GE-020 | Insoles | 6 | ⚡ (1) | Concrete: +⚡ |
 
-Total: **20 copies / 18 designs**. GE-004, GE-007, GE-011, GE-015, and GE-017 are reassigned by frozen RR-01 and the former duplicate copies are superseded. Gear Energy fields are not inferred from effect text. Gear relocation remains RR-11.
+Hydration Belt gains 1 Energy at an applicable Water opportunity, at most once per opportunity. Temporary Gear counts its installation turn as the first runner-round. Energy gains trigger once per runner-turn where stated; GPS Watch grants +1 on each of its two active runner-rounds. Weather protection caps at the actual matching Energy loss and never creates Energy.

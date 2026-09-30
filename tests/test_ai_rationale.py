@@ -35,7 +35,8 @@ class Rationale(unittest.TestCase):
         p = d['selected_plan']
         self.assertEqual(p['projected_movement_miles'], 1.0)
         self.assertIsInstance(p['projected_energy_cost'], int)
-        self.assertIn('Projected Pace cost', d['reason'])
+        self.assertIn('Projected Pace plus Movement-card cost', d['reason'])
+        self.assertEqual(p['projected_movement_energy_cost'], 3)
         self.assertIn('estimated turns-to-finish', d['reason'])
         self.assertIn('total_plan_score', p)
 

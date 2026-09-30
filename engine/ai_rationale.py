@@ -4,7 +4,7 @@ This module never generates, filters, ranks, or executes actions. Its estimates 
 those already produced by the AI preview; the live MOVE event remains authoritative.
 """
 import collections
-from engine.simulate import (GEAR_DURATION, TRAINING_DURATION, course_event_bonus,
+from engine.simulate import (GEAR_DURATION, TRAINING_DURATION, MILESTONES, course_event_bonus,
                              effective_difficulty)
 
 REASON_CODES = frozenset({
@@ -26,9 +26,7 @@ def plan_class(sim, row):
         if action == 'attach':
             return 'attached Gear remedy + Move'
         if action == 'fuel':
-            return 'Fuel remedy + Move' if plan.get('choice') == 'remedy' else 'Fuel recovery + Move'
-        if action == 'treat':
-            return 'Condition treatment + Move'
+            return 'Fuel remedy + Move' if plan.get('choice') in ('remedy', 'severity') else 'Fuel recovery + Move'
         return 'Treat/Prepare + Move'
     if any(sim.card(cid)['family'] == 'Event' for cid in cards):
         return 'Event-related legal plan'
@@ -56,16 +54,19 @@ def _detail(sim, runner, row, baseline, before_quarters):
     plan = row['treat_prepare']
     prepared = sim.preview_preparation(runner, plan)
     paid = sim.preview_payment(prepared)
-    cards = [next(c for c in prepared['hand'] if c['id'] == cid)
-             for cid in row['movement_cards']]
-    result = sim.preview_movement(paid, cards)
+    cards = [{**next(c for c in prepared['hand'] if c['id'] == cid), 'use_mode': mode}
+             for cid, mode in zip(row['movement_cards'], row.get('card_modes', ['MOVEMENT'] * len(row['movement_cards'])))]
+    after_cards = dict(paid)
+    after_cards['energy'] -= row.get('movement_energy_cost', 0)
+    result = sim.preview_movement(after_cards, cards)
     remaining_after = max(0, len(sim.course) * 4 - result['to_space'])
     rate = max(2, row['movement_quarters'] or 2)
     roles = ([{'id': plan['card_id'], 'title': sim.card(plan['card_id'])['title'],
                'printed_effort': sim.card(plan['card_id']).get('effort'),
                'role': plan['action'], 'replaces': plan.get('replace_id')}] if plan else [])
     roles += [{'id': c['id'], 'title': c['title'], 'printed_effort': c.get('effort'),
-               'role': 'Movement'} for c in cards]
+               'role': c['use_mode'], 'movement_energy_cost':
+               c['movement_energy_cost'] if c['use_mode'] == 'MOVEMENT' else 0} for c in cards]
     old_conditions = {c['id']: c['effective_severity'] for c in runner['active_conditions']}
     new_conditions = {c['id']: c['effective_severity'] for c in prepared['active_conditions']}
     condition_impact = {cid: {'before': sev, 'after': new_conditions.get(cid, 0)}
@@ -95,18 +96,34 @@ def _detail(sim, runner, row, baseline, before_quarters):
             'mean_difficulty_reduction': difficulty_delta,
             'pace_energy_cost_reduction': sim.pace_cost(runner, runner['pace'])['final']
                                           - sim.pace_cost(prepared, prepared['pace'])['final'],
+            'installed_energy_this_turn': sum(amount for _, amount in sim.installed_energy(prepared))
+                                          - sum(amount for _, amount in sim.installed_energy(runner)),
+            'future_visible_energy_gain_at_current_pace':
+            (sum(sum(amount for _, amount in sim.energy_gains_on_side(prepared, side))
+                 - sum(amount for _, amount in sim.energy_gains_on_side(runner, side))
+                 for side in visible[1:]) / len(visible[1:])) if len(visible) > 1 else 0,
+            'future_visible_water_opportunity_delta':
+            sum(('Hydration Belt' in sim.installed_titles(prepared, 'gear'))
+                - ('Hydration Belt' in sim.installed_titles(runner, 'gear'))
+                for side in visible[1:]
+                if side['mile'] in MILESTONES[sim.cfg['race_format']]['Water']),
             'discount_factor': horizon,
-            'note': 'These are visible inputs to the existing setup score; other resistance, Gut Check and card-specific terms are not decomposed.'}
+            'note': 'Current Pace is a proxy for future visible Course starts; no future draw or Pace choice is assumed. Other resistance, Gut Check, and staged-weather terms are not fully decomposed.'}
     gap = _position(sim, runner)['gap_to_leader_miles']
     return {'plan_type': plan_class(sim, row), 'treat_prepare': plan,
-            'movement_cards': row['movement_cards'], 'cards_used': roles,
-            'selected_pace': paid['pace'], 'projected_effort': sum(c['effort'] for c in cards),
+            'movement_cards': row['movement_cards'], 'card_modes': row.get('card_modes'),
+            'cards_used': roles,
+            'selected_pace': paid['pace'], 'projected_effort': sum(c['effort'] for c in cards
+                                                                 if c['use_mode'] == 'MOVEMENT'),
             'projected_movement_quarters': row['movement_quarters'],
             'projected_movement_miles': row['movement_quarters'] / 4,
-            'projected_energy_cost': pace_cost['final'],
+            'projected_energy_cost': pace_cost['final'] + row.get('movement_energy_cost', 0),
+            'projected_movement_energy_cost': row.get('movement_energy_cost', 0),
             'projected_energy_after_pace': paid['energy'],
-            'projected_energy_after_action': None if any(c['family'] == 'Event' for c in cards) else
-            max(0, paid['energy'] - result['staged_energy_cost']),
+            'projected_energy_after_action': None if any(c['family'] == 'Event' and c['use_mode'] == 'EFFECT'
+                                                         for c in cards) else
+            min(15, max(0, after_cards['energy'] - result['staged_energy_cost'])
+                + result['milestone_energy_gain']),
             'energy_after_note': 'Event and checkpoint effects resolve in the live turn; preview score estimates them.',
             'projected_condition_impact': condition_impact,
             'projected_setup_benefit': setup_estimate,
@@ -144,7 +161,7 @@ def describe_decision(sim, runner, capture):
     unique = []
     seen = set()
     for row in important:
-        key = (str(row['treat_prepare']), tuple(row['movement_cards']))
+        key = (str(row['treat_prepare']), tuple(row['movement_cards']), tuple(row.get('card_modes', [])))
         if key not in seen:
             unique.append(row)
             seen.add(key)
@@ -188,7 +205,7 @@ def describe_decision(sim, runner, capture):
         reason = 'FINISH_SPRINT'
     elif selected['treat_prepare'] and selected['treat_prepare']['action'] in ('training', 'gear', 'attach'):
         reason = 'SETUP_PAYOFF'
-    elif selected['treat_prepare'] and selected['treat_prepare']['action'] in ('fuel', 'treat'):
+    elif selected['treat_prepare'] and selected['treat_prepare']['action'] == 'fuel':
         reason = 'CONDITION_EMERGENCY' if selected_detail['projected_condition_impact'] else 'ENERGY_SUSTAINABILITY'
     else:
         reason = 'WIN_SPEED'
@@ -213,7 +230,8 @@ def describe_decision(sim, runner, capture):
                    f"estimated turns-to-finish {selected_detail['expected_turns_remaining_before_plan']:.2f} "
                    f"to {selected['expected_turns_remaining']:.2f}, "
                    f"and a {position['gap_to_leader_miles']:.2f}-mile gap to the leader. "
-                   f"Projected Pace cost is {selected_detail['projected_energy_cost']} Energy; "
+                   f"Projected Pace plus Movement-card cost is {selected_detail['projected_energy_cost']} Energy "
+                   f"({selected_detail['projected_movement_energy_cost']} from cards); "
                    f"total score {selected['score']:.3f}." + comparison)
     if rejected:
         reason_text += (' Closest rejected alternative projects '
@@ -245,6 +263,8 @@ def describe_decision(sim, runner, capture):
                                'class_counts': dict(classes),
                                'best_by_class': {k: {'treat_prepare': v['treat_prepare'],
                                                      'movement_cards': v['movement_cards'],
+                                                     'card_modes': v.get('card_modes'),
+                                                     'movement_energy_cost': v.get('movement_energy_cost'),
                                                      'movement_quarters': v['movement_quarters'],
                                                      'score': v['score']} for k, v in best_by_class.items()},
                                'summary_note': 'Counts cover every enumerated legal complete plan; representative plans omit redundant permutations.'},

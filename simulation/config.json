@@ -39,7 +39,7 @@
   "milestone_resolution": "Water and Aid apply named Condition remedies; Gut Checks use Hand Effort",
   "will_resolution": "single-use fallback for otherwise-legal unaffordable Pace",
   "pack_resolution_assumption": "deterministic AI consents to the nearest legal same-Pace group at Round Start; Pack preserves 1 Pace Energy",
-  "effect_resolution": "mandatory Event effects execute by canonical timing and scope",
+  "effect_resolution": "Event Effects execute only in EFFECT mode; Movement mode uses printed Effort and pays the card Energy cost",
   "energy_floor_assumption": 0,
   "max_turns_per_runner": 400,
   "training_slots": 2,

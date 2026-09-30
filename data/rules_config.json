@@ -15,32 +15,36 @@
     "modifiers": {
       "Strength Training": 1,
       "Strength": 1,
-      "Mental Toughness": 2,
-      "Pace Band": 1
+      "Mental Toughness": 3,
+      "Pace Band": 2
     }
   },
   "condition_severity": {
     "minimum": 0,
     "penalties_active_when": "effective_severity > 0",
     "numeric_effects": {
-      "Hot Spot": "Race/Push: -Effective Severity Effort",
-      "Side Stitch": "Race/Push: -Effective Severity Effort",
-      "Dead Legs": "Race/Push: -Effective Severity Effort",
-      "Sore Feet": "Concrete/Asphalt: +Effective Severity Difficulty"
+      "Hot Spot": "Race/Push: -1 Direct Movement when Effective Severity > 0",
+      "Side Stitch": "Race/Push: -1 Direct Movement when Effective Severity > 0",
+      "Dead Legs": "Race/Push: -1 Direct Movement when Effective Severity > 0",
+      "Gashed Knee": "-1 Direct Movement when Effective Severity > 0",
+      "Sore Feet": "Concrete/Asphalt: +2 Difficulty when Effective Severity > 0"
     },
     "suppression": {
       "Running Socks:Blister": 2,
-      "Compression:Cramp": 2,
+      "Compression Sleeves:Cramp": 2,
       "Recovery Sleeves:Tight Calf": 1
     },
     "remedies_set_current_to_zero": [
       "Electrolytes:Dehydrated",
       "Water:Dehydrated",
       "Salt Tabs:Cramp",
-      "Aid:Stomach Trouble",
-      "Aid:Heat Exhaustion"
+      "Aid:Nausea",
+      "Aid:Gashed Knee"
     ],
-    "removal_exception": "Aid:Twisted Ankle"
+    "aid_severity_reduction": {
+      "Twisted Ankle": 3,
+      "Heat Exhaustion": 4
+    }
   },
   "training_difficulty": {
     "Hill Repeats": {
@@ -59,6 +63,14 @@
       "stacking": true
     }
   },
+  "weather_energy": {
+    "Hot Spell": {"weather": "Heat", "target": "playing_runner", "energy_loss": 1, "activate": "next_round", "duration_rounds": 1},
+    "Cold Snap": {"weather": "Cold", "target": "playing_runner", "energy_loss": 1, "activate": "next_round", "duration_rounds": 1},
+    "protection_caps_at_actual_loss": true
+  },
+  "water_gear": {
+    "Hydration Belt": {"energy_gain": 1, "trigger": "Water milestone", "maximum_per_opportunity": 1}
+  },
   "deck_recycle": {
     "enabled": true,
     "rng": "seeded",
@@ -73,7 +85,14 @@
   "movement": {
     "direct_movement_miles": 0.25,
     "separate_from_base": true,
-    "boundary_uses_effective_difficulty": true
+    "boundary_uses_effective_difficulty": true,
+    "card_energy_cost_by_printed_effort": {
+      "1-3": 0,
+      "4-6": 1,
+      "7+": 2
+    },
+    "effect_use_contributes_effort": false,
+    "effect_use_pays_card_energy_cost": false
   },
   "preparation_slots": {
     "training": 2,

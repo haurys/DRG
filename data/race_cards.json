@@ -8,14 +8,34 @@
     "category": "Endurance",
     "effort": 7,
     "energy": null,
-    "effect_text": "Race preserve 1 Pace Energy; on acquisition Dead Legs starting Current Severity -2",
-    "effect_type": null,
+    "effect_text": "▶▶: No -⚡; Dead Legs: -2",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "pace_preserve",
+        "pace": "Race",
+        "energy_delta": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "condition": "Dead Legs",
+        "severity_delta": -2,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-002",
@@ -26,14 +46,34 @@
     "category": "Endurance",
     "effort": 7,
     "energy": null,
-    "effect_text": "Race preserve 1 Pace Energy; on acquisition Dead Legs starting Current Severity -2",
-    "effect_type": null,
+    "effect_text": "▶▶: No -⚡; Dead Legs: -2",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "pace_preserve",
+        "pace": "Race",
+        "energy_delta": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "condition": "Dead Legs",
+        "severity_delta": -2,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-003",
@@ -44,14 +84,37 @@
     "category": "Endurance",
     "effort": 6,
     "energy": null,
-    "effect_text": "Easy +1 Effort; on acquisition Dead Legs/Tight Calf starting Current Severity -1",
-    "effect_type": null,
+    "effect_text": "▷: +⚡; Dead Legs/Tight Calf: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Easy",
+        "energy_delta": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "conditions": [
+          "Dead Legs",
+          "Tight Calf"
+        ],
+        "severity_delta": -1,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-004",
@@ -62,14 +125,24 @@
     "category": "Endurance",
     "effort": 8,
     "energy": null,
-    "effect_text": "Race +1 Effort",
-    "effect_type": null,
+    "effect_text": "▶▶: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Race",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-005",
@@ -80,14 +153,24 @@
     "category": "Speed",
     "effort": 6,
     "energy": null,
-    "effect_text": "Steady +1 Effort",
-    "effect_type": null,
+    "effect_text": "▶: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Steady",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-006",
@@ -98,14 +181,24 @@
     "category": "Speed",
     "effort": 6,
     "energy": null,
-    "effect_text": "Steady +1 Effort",
-    "effect_type": null,
+    "effect_text": "▶: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Steady",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-007",
@@ -116,14 +209,24 @@
     "category": "Speed",
     "effort": 8,
     "energy": null,
-    "effect_text": "Push +1 Effort",
-    "effect_type": null,
+    "effect_text": "▶▶▶: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Push",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-008",
@@ -134,14 +237,24 @@
     "category": "Speed",
     "effort": 8,
     "energy": null,
-    "effect_text": "Push +1 Effort",
-    "effect_type": null,
+    "effect_text": "▶▶▶: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Push",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-009",
@@ -152,14 +265,29 @@
     "category": "Strength",
     "effort": 7,
     "energy": null,
-    "effect_text": "Incline Difficulty -2; Steep Incline Difficulty -1",
-    "effect_type": null,
+    "effect_text": "Incline: -2; Steep Incline: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "difficulty_delta",
+        "elevation": "Incline",
+        "difficulty_delta": -2
+      },
+      {
+        "type": "difficulty_delta",
+        "elevation": "Steep Incline",
+        "difficulty_delta": -1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-010",
@@ -170,14 +298,29 @@
     "category": "Strength",
     "effort": 7,
     "energy": null,
-    "effect_text": "Incline Difficulty -2; Steep Incline Difficulty -1",
-    "effect_type": null,
+    "effect_text": "Incline: -2; Steep Incline: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "difficulty_delta",
+        "elevation": "Incline",
+        "difficulty_delta": -2
+      },
+      {
+        "type": "difficulty_delta",
+        "elevation": "Steep Incline",
+        "difficulty_delta": -1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-011",
@@ -188,14 +331,36 @@
     "category": "Strength",
     "effort": 5,
     "energy": null,
-    "effect_text": "Gut Check +1; on acquisition Cramp/Tight Calf starting Current Severity -1",
-    "effect_type": null,
+    "effect_text": "Gut Check: +1; Cramp/Tight Calf: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "gut_check_modifier",
+        "value": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "conditions": [
+          "Cramp",
+          "Tight Calf"
+        ],
+        "severity_delta": -1,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-012",
@@ -206,14 +371,36 @@
     "category": "Strength",
     "effort": 5,
     "energy": null,
-    "effect_text": "Gut Check +1; on acquisition Cramp/Tight Calf starting Current Severity -1",
-    "effect_type": null,
+    "effect_text": "Gut Check: +1; Cramp/Tight Calf: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "gut_check_modifier",
+        "value": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "conditions": [
+          "Cramp",
+          "Tight Calf"
+        ],
+        "severity_delta": -1,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-013",
@@ -224,14 +411,34 @@
     "category": "Technique",
     "effort": 6,
     "energy": null,
-    "effect_text": "Steady preserve 1 Pace Energy; on acquisition Side Stitch starting Current Severity -2",
-    "effect_type": null,
+    "effect_text": "▶: No -⚡; Side Stitch: -2",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "pace_preserve",
+        "pace": "Steady",
+        "energy_delta": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "condition": "Side Stitch",
+        "severity_delta": -2,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-014",
@@ -242,14 +449,34 @@
     "category": "Technique",
     "effort": 6,
     "energy": null,
-    "effect_text": "Steady preserve 1 Pace Energy; on acquisition Side Stitch starting Current Severity -2",
-    "effect_type": null,
+    "effect_text": "▶: No -⚡; Side Stitch: -2",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "pace_preserve",
+        "pace": "Steady",
+        "energy_delta": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "condition": "Side Stitch",
+        "severity_delta": -2,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-015",
@@ -260,14 +487,24 @@
     "category": "Technique",
     "effort": 5,
     "energy": null,
-    "effect_text": "Trail +1 Effort",
-    "effect_type": null,
+    "effect_text": "Trail: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "route": "Trail",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-016",
@@ -278,14 +515,24 @@
     "category": "Technique",
     "effort": 5,
     "energy": null,
-    "effect_text": "Trail +1 Effort",
-    "effect_type": null,
+    "effect_text": "Trail: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "route": "Trail",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-017",
@@ -296,14 +543,37 @@
     "category": "Technique",
     "effort": 4,
     "energy": null,
-    "effect_text": "Flat +1 Effort; on acquisition Hot Spot/Sore Feet starting Current Severity -1",
-    "effect_type": null,
+    "effect_text": "Flat: +⚡; Hot Spot/Sore Feet: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "elevation": "Flat",
+        "energy_delta": 1
+      },
+      {
+        "type": "condition_severity_reduction",
+        "conditions": [
+          "Hot Spot",
+          "Sore Feet"
+        ],
+        "severity_delta": -1,
+        "triggers": [
+          "installation",
+          "acquisition"
+        ],
+        "installation_target_limit": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-018",
@@ -314,14 +584,29 @@
     "category": "Technique",
     "effort": 5,
     "energy": null,
-    "effect_text": "Descent Difficulty -2; Steep Descent Difficulty -1",
-    "effect_type": null,
+    "effect_text": "Descent: -2; Steep Descent: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "difficulty_delta",
+        "elevation": "Descent",
+        "difficulty_delta": -2
+      },
+      {
+        "type": "difficulty_delta",
+        "elevation": "Steep Descent",
+        "difficulty_delta": -1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "TR-019",
@@ -332,14 +617,23 @@
     "category": "Mental",
     "effort": 9,
     "energy": null,
-    "effect_text": "Gut Check +2",
-    "effect_type": null,
+    "effect_text": "Gut Check: +3",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "gut_check_modifier",
+        "value": 3
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "TR-020",
@@ -350,14 +644,23 @@
     "category": "Mental",
     "effort": 9,
     "energy": null,
-    "effect_text": "Gut Check +2",
-    "effect_type": null,
+    "effect_text": "Gut Check: +3",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "gut_check_modifier",
+        "value": 3
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "GE-001",
@@ -368,14 +671,24 @@
     "category": "Footwear",
     "effort": 7,
     "energy": null,
-    "effect_text": "Asphalt +1 Effort",
-    "effect_type": null,
+    "effect_text": "Asphalt: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "surface": "Asphalt",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "GE-002",
@@ -386,14 +699,24 @@
     "category": "Footwear",
     "effort": 7,
     "energy": null,
-    "effect_text": "Asphalt +1 Effort",
-    "effect_type": null,
+    "effect_text": "Asphalt: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "surface": "Asphalt",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "GE-003",
@@ -404,14 +727,24 @@
     "category": "Footwear",
     "effort": 4,
     "energy": null,
-    "effect_text": "Attached to Blister: -2 Effective Severity",
-    "effect_type": null,
+    "effect_text": "Blister: -2",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "condition_suppression",
+        "condition": "Blister",
+        "severity_delta": -2
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-004",
@@ -422,14 +755,24 @@
     "category": "Footwear",
     "effort": 6,
     "energy": null,
-    "effect_text": "Equipped Footwear; Steady preserve 1 Pace Energy",
-    "effect_type": null,
+    "effect_text": "▶: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Steady",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-005",
@@ -440,14 +783,24 @@
     "category": "Footwear",
     "effort": 7,
     "energy": null,
-    "effect_text": "Trail +2 Effort",
-    "effect_type": null,
+    "effect_text": "Trail: +⚡⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "route": "Trail",
+        "energy_delta": 2
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "GE-006",
@@ -458,14 +811,26 @@
     "category": "Apparel",
     "effort": 5,
     "energy": null,
-    "effect_text": "Heat effects -1 Energy",
-    "effect_type": null,
+    "effect_text": "No -⚡ for Heat/Rain",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "weather_protection",
+        "weather": [
+          "Heat",
+          "Rain"
+        ]
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-007",
@@ -476,14 +841,28 @@
     "category": "Apparel",
     "effort": 7,
     "energy": null,
-    "effect_text": "Temporary(5) Footwear; Steady/Race +1 Effort",
-    "effect_type": null,
+    "effect_text": "▶/▶▶: +⚡ (5 Rounds)",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
-    "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_duration": 5,
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": [
+          "Steady",
+          "Race"
+        ],
+        "energy_delta": 1,
+        "duration_turns": 5
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "GE-008",
@@ -494,14 +873,26 @@
     "category": "Apparel",
     "effort": 4,
     "energy": null,
-    "effect_text": "Heat effects -1 Energy",
-    "effect_type": null,
+    "effect_text": "No -⚡ for Cold/Heat",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "weather_protection",
+        "weather": [
+          "Cold",
+          "Heat"
+        ]
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-009",
@@ -512,14 +903,24 @@
     "category": "Apparel",
     "effort": 5,
     "energy": null,
-    "effect_text": "Steady +1 Effort",
-    "effect_type": null,
+    "effect_text": "▶: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": "Steady",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-010",
@@ -530,14 +931,25 @@
     "category": "Accessory",
     "effort": 4,
     "energy": null,
-    "effect_text": "Sun effects ignored",
-    "effect_type": null,
+    "effect_text": "No -⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "weather_protection",
+        "weather": [
+          "Sun"
+        ]
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-011",
@@ -548,14 +960,28 @@
     "category": "Accessory",
     "effort": 8,
     "energy": null,
-    "effect_text": "Temporary(3) Footwear; Race/Push +2 Effort",
-    "effect_type": null,
+    "effect_text": "▶▶/▶▶▶: +⚡⚡ (3 Rounds)",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
-    "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_duration": 3,
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "pace": [
+          "Race",
+          "Push"
+        ],
+        "energy_delta": 2,
+        "duration_turns": 3
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "GE-012",
@@ -566,32 +992,56 @@
     "category": "Accessory",
     "effort": 6,
     "energy": null,
-    "effect_text": "Water +1 Energy",
-    "effect_type": null,
+    "effect_text": "+⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 1,
+        "trigger": "Water",
+        "once_per_opportunity": true
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-013",
-    "title": "Hydration Belt",
+    "title": "Running Jacket",
     "family": "Gear",
     "quantity": 1,
     "printing": 2,
     "category": "Accessory",
     "effort": 6,
     "energy": null,
-    "effect_text": "Water +1 Energy",
-    "effect_type": null,
+    "effect_text": "No -⚡ for Cold/Rain/Wind",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "weather_protection",
+        "weather": [
+          "Cold",
+          "Rain",
+          "Wind"
+        ]
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-014",
@@ -602,32 +1052,52 @@
     "category": "Support",
     "effort": 5,
     "energy": null,
-    "effect_text": "Prevent a new Hot Spot while active",
-    "effect_type": null,
+    "effect_text": "Prevent Hot Spot",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "condition_prevention",
+        "condition": "Hot Spot"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-015",
-    "title": "Lightweight Singlet",
+    "title": "Singlet",
     "family": "Gear",
     "quantity": 1,
     "printing": 2,
     "category": "Support",
     "effort": 5,
     "energy": null,
-    "effect_text": "Temporary(5); preserve 1 Heat-related Energy loss",
-    "effect_type": null,
+    "effect_text": "No -⚡ Heat",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "weather_protection",
+        "weather": [
+          "Heat"
+        ]
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-016",
@@ -638,14 +1108,24 @@
     "category": "Technology",
     "effort": 8,
     "energy": null,
-    "effect_text": "Pace +1 Effort once/Round",
-    "effect_type": null,
+    "effect_text": "+⚡ (2 Rounds)",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
-    "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_duration": 2,
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 1,
+        "duration_turns": 2
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "GE-017",
@@ -656,14 +1136,24 @@
     "category": "Technology",
     "effort": 5,
     "energy": null,
-    "effect_text": "Attached to Tight Calf: -1 Effective Severity",
-    "effect_type": null,
+    "effect_text": "Tight Calf: -1",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "condition_suppression",
+        "condition": "Tight Calf",
+        "severity_delta": -1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-018",
@@ -674,14 +1164,23 @@
     "category": "Technology",
     "effort": 6,
     "energy": null,
-    "effect_text": "Gut Check +1",
-    "effect_type": null,
+    "effect_text": "Gut Check: +2",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "gut_check_modifier",
+        "value": 2
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-019",
@@ -692,14 +1191,24 @@
     "category": "Support",
     "effort": 5,
     "energy": null,
-    "effect_text": "Attached to Cramp: -2 Effective Severity",
-    "effect_type": null,
+    "effect_text": "Cramp: -2",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "condition_suppression",
+        "condition": "Cramp",
+        "severity_delta": -2
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "GE-020",
@@ -710,14 +1219,24 @@
     "category": "Support",
     "effort": 6,
     "energy": null,
-    "effect_text": "Concrete +1 Effort",
-    "effect_type": null,
+    "effect_text": "Concrete: +⚡",
+    "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "INSTALLED_TRIGGER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "surface": "Concrete",
+        "energy_delta": 1
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-001",
@@ -727,15 +1246,25 @@
     "printing": 1,
     "category": "",
     "effort": 3,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": ""
   },
   {
     "id": "FU-002",
@@ -745,15 +1274,25 @@
     "printing": 2,
     "category": "",
     "effort": 5,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-003",
@@ -763,15 +1302,25 @@
     "printing": 3,
     "category": "",
     "effort": 7,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "FU-004",
@@ -781,15 +1330,25 @@
     "printing": 1,
     "category": "",
     "effort": 4,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-005",
@@ -799,15 +1358,25 @@
     "printing": 2,
     "category": "",
     "effort": 6,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-006",
@@ -817,15 +1386,32 @@
     "printing": 1,
     "category": "",
     "effort": 3,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Tight Calf: -2",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "severity_delta",
+        "condition": "Tight Calf",
+        "severity_delta": -2,
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": ""
   },
   {
     "id": "FU-007",
@@ -835,15 +1421,32 @@
     "printing": 2,
     "category": "",
     "effort": 5,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Tight Calf: -2",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "severity_delta",
+        "condition": "Tight Calf",
+        "severity_delta": -2,
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-008",
@@ -853,15 +1456,25 @@
     "printing": 1,
     "category": "",
     "effort": 4,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-009",
@@ -871,15 +1484,25 @@
     "printing": 2,
     "category": "",
     "effort": 7,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "FU-010",
@@ -889,15 +1512,32 @@
     "printing": 1,
     "category": "",
     "effort": 2,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Heat Exhaustion: -2",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "severity_delta",
+        "condition": "Heat Exhaustion",
+        "severity_delta": -2,
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": ""
   },
   {
     "id": "FU-011",
@@ -907,15 +1547,32 @@
     "printing": 2,
     "category": "",
     "effort": 4,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Heat Exhaustion: -2",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "severity_delta",
+        "condition": "Heat Exhaustion",
+        "severity_delta": -2,
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-012",
@@ -925,15 +1582,32 @@
     "printing": 3,
     "category": "",
     "effort": 6,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Heat Exhaustion: -2",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "severity_delta",
+        "condition": "Heat Exhaustion",
+        "severity_delta": -2,
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-013",
@@ -943,15 +1617,25 @@
     "printing": 1,
     "category": "",
     "effort": 3,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": ""
   },
   {
     "id": "FU-014",
@@ -961,15 +1645,25 @@
     "printing": 2,
     "category": "",
     "effort": 5,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-015",
@@ -979,15 +1673,25 @@
     "printing": 3,
     "category": "",
     "effort": 7,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "FU-016",
@@ -997,15 +1701,31 @@
     "printing": 1,
     "category": "",
     "effort": 4,
-    "energy": 1,
-    "effect_text": "+1 Energy OR remedy Dehydrated",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Remedy Dehydrated",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "remedy",
+        "condition": "Dehydrated",
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-017",
@@ -1015,15 +1735,31 @@
     "printing": 2,
     "category": "",
     "effort": 6,
-    "energy": 1,
-    "effect_text": "+1 Energy OR remedy Dehydrated",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Remedy Dehydrated",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "remedy",
+        "condition": "Dehydrated",
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-018",
@@ -1033,15 +1769,31 @@
     "printing": 3,
     "category": "",
     "effort": 8,
-    "energy": 1,
-    "effect_text": "+1 Energy OR remedy Dehydrated",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Remedy Dehydrated",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "remedy",
+        "condition": "Dehydrated",
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "FU-019",
@@ -1051,15 +1803,31 @@
     "printing": 1,
     "category": "",
     "effort": 5,
-    "energy": 1,
-    "effect_text": "+1 Energy OR remedy Cramp",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Remedy Cramp",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "remedy",
+        "condition": "Cramp",
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "FU-020",
@@ -1069,15 +1837,31 @@
     "printing": 2,
     "category": "",
     "effort": 7,
-    "energy": 1,
-    "effect_text": "+1 Energy OR remedy Cramp",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡ or Remedy Cramp",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE",
+        "choice_group": "energy_or_condition"
+      },
+      {
+        "type": "remedy",
+        "condition": "Cramp",
+        "choice_group": "energy_or_condition"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "FU-021",
@@ -1087,15 +1871,25 @@
     "printing": 1,
     "category": "",
     "effort": 3,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": ""
   },
   {
     "id": "FU-022",
@@ -1105,15 +1899,25 @@
     "printing": 1,
     "category": "",
     "effort": 8,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": 2,
+    "effect_text": "+⚡⚡",
+    "effect_type": "FUEL_CHOICE",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "TREAT_PREPARE",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_gain",
+        "energy_delta": 2,
+        "effect_timing": "TREAT_PREPARE"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-001",
@@ -1124,14 +1928,26 @@
     "category": "",
     "effort": 5,
     "energy": null,
-    "effect_text": "Target -1 Pace Effort",
-    "effect_type": null,
+    "effect_text": "Runner -→",
+    "effect_type": "OTHER_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "NEXT_ROUND"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-002",
@@ -1142,14 +1958,26 @@
     "category": "",
     "effort": 7,
     "energy": null,
-    "effect_text": "Target -1 Pace Effort",
-    "effect_type": null,
+    "effect_text": "Runner -→",
+    "effect_type": "OTHER_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "NEXT_ROUND"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-003",
@@ -1160,14 +1988,26 @@
     "category": "",
     "effort": 4,
     "energy": null,
-    "effect_text": "+1 movement",
-    "effect_type": null,
+    "effect_text": "+→",
+    "effect_type": "CURRENT_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "movement_delta": 1,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": 1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-004",
@@ -1178,14 +2018,26 @@
     "category": "",
     "effort": 6,
     "energy": null,
-    "effect_text": "+1 movement",
-    "effect_type": null,
+    "effect_text": "+→",
+    "effect_type": "CURRENT_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "movement_delta": 1,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": 1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-005",
@@ -1196,14 +2048,26 @@
     "category": "",
     "effort": 5,
     "energy": null,
-    "effect_text": "Next mile +1 Difficulty for 4 rounds; stacks independently",
+    "effect_text": "Difficulty +1 (4 Rounds)",
     "effect_type": "COURSE_DIFFICULTY",
     "effect_value": 1,
-    "effect_target": "NEXT_MILE",
+    "effect_target": "COURSE",
     "effect_duration": 4,
-    "effect_timing": "CURRENT_MOVEMENT",
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "difficulty_delta",
+        "value": 1,
+        "target": "COURSE",
+        "timing": "FOUR_ROUNDS"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-006",
@@ -1214,14 +2078,28 @@
     "category": "",
     "effort": 6,
     "energy": null,
-    "effect_text": "All runners: Push costs +1 Energy next round",
-    "effect_type": "PACE_ENERGY_COST",
+    "effect_text": "-⚡ (1 Round)",
+    "effect_type": "SELF_WEATHER_ENERGY_LOSS",
     "effect_value": 1,
-    "effect_target": "GLOBAL",
+    "effect_target": "SELF",
     "effect_duration": 1,
     "effect_timing": "NEXT_ROUND",
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": -1,
+        "target": "SELF",
+        "timing": "NEXT_ROUND",
+        "duration_rounds": 1,
+        "weather": "Heat"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-007",
@@ -1231,15 +2109,27 @@
     "printing": 1,
     "category": "",
     "effort": 4,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡",
+    "effect_type": "ENERGY_GAIN",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-008",
@@ -1250,14 +2140,26 @@
     "category": "",
     "effort": 3,
     "energy": null,
-    "effect_text": "+1 Pace Effort",
-    "effect_type": null,
+    "effect_text": "+→",
+    "effect_type": "CURRENT_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "movement_delta": 1,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": 1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_energy_icon": ""
   },
   {
     "id": "EV-009",
@@ -1268,32 +2170,58 @@
     "category": "",
     "effort": 4,
     "energy": null,
-    "effect_text": "Target -1 movement",
-    "effect_type": null,
+    "effect_text": "-→",
+    "effect_type": "SELF_DIRECT_LOSS",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_delta": -1,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-010",
-    "title": "Congestion",
+    "title": "Cold Snap",
     "family": "Event",
     "quantity": 1,
     "printing": 2,
     "category": "",
     "effort": 6,
     "energy": null,
-    "effect_text": "Target -1 movement",
-    "effect_type": null,
+    "effect_text": "-⚡ (1 Round)",
+    "effect_type": "SELF_WEATHER_ENERGY_LOSS",
     "effect_value": null,
-    "effect_target": null,
-    "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_target": "SELF",
+    "effect_duration": 1,
+    "effect_timing": "NEXT_ROUND",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": -1,
+        "target": "SELF",
+        "timing": "NEXT_ROUND",
+        "duration_rounds": 1,
+        "weather": "Cold"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-011",
@@ -1304,14 +2232,34 @@
     "category": "",
     "effort": 5,
     "energy": null,
-    "effect_text": "Target chooses -1 movement or -1 Energy",
-    "effect_type": null,
+    "effect_text": "Runner -→ or -⚡",
+    "effect_type": "OTHER_CHOICE",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "IMMEDIATE_OR_NEXT_MOVEMENT",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "IMMEDIATE",
+        "choice_group": "energy_or_movement"
+      },
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "TARGET_NEXT_MOVEMENT",
+        "choice_group": "energy_or_movement"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-012",
@@ -1322,14 +2270,34 @@
     "category": "",
     "effort": 7,
     "energy": null,
-    "effect_text": "Target chooses -1 movement or -1 Energy",
-    "effect_type": null,
+    "effect_text": "Runner -→ or -⚡",
+    "effect_type": "OTHER_CHOICE",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "IMMEDIATE_OR_NEXT_MOVEMENT",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "IMMEDIATE",
+        "choice_group": "energy_or_movement"
+      },
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "TARGET_NEXT_MOVEMENT",
+        "choice_group": "energy_or_movement"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-013",
@@ -1340,14 +2308,26 @@
     "category": "",
     "effort": 7,
     "energy": null,
-    "effect_text": "+1 movement",
-    "effect_type": null,
+    "effect_text": "+→",
+    "effect_type": "CURRENT_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "movement_delta": 1,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": 1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-014",
@@ -1358,14 +2338,26 @@
     "category": "",
     "effort": 4,
     "energy": null,
-    "effect_text": "Ignore Course Difficulty this Movement",
-    "effect_type": "IGNORE_COURSE_DIFFICULTY",
+    "effect_text": "Ignore Difficulty",
+    "effect_type": "IGNORE_DIFFICULTY",
     "effect_target": "SELF",
-    "effect_timing": "CURRENT_MOVEMENT",
+    "effect_timing": "MOVEMENT_OR_AFTER",
     "effect_value": null,
     "effect_duration": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "ignore_difficulty",
+        "value": true,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-015",
@@ -1375,15 +2367,33 @@
     "printing": 1,
     "category": "",
     "effort": 5,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡; Runner +⚡",
+    "effect_type": "ENERGY_TO_SELF_AND_OTHER",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      },
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "OTHER",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-016",
@@ -1393,15 +2403,33 @@
     "printing": 2,
     "category": "",
     "effort": 7,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡; Runner +⚡",
+    "effect_type": "ENERGY_TO_SELF_AND_OTHER",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      },
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "OTHER",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-017",
@@ -1412,14 +2440,26 @@
     "category": "",
     "effort": 6,
     "energy": null,
-    "effect_text": "After Movement, cycle up to 2 other hand cards",
-    "effect_type": "CYCLE_HAND",
+    "effect_text": "Cycle 2 Cards",
+    "effect_type": "HAND_CYCLE",
     "effect_value": 2,
     "effect_target": "SELF",
-    "effect_timing": "AFTER_MOVEMENT",
+    "effect_timing": "MOVEMENT_OR_AFTER",
     "effect_duration": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "cycle_cards",
+        "value": 2,
+        "target": "SELF",
+        "timing": "AFTER_MOVEMENT"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-018",
@@ -1430,14 +2470,33 @@
     "category": "",
     "effort": 3,
     "energy": null,
-    "effect_text": "Pack members +1 Energy; if solo, self +1 Energy",
-    "effect_type": "ENERGY",
+    "effect_text": "+⚡; Runner +⚡",
+    "effect_type": "ENERGY_TO_SELF_AND_OTHER",
     "effect_value": 1,
-    "effect_target": "PACK_OR_SELF",
-    "effect_timing": "AFTER_MOVEMENT",
+    "effect_target": "OTHER",
+    "effect_timing": "MOVEMENT_OR_AFTER",
     "effect_duration": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      },
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "OTHER",
+        "timing": "IMMEDIATE",
+        "target_eligibility": "other_current_pack_member_if_packed"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": ""
   },
   {
     "id": "EV-019",
@@ -1448,14 +2507,32 @@
     "category": "",
     "effort": 7,
     "energy": null,
-    "effect_text": "+1 Pace Effort",
-    "effect_type": null,
+    "effect_text": "+→; Runner +→",
+    "effect_type": "DIRECT_TO_SELF_AND_OTHER",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "movement_delta": 1,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": 1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      },
+      {
+        "type": "direct_movement",
+        "value": 1,
+        "target": "OTHER",
+        "timing": "NEXT_ROUND"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-020",
@@ -1466,14 +2543,26 @@
     "category": "",
     "effort": 5,
     "energy": null,
-    "effect_text": "After Movement, transfer this card to eligible runner; gain +1 Energy",
-    "effect_type": "TRANSFER_SELF",
+    "effect_text": "Runner +⚡",
+    "effect_type": "OTHER_ENERGY_GAIN",
     "effect_value": 1,
-    "effect_target": "ELIGIBLE_RUNNER",
-    "effect_timing": "AFTER_MOVEMENT",
+    "effect_target": "OTHER",
+    "effect_timing": "IMMEDIATE",
     "effect_duration": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "OTHER",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-021",
@@ -1483,15 +2572,27 @@
     "printing": 1,
     "category": "",
     "effort": 8,
-    "energy": 3,
-    "effect_text": "+3 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡⚡⚡",
+    "effect_type": "ENERGY_GAIN",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 3,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-022",
@@ -1501,15 +2602,27 @@
     "printing": 2,
     "category": "",
     "effort": 9,
-    "energy": 3,
-    "effect_text": "+3 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡⚡⚡",
+    "effect_type": "ENERGY_GAIN",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 3,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-023",
@@ -1520,14 +2633,26 @@
     "category": "",
     "effort": 10,
     "energy": null,
-    "effect_text": "No additional Effect; printed Effort is the benefit",
-    "effect_type": "NONE",
+    "effect_text": "++→",
+    "effect_type": "CURRENT_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "movement_delta": 2,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": 2,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-024",
@@ -1537,15 +2662,27 @@
     "printing": 1,
     "category": "",
     "effort": 6,
-    "energy": 2,
-    "effect_text": "+2 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡⚡",
+    "effect_type": "ENERGY_GAIN",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 2,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-025",
@@ -1556,14 +2693,34 @@
     "category": "",
     "effort": 8,
     "energy": null,
-    "effect_text": "Eligible opponent: next round -1 Movement and +1 Pace Energy cost",
-    "effect_type": "STAGED_MOVEMENT_AND_PACE_COST",
+    "effect_text": "Runner -→ or -⚡",
+    "effect_type": "OTHER_CHOICE",
     "effect_value": -1,
     "effect_target": "OTHER",
     "effect_duration": null,
-    "effect_timing": "NEXT_ROUND_STAGED",
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "IMMEDIATE_OR_NEXT_MOVEMENT",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 2,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "IMMEDIATE",
+        "choice_group": "energy_or_movement"
+      },
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "TARGET_NEXT_MOVEMENT",
+        "choice_group": "energy_or_movement"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡⚡"
   },
   {
     "id": "EV-026",
@@ -1574,14 +2731,32 @@
     "category": "",
     "effort": 4,
     "energy": null,
-    "effect_text": "Movement maximum 0.5 mile; after Movement gain 2 Energy",
-    "effect_type": "MOVEMENT_CAP_AND_ENERGY",
+    "effect_text": "-→; +⚡⚡",
+    "effect_type": "DIRECT_LOSS_AND_ENERGY_GAIN",
     "effect_value": 2,
     "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": "CURRENT_AND_AFTER_MOVEMENT",
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      },
+      {
+        "type": "energy_delta",
+        "value": 2,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": -1,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-027",
@@ -1592,14 +2767,26 @@
     "category": "",
     "effort": 6,
     "energy": null,
-    "effect_text": "+1 movement",
-    "effect_type": null,
+    "effect_text": "+→",
+    "effect_type": "CURRENT_DIRECT",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "movement_delta": 1,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": 1,
+        "target": "SELF",
+        "timing": "CURRENT_MOVEMENT"
+      }
+    ],
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "EV-028",
@@ -1609,15 +2796,27 @@
     "printing": 1,
     "category": "",
     "effort": 3,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡",
+    "effect_type": "ENERGY_GAIN",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": ""
   },
   {
     "id": "EV-029",
@@ -1627,15 +2826,27 @@
     "printing": 1,
     "category": "",
     "effort": 2,
-    "energy": 1,
-    "effect_text": "+1 Energy",
-    "effect_type": null,
+    "energy": null,
+    "effect_text": "+⚡",
+    "effect_type": "ENERGY_GAIN",
     "effect_value": null,
-    "effect_target": null,
+    "effect_target": "SELF",
     "effect_duration": null,
-    "effect_timing": null,
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 0,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "energy_delta",
+        "value": 1,
+        "target": "SELF",
+        "timing": "IMMEDIATE"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": ""
   },
   {
     "id": "EV-030",
@@ -1646,14 +2857,32 @@
     "category": "",
     "effort": 5,
     "energy": null,
-    "effect_text": "Eligible opponent: next round -1 Movement and no Pack Energy preservation",
-    "effect_type": "STAGED_MOVEMENT_AND_PACK_BLOCK",
+    "effect_text": "Runner -→; No Pack (1 Round)",
+    "effect_type": "OTHER_DIRECT_AND_NO_PACK",
     "effect_value": -1,
     "effect_target": "OTHER",
-    "effect_duration": null,
-    "effect_timing": "NEXT_ROUND_STAGED",
-    "status": "SOURCE BASELINE",
-    "notes": ""
+    "effect_duration": 1,
+    "effect_timing": "MOVEMENT_OR_AFTER",
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": 1,
+    "severity": null,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "value": -1,
+        "target": "OTHER",
+        "timing": "NEXT_ROUND"
+      },
+      {
+        "type": "pack_unavailable",
+        "value": true,
+        "target": "OTHER",
+        "timing": "NEXT_ROUND"
+      }
+    ],
+    "movement_delta": 0,
+    "movement_energy_icon": "⚡"
   },
   {
     "id": "CO-001",
@@ -1664,14 +2893,23 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Push unavailable; Treat 4",
-    "effect_type": null,
+    "effect_text": "No ▶▶▶",
+    "effect_type": "pace_unavailable",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 4,
+    "effect_components": [
+      {
+        "type": "pace_unavailable",
+        "pace": "Push"
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-002",
@@ -1682,14 +2920,23 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Push unavailable; Treat 4",
-    "effect_type": null,
+    "effect_text": "No ▶▶▶",
+    "effect_type": "pace_unavailable",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 4,
+    "effect_components": [
+      {
+        "type": "pace_unavailable",
+        "pace": "Push"
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-003",
@@ -1700,14 +2947,24 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Push costs +1 Energy; Treat 3",
-    "effect_type": null,
+    "effect_text": "▶▶▶: -⚡",
+    "effect_type": "extra_pace_energy",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 3,
+    "effect_components": [
+      {
+        "type": "extra_pace_energy",
+        "pace": "Push",
+        "energy_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-004",
@@ -1718,14 +2975,27 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Race/Push: -Effective Severity Effort; Treat 5",
-    "effect_type": null,
+    "effect_text": "▶▶/▶▶▶: -→",
+    "effect_type": "direct_movement",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 5,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "pace": [
+          "Race",
+          "Push"
+        ],
+        "movement_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-005",
@@ -1736,14 +3006,24 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Push costs +1 Energy; Treat 3",
-    "effect_type": null,
+    "effect_text": "▶▶▶: -⚡",
+    "effect_type": "extra_pace_energy",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 3,
+    "effect_components": [
+      {
+        "type": "extra_pace_energy",
+        "pace": "Push",
+        "energy_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-006",
@@ -1754,14 +3034,24 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Push costs +1 Energy; Treat 3",
-    "effect_type": null,
+    "effect_text": "▶▶▶: -⚡",
+    "effect_type": "extra_pace_energy",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 3,
+    "effect_components": [
+      {
+        "type": "extra_pace_energy",
+        "pace": "Push",
+        "energy_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-007",
@@ -1772,14 +3062,27 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Race/Push: -Effective Severity Effort; Treat 2",
-    "effect_type": null,
+    "effect_text": "▶▶/▶▶▶: -→",
+    "effect_type": "direct_movement",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 2,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "pace": [
+          "Race",
+          "Push"
+        ],
+        "movement_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-008",
@@ -1790,14 +3093,27 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Race/Push: -Effective Severity Effort; Treat 2",
-    "effect_type": null,
+    "effect_text": "▶▶/▶▶▶: -→",
+    "effect_type": "direct_movement",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 2,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "pace": [
+          "Race",
+          "Push"
+        ],
+        "movement_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-009",
@@ -1808,14 +3124,27 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Concrete/Asphalt: +Effective Severity Difficulty; Treat 4",
-    "effect_type": null,
+    "effect_text": "Concrete/Asphalt: +2",
+    "effect_type": "difficulty_delta",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 4,
+    "effect_components": [
+      {
+        "type": "difficulty_delta",
+        "surface": [
+          "Concrete",
+          "Asphalt"
+        ],
+        "difficulty_delta": 2
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-010",
@@ -1826,32 +3155,59 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Steady/Race/Push +1 Energy; Water or Treat 5",
-    "effect_type": null,
+    "effect_text": "▶/▶▶/▶▶▶: -⚡",
+    "effect_type": "extra_pace_energy",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 5,
+    "effect_components": [
+      {
+        "type": "extra_pace_energy",
+        "pace": [
+          "Steady",
+          "Race",
+          "Push"
+        ],
+        "energy_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-011",
-    "title": "Dehydrated",
+    "title": "Cold Chills",
     "family": "Condition",
     "quantity": 1,
     "printing": 2,
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Steady/Race/Push +1 Energy; Water or Treat 5",
-    "effect_type": null,
+    "effect_text": "▶▶/▶▶▶: -⚡",
+    "effect_type": "extra_pace_energy",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 5,
+    "effect_components": [
+      {
+        "type": "extra_pace_energy",
+        "pace": [
+          "Race",
+          "Push"
+        ],
+        "energy_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-012",
@@ -1862,32 +3218,49 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Fuel gives -1 Energy; Treat 4",
-    "effect_type": null,
+    "effect_text": "No Fuel Allowed",
+    "effect_type": "fuel_unavailable",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 4,
+    "effect_components": [
+      {
+        "type": "fuel_unavailable"
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-013",
-    "title": "Stomach Trouble",
+    "title": "Gashed Knee",
     "family": "Condition",
     "quantity": 1,
     "printing": 1,
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Fuel unavailable; Aid or Treat 5",
-    "effect_type": null,
+    "effect_text": "-→",
+    "effect_type": "direct_movement",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 5,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "movement_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-014",
@@ -1898,14 +3271,27 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Race/Push: -Effective Severity Effort; Treat 3",
-    "effect_type": null,
+    "effect_text": "▶▶/▶▶▶: -→",
+    "effect_type": "direct_movement",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 3,
+    "effect_components": [
+      {
+        "type": "direct_movement",
+        "pace": [
+          "Race",
+          "Push"
+        ],
+        "movement_delta": -1
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-015",
@@ -1916,14 +3302,23 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Maximum Pace: Steady; Aid or Treat 7",
-    "effect_type": null,
+    "effect_text": "Max ▶",
+    "effect_type": "pace_cap",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 7,
+    "effect_components": [
+      {
+        "type": "pace_cap",
+        "pace": "Steady"
+      }
+    ],
+    "movement_energy_icon": null
   },
   {
     "id": "CO-016",
@@ -1934,13 +3329,22 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Maximum Pace: Easy; Aid or Treat 8",
-    "effect_type": null,
+    "effect_text": "Max ▷",
+    "effect_type": "pace_cap",
     "effect_value": null,
     "effect_target": null,
     "effect_duration": null,
     "effect_timing": null,
-    "status": "RULES REVIEW",
-    "notes": "Activation, stacking, treatment timing, and duration unresolved."
+    "status": "FROZEN REDESIGN",
+    "notes": "",
+    "movement_energy_cost": null,
+    "severity": 8,
+    "effect_components": [
+      {
+        "type": "pace_cap",
+        "pace": "Easy"
+      }
+    ],
+    "movement_energy_icon": null
   }
 ]
