@@ -77,6 +77,7 @@ class VictoryDirective(unittest.TestCase):
         sim, runner = fixture(difficulty=1)
         runner['pace'] = 'Race'
         runner['energy'] = 3
+        runner['will_available'] = False  # isolate the remedy choice from the new Will line
         runner['hand'] = [card('FU-019'), card('EV-023')]
         runner['active_conditions'] = [m.make_condition(card('CO-001'))]
         plan = sim.choose_turn_plan(runner)

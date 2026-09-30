@@ -19,4 +19,4 @@ This is a historical boundary document. The [2026-09-30 canonical rules](DRG-Can
 | Condition penalty scaled by Effective Severity | Printed binary penalties while Effective Severity > 0; treatment and suppression still use Severity. |
 | Porta-Potty fixed half-mile cap | Its printed EFFECT is −1 direct Movement and +2 Energy after Movement; ordinary two-mile cap remains. |
 
-The unchanged Pace, Course, Pack, Will, hand, draw, Finish, and milestone rules remain in the canonical document.
+The current Pace, Course, Pack, Will, hand, draw, Finish, and milestone rules are in the canonical document. The former Pace-only Will fallback is superseded: Will now covers exact combined Pace and Movement-card Energy shortfall after reductions.

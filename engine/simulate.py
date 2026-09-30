@@ -947,22 +947,27 @@ class Sim:
                 projected['energy'] = min(15, projected['energy'] + (card['energy'] or 0))
         return projected
 
-    def preview_payment(self, runner):
+    def preview_payment(self, runner, movement_cost=0):
         projected = copy.deepcopy(runner)
         projected['energy'] = min(15, projected['energy'] +
                                   sum(amount for _, amount in self.installed_energy(projected)))
         cost = self.pace_cost(projected, projected['pace'])['final']
-        if cost > projected['energy']:
+        total = cost + movement_cost
+        if total > projected['energy']:
             if projected['will_available']:
                 projected['will_available'] = False
                 projected['energy'] = 0
             else:
-                affordable = [pace for pace in PACE_ORDER[:PACE_ORDER.index(projected['pace']) + 1]
-                              if self.pace_cost(projected, pace)['final'] <= projected['energy']]
-                projected['pace'] = affordable[-1] if affordable else 'Easy'
-                projected['energy'] -= self.pace_cost(projected, projected['pace'])['final']
+                if cost > projected['energy']:
+                    affordable = [pace for pace in PACE_ORDER[:PACE_ORDER.index(projected['pace']) + 1]
+                                  if self.pace_cost(projected, pace)['final'] <= projected['energy']]
+                    projected['pace'] = affordable[-1] if affordable else 'Easy'
+                total = self.pace_cost(projected, projected['pace'])['final'] + movement_cost
+                if total > projected['energy']:
+                    return None
+                projected['energy'] -= total
         else:
-            projected['energy'] -= cost
+            projected['energy'] -= total
         return projected
 
     def preview_movement(self, runner, cards):
@@ -1129,17 +1134,15 @@ class Sim:
         candidates = []
         for plan in self.treat_candidates(runner):
             prepared = self.preview_preparation(runner, plan)
-            paid = self.preview_payment(prepared)
             allowance = self.cfg['max_voluntary_plays'] - bool(plan)
             for cards in self.movement_candidates(prepared, allowance):
                 if not cards and prepared['hand']:
                     continue
                 cost = sum(movement_energy_cost(card) for card in cards
                            if card['use_mode'] == 'MOVEMENT')
-                if cost > paid['energy']:
+                after_cards = self.preview_payment(prepared, cost)
+                if after_cards is None:
                     continue
-                after_cards = copy.deepcopy(paid)
-                after_cards['energy'] -= cost
                 resolved = self.preview_movement(after_cards, cards)
                 score, turns = self.plan_score(runner, prepared, after_cards, plan, cards, resolved)
                 candidates.append({'treat_prepare': plan,
@@ -1149,7 +1152,8 @@ class Sim:
                                    'movement_quarters': resolved['quarter_miles'],
                                    'expected_turns_remaining': turns, 'score': score})
         if not candidates:
-            fallback = {'treat_prepare': None, 'movement_cards': [], 'movement_quarters': 0,
+            fallback = {'treat_prepare': None, 'movement_cards': [], 'card_modes': [],
+                        'movement_energy_cost': 0, 'movement_quarters': 0,
                         'expected_turns_remaining': len(self.course) * 2, 'score': -1000}
             if rationale is not None:
                 rationale.update({'candidates': [], 'eligible': [], 'selected': fallback,
@@ -1183,13 +1187,21 @@ class Sim:
                                 and not any(event['card']['id'] == 'EV-030'
                                             for event in self.active_staged(runner))),
                                key=lambda runner: (-runner['quarter_mile_space'], runner['player_id']))
-            while available:
-                leader = available.pop(0)
-                members = [leader] + [runner for runner in available
-                                      if leader['quarter_mile_space'] - runner['quarter_mile_space'] <= 2]
-                available = [runner for runner in available if runner not in members]
+            groups = []
+            for runner in available:
+                eligible = [group for group in groups
+                            if group[0]['quarter_mile_space'] - runner['quarter_mile_space'] <= 2]
+                if eligible:
+                    nearest = min(eligible, key=lambda group: (
+                        group[0]['quarter_mile_space'] - runner['quarter_mile_space'],
+                        group[0]['player_id']))
+                    nearest.append(runner)
+                else:
+                    groups.append([runner])
+            for members in groups:
                 if len(members) < 2:
                     continue
+                leader = members[0]
                 pack_number += 1
                 pack_id = f'PACK-R{self.round}-{pack_number}'
                 member_ids = [runner['player_id'] for runner in members]
@@ -1277,24 +1289,32 @@ class Sim:
         return {'base': base, 'condition_extra': condition_extra, 'staged_extra': staged_extra,
                 'preservation_sources': sources, 'final': final}
 
-    def pay_pace(self, runner):
+    def pay_pace(self, runner, movement_cost=0):
         maximum = self.maximum_legal_pace(runner)
         if PACE_ORDER.index(runner['pace']) > PACE_ORDER.index(maximum):
             runner['pace'] = maximum
         cost = self.pace_cost(runner, runner['pace'])
         will_used = False
-        if cost['final'] > runner['energy']:
+        total = cost['final'] + movement_cost
+        shortfall = max(0, total - runner['energy'])
+        if shortfall:
             if runner['will_available']:
                 will_used = True
                 runner['will_available'] = False
                 runner['stats']['will_used'] += 1
-                paid = runner['energy']
-                runner['energy'] = 0
+                paid = min(cost['final'], runner['energy'])
+                runner['energy'] -= paid
+                self.emit('WILL_USE', runner['player_id'], {'pace_cost': cost['final'],
+                          'movement_cost': movement_cost, 'shortfall': shortfall,
+                          'stored_energy_paid_for_pace': paid})
             else:
-                affordable = [pace for pace in PACE_ORDER[:PACE_ORDER.index(runner['pace']) + 1]
-                              if self.pace_cost(runner, pace)['final'] <= runner['energy']]
-                runner['pace'] = affordable[-1] if affordable else 'Easy'
-                cost = self.pace_cost(runner, runner['pace'])
+                if cost['final'] > runner['energy']:
+                    affordable = [pace for pace in PACE_ORDER[:PACE_ORDER.index(runner['pace']) + 1]
+                                  if self.pace_cost(runner, pace)['final'] <= runner['energy']]
+                    runner['pace'] = affordable[-1] if affordable else 'Easy'
+                    cost = self.pace_cost(runner, runner['pace'])
+                if cost['final'] + movement_cost > runner['energy']:
+                    raise ValueError('Movement Energy unavailable')
                 paid = cost['final']
                 runner['energy'] -= paid
         else:
@@ -1302,7 +1322,8 @@ class Sim:
             runner['energy'] -= paid
         runner['stats']['energy_spent'] += paid
         self.emit('PACE_PAYMENT', runner['player_id'], {**cost, 'selected_pace': runner['pace'],
-                  'paid': paid, 'will_used': will_used, 'energy_after': runner['energy']})
+                  'paid': paid, 'will_used': will_used, 'will_shortfall': shortfall if will_used else 0,
+                  'movement_cost': movement_cost, 'energy_after': runner['energy']})
         return cost, will_used
 
     def movement_effort_bonus(self, runner, segment):
@@ -1311,15 +1332,13 @@ class Sim:
         return 0, []
 
     def choose_movement_cards(self, runner, available_plays):
-        paid = self.preview_payment(runner)
         choices = self.movement_candidates(runner, available_plays)
         ranked = []
         for cards in choices:
             cost = sum(movement_energy_cost(c) for c in cards if c['use_mode'] == 'MOVEMENT')
-            if cost > paid['energy']:
+            after = self.preview_payment(runner, cost)
+            if after is None:
                 continue
-            after = copy.deepcopy(paid)
-            after['energy'] -= cost
             resolved = self.preview_movement(after, cards)
             score, _ = self.plan_score(runner, runner, after, None, cards, resolved)
             ranked.append((score, resolved['quarter_miles'], tuple(c['id'] for c in cards), cards))
@@ -1539,7 +1558,6 @@ class Sim:
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
         self.apply_installed_energy(runner)
-        self.pay_pace(runner)
         available = 2 - used_plays
         if 'movement_cards' in script or planned_cards is not None:
             ids = script['movement_cards'] if 'movement_cards' in script else planned_cards
@@ -1559,8 +1577,7 @@ class Sim:
             raise ValueError('non-Event Effects use Treat/Prepare')
         card_cost = sum(movement_energy_cost(card) for card, mode in zip(played, modes)
                         if mode == 'MOVEMENT')
-        if card_cost > runner['energy']:
-            raise ValueError('Movement Energy unavailable')
+        _, will_used = self.pay_pace(runner, card_cost)
         for card in played:
             runner['hand'].remove(card)
         for card, mode in zip(played, modes):
@@ -1568,11 +1585,16 @@ class Sim:
             if mode == 'MOVEMENT':
                 cost = movement_energy_cost(card)
                 before = runner['energy']
-                runner['energy'] -= cost
-                runner['stats']['energy_spent'] += cost
+                paid = min(before, cost)
+                covered = cost - paid
+                if covered and not will_used:
+                    raise ValueError('Movement Energy unavailable')
+                runner['energy'] -= paid
+                runner['stats']['energy_spent'] += paid
                 self.emit('MOVEMENT_ENERGY_PAYMENT', runner['player_id'],
                           {'card': card['id'], 'printed_effort': card['effort'],
-                           'cost': cost, 'before': before, 'after': runner['energy']})
+                           'cost': cost, 'paid': paid, 'covered_by_will': covered,
+                           'before': before, 'after': runner['energy']})
             runner['stats']['cards_played'] += 1
             runner['stats']['total_effort_used'] += card_effort(card)
             self.emit('PLAY', runner['player_id'], {'card': self.cardview(card), 'mode': mode,
@@ -1707,18 +1729,17 @@ class Sim:
                 self.emit('GLOBAL_EVENT_EXPIRE', payload={'card': event['card']['id']})
         for pack_id in sorted({runner['pack_state'] for runner in self.runners if runner['pack_state']}):
             members = [runner for runner in self.runners if runner['pack_state'] == pack_id and not runner['finished']]
+            original_members = [runner['player_id'] for runner in members]
             if members:
                 lead_position = max(runner['quarter_mile_space'] for runner in members)
                 members = [runner for runner in members if lead_position - runner['quarter_mile_space'] <= 2]
             if len(members) < 2:
                 members = []
             member_ids = [runner['player_id'] for runner in members]
-            for runner in self.runners:
-                if runner['pack_state'] == pack_id:
-                    runner['pack_state'] = pack_id if runner in members else None
-                    runner['pack_members_snapshot'] = member_ids if runner in members else []
             self.emit('PACK_COHESION', payload={'pack': pack_id, 'members': member_ids,
-                                                'dissolved': len(members) < 2})
+                                                'round_members': original_members,
+                                                'dissolved': len(members) < 2,
+                                                'membership_rechecks': 'next ROUND_START'})
         self.emit('ROUND_END', payload={'positions': {runner['player_id']: runner['quarter_mile_space']
                                                      for runner in self.runners},
                                         'finishers': [runner['player_id'] for runner in self.runners

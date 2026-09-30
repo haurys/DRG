@@ -76,9 +76,18 @@ class FrozenRedesign(unittest.TestCase):
                              if e['type'] == 'MOVEMENT_ENERGY_PAYMENT'), 0)
         self.assertEqual(r['energy'], 8)
 
-    def test_unaffordable_card_rejected_before_play_and_ai_filters(self):
+    def test_will_qualifies_card_but_spent_will_rejects_unaffordable_card(self):
         sim, r = fixture()
         r['energy'] = 0
+        r['hand'] = [card('TR-001'), card('EV-029')]
+        sim.start_round({'P1': 'Easy'})
+        self.assertIn('TR-001', sim.choose_turn_plan(r)['movement_cards'])
+        sim.turn(r, {'movement_cards': ['TR-001']})
+        self.assertFalse(r['will_available'])
+        self.assertEqual(r['energy'], 0)
+        sim, r = fixture()
+        r['energy'] = 0
+        r['will_available'] = False
         r['hand'] = [card('TR-001'), card('EV-029')]
         sim.start_round({'P1': 'Easy'})
         self.assertEqual(sim.choose_turn_plan(r)['movement_cards'], ['EV-029'])

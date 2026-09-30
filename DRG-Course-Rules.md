@@ -32,6 +32,6 @@ At a Gut Check, sum printed Effort on every Race card remaining in hand and add 
 
 ## Finish
 
-The Finish extension has **no Difficulty**. Any positive legal remaining movement sufficient to cover the final 0.2 or 0.1 mile finishes, then stop and lose unused movement. Same-round finishers are simultaneous; complete the full round before placing them. Compare (1) sum of printed Effort **remaining in hand** after used Movement cards leave it, (2) Energy, (3) unspent Will, and (4) shared place if still tied. Conditions have no tiebreak Effort; seat order is never a Finish tiebreak.
+The Finish extension has **no Difficulty**. Exactly reaching 26.0 or 13.0 miles with no remaining Movement does not finish. One positive legal quarter-mile Movement unit beyond the Course endpoint crosses the final 0.2 or 0.1 mile, then stop and lose unused movement. Same-round finishers are simultaneous; complete the full round before placing them. Compare (1) sum of printed Effort **remaining in hand** after used Movement cards leave it, (2) Energy, (3) unspent Will, and (4) shared place if still tied. Conditions have no tiebreak Effort; seat order is never a Finish tiebreak.
 
 Course physical layout: portrait 4 × 6 inches, mirrored/reversible halves, with Difficulty, terrain/environment, and elevation positioned for legibility. Race card size is 2.5 × 3.5 inches. These are presentation specifications, not extra Course Difficulty rules.

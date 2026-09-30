@@ -13,7 +13,7 @@ The supplied simulation configuration is historical. Do not run a formal maratho
 
 ## Movement implementation status
 
-**Frozen card redesign under validation.** The live race path now executes Replenish, Treat/Prepare, Pace payment and Will, Pack preservation, installed Training/Gear, Fuel/remedies, Condition treatment/suppression, mandatory Event timing, Gut Checks, Effective Difficulty boundaries, Finish extension, and same-round placement. Validation uses bounded turn/round fixtures; it does not run the 8-runner marathon.
+**Frozen card redesign under validation.** The live race path now executes Replenish, Treat/Prepare, combined Pace/Movement payment and Will, Pack preservation, installed Training/Gear, Fuel/remedies, Condition treatment/suppression, mandatory Event timing, Gut Checks, Effective Difficulty boundaries, Finish extension, and same-round placement. Validation uses bounded turn/round fixtures; it does not run the 8-runner marathon.
 
 ## Frozen 108-card redesign
 

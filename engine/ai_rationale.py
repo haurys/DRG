@@ -56,8 +56,7 @@ def _detail(sim, runner, row, baseline, before_quarters):
     paid = sim.preview_payment(prepared)
     cards = [{**next(c for c in prepared['hand'] if c['id'] == cid), 'use_mode': mode}
              for cid, mode in zip(row['movement_cards'], row.get('card_modes', ['MOVEMENT'] * len(row['movement_cards'])))]
-    after_cards = dict(paid)
-    after_cards['energy'] -= row.get('movement_energy_cost', 0)
+    after_cards = sim.preview_payment(prepared, row.get('movement_energy_cost', 0))
     result = sim.preview_movement(after_cards, cards)
     remaining_after = max(0, len(sim.course) * 4 - result['to_space'])
     rate = max(2, row['movement_quarters'] or 2)
