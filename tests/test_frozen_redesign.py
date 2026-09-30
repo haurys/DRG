@@ -7,8 +7,8 @@ from pathlib import Path
 from engine import simulate as m
 
 ROOT = Path(__file__).resolve().parents[1]
-CARDS = {c['id']: c for c in json.loads((ROOT / 'data/race_cards.json').read_text())}
-CFG = json.loads((ROOT / 'simulation/config.json').read_text())
+CARDS = {c['id']: c for c in json.loads((ROOT / 'data/race_cards.json').read_text(encoding='utf-8'))}
+CFG = json.loads((ROOT / 'simulation/config.json').read_text(encoding='utf-8'))
 
 
 def card(cid):
