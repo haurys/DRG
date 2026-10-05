@@ -1280,8 +1280,8 @@ class Sim:
         self.emit('ASSISTANCE_PARTNER_SELECT', runner['player_id'], {
                   'helper': helper['player_id'] if helper else None,
                   'helper_position': helper_position,
-                  'reason': 'second_place_if_leading' if position == 1 else
-                            'current_leader' if helper else 'no_eligible_active_helper',
+                  'reason': 'no_eligible_active_helper' if helper is None else
+                            'second_place_if_leading' if position == 1 else 'current_leader',
                   'helper_hand': [c['id'] for c in helper['hand']] if helper else []})
         runner['stats']['treat_prepare_actions'] += 1
         self.emit('TREAT_PREPARE', runner['player_id'], {'action': 'assistance',
