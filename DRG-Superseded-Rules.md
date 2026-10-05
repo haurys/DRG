@@ -20,3 +20,7 @@ This is a historical boundary document. The [2026-09-30 canonical rules](DRG-Can
 | Porta-Potty fixed half-mile cap | Its printed EFFECT is −1 direct Movement and +2 Energy after Movement; ordinary two-mile cap remains. |
 
 The current Pace, Course, Pack, Will, hand, draw, Finish, and milestone rules are in the canonical document. The former Pace-only Will fallback is superseded: Will now covers exact combined Pace and Movement-card Energy shortfall after reductions.
+
+## v1.3 supersessions
+
+Choosing only one Aid-eligible or Water-eligible Condition is superseded: each eligible active Condition resolves. An in-race assistance swap uses the requester's Treat/Prepare action but no card-play slot, with no helper action debt.

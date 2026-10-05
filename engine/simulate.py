@@ -319,6 +319,13 @@ class Sim:
         self.deck_audit, self.round_pack_snapshot = [], {}
         self.ai_rationale_enabled = True
         self.ai_decisions = []
+        rule_conditions = load_json(root / 'data/rules_config.json')['condition_severity']
+        self.station_zero_remedies = {kind: set() for kind in ('Water', 'Aid')}
+        for entry in rule_conditions['remedies_set_current_to_zero']:
+            kind, title = entry.split(':', 1)
+            if kind in self.station_zero_remedies:
+                self.station_zero_remedies[kind].add(title)
+        self.station_aid_reductions = rule_conditions['aid_severity_reduction']
 
     def emit(self, event_type, player=None, payload=None, state=None):
         self.seq += 1
@@ -387,6 +394,8 @@ class Sim:
             'equipped_gear': [], 'attached_gear': [], 'staged_events': [],
             'active_effects': [], 'pack_state': None, 'pack_members_snapshot': [],
             'pack_leader': None, 'finished': False, 'finish_pending': False,
+            'race_status': 'ACTIVE', 'dnf': False, 'dnf_reason': None,
+            'dnf_round': None, 'dnf_turn': None,
             'finish_order': None, 'finish_turn': None, 'finish_round': None,
             'locked_ids': set(), 'exchanges_used': 0, 'stats': stats,
         }
@@ -648,6 +657,25 @@ class Sim:
         if result is None:
             self.discard_condition(runner, condition, f'{remedy} remedy')
 
+    def station_remedy(self, runner, condition, station):
+        """Resolve each configured station remedy independently, including fixture additions."""
+        title = condition['title']
+        before = condition['current_severity']
+        if title in self.station_zero_remedies[station]:
+            condition['current_severity'] = 0
+        elif station == 'Aid' and title in self.station_aid_reductions:
+            condition['current_severity'] = max(0, before - self.station_aid_reductions[title])
+        else:
+            return
+        update_effective_severity(condition)
+        removed = condition['current_severity'] == 0 and not condition['persistent']
+        runner['stats']['conditions_treated'] += 1
+        self.emit('CONDITION_REMEDY', runner['player_id'], {'condition': condition['id'],
+                  'remedy': station, 'current_before': before,
+                  'current_severity': condition['current_severity'], 'removed': removed})
+        if removed:
+            self.discard_condition(runner, condition, f'{station} remedy')
+
     def use_fuel(self, runner, card, choice=None):
         if not self.fuel_available(runner):
             return False
@@ -841,7 +869,7 @@ class Sim:
             preview['pack_state'] = None  # This round's Pack is formed after all Pace choices.
             plan = self.choose_turn_plan(preview)
             pack_style = 0.4 if runner['profile'] == 'Pack Runner' and any(
-                other is not runner and not other['finished']
+                other is not runner and not other['finished'] and not other.get('dnf')
                 and abs(other['quarter_mile_space'] - runner['quarter_mile_space']) <= 2
                 and (other['previous_pace'] or other['pace']) == pace
                 for other in self.runners) else 0
@@ -1017,7 +1045,7 @@ class Sim:
         moved = movement_result['quarter_miles']
         remaining = max(0, len(self.course) * 4 - movement_result['to_space'])
         opponents = [r['quarter_mile_space'] for r in self.runners if r['player_id'] != runner['player_id']
-                     and not r['finished']]
+                     and not r['finished'] and not r.get('dnf')]
         gap = max(opponents, default=runner['quarter_mile_space']) - runner['quarter_mile_space']
         progress_weight = 12 + min(2, max(0, gap) / 16)
         turns = remaining / max(2, moved or 2)
@@ -1130,9 +1158,9 @@ class Sim:
             score += 0.2
         return score, turns
 
-    def choose_turn_plan(self, runner, rationale=None):
+    def choose_turn_plan(self, runner, rationale=None, allow_treat=True):
         candidates = []
-        for plan in self.treat_candidates(runner):
+        for plan in (self.treat_candidates(runner) if allow_treat else [None]):
             prepared = self.preview_preparation(runner, plan)
             allowance = self.cfg['max_voluntary_plays'] - bool(plan)
             for cards in self.movement_candidates(prepared, allowance):
@@ -1155,6 +1183,23 @@ class Sim:
             fallback = {'treat_prepare': None, 'movement_cards': [], 'card_modes': [],
                         'movement_energy_cost': 0, 'movement_quarters': 0,
                         'expected_turns_remaining': len(self.course) * 2, 'score': -1000}
+            # The mandatory Movement override permits a recovery Treat when no
+            # payable Movement exists. It uses one card, never a second Treat.
+            if allow_treat:
+                recovery = []
+                for plan in self.treat_candidates(runner):
+                    if plan and plan['action'] == 'fuel':
+                        prepared = self.preview_preparation(runner, plan)
+                        gain = prepared['energy'] - runner['energy']
+                        relief = sum(c['effective_severity'] - next(
+                            (n['effective_severity'] for n in prepared['active_conditions']
+                             if n['id'] == c['id']), 0) for c in runner['active_conditions'])
+                        if gain > 0 or relief > 0:
+                            recovery.append((gain, relief, plan['card_id'], plan))
+                if recovery:
+                    best = max(recovery, key=lambda row: (row[0], row[1], row[2]))
+                    fallback['treat_prepare'] = best[3]
+                    fallback['score'] = -100 + best[0] * 2 + best[1]
             if rationale is not None:
                 rationale.update({'candidates': [], 'eligible': [], 'selected': fallback,
                                   'emergency': False})
@@ -1175,6 +1220,139 @@ class Sim:
                               'selected': selected, 'emergency': emergency})
         return selected
 
+    def continuation_paths(self, runner, allow_treat=True, future_replenish=True):
+        """Known legal options only; unknown future draws count as possible, not certain."""
+        capture = {}
+        self.choose_turn_plan(runner, capture, allow_treat=allow_treat)
+        options = capture['candidates']
+        positive = [p for p in options if p['movement_quarters'] > 0]
+        if positive:
+            return {'viable': True, 'kind': 'forward_movement',
+                    'movement_quarters': max(p['movement_quarters'] for p in positive)}
+        if allow_treat and not options and capture['selected']['treat_prepare']:
+            return {'viable': True, 'kind': 'treat_recovery', 'movement_quarters': 0}
+        if self.installed_energy(runner):
+            projected = copy.deepcopy(runner)
+            projected['energy'] = min(15, projected['energy'] + sum(
+                amount for _, amount in self.installed_energy(runner)))
+            if projected['energy'] > runner['energy']:
+                return {'viable': True, 'kind': 'installed_energy', 'movement_quarters': 0}
+        # A playable recovery, treatment, or card cycle can create a next-turn path.
+        for plan in options:
+            treat = plan['treat_prepare']
+            if treat and treat['action'] == 'fuel':
+                prepared = self.preview_preparation(runner, treat)
+                if prepared['energy'] > runner['energy'] or any(
+                        c['effective_severity'] > next((n['effective_severity'] for n in
+                        prepared['active_conditions'] if n['id'] == c['id']), 0)
+                        for c in runner['active_conditions']):
+                    return {'viable': True, 'kind': 'treat_recovery', 'movement_quarters': 0}
+            if plan['movement_cards']:
+                return {'viable': True, 'kind': 'legal_card_cycle', 'movement_quarters': 0}
+            if treat and treat['action'] in ('training', 'gear', 'attach'):
+                return {'viable': True, 'kind': 'legal_preparation', 'movement_quarters': 0}
+        # A received Fuel/Training/Gear card needs the next Treat opportunity.
+        if not allow_treat:
+            following = copy.deepcopy(runner)
+            following['pace'] = 'Easy'
+            later = self.continuation_paths(following, allow_treat=True, future_replenish=False)
+            if later['viable']:
+                return {'viable': True, 'kind': 'next_turn_' + later['kind'],
+                        'movement_quarters': later['movement_quarters']}
+        if future_replenish and len(runner['hand']) < 7 and (self.draw or any(
+                c['id'] not in self.in_play_ids() for c in self.discard)):
+            return {'viable': True, 'kind': 'future_replenishment', 'movement_quarters': 0}
+        return {'viable': False, 'kind': 'exhausted_known_paths', 'movement_quarters': 0}
+
+    def assistance_helper(self, requester):
+        active = sorted((r for r in self.runners if not r['finished'] and not r.get('dnf')
+                         and not r['finish_pending']),
+                        key=lambda r: (-r['quarter_mile_space'], r['player_id']))
+        position = next((i + 1 for i, r in enumerate(active) if r is requester), None)
+        helper = next((r for r in active if r is not requester), None)
+        return helper, position, next((i + 1 for i, r in enumerate(active) if r is helper), None)
+
+    def request_assistance(self, runner):
+        helper, position, helper_position = self.assistance_helper(runner)
+        self.emit('ASSISTANCE_REQUEST', runner['player_id'], {'requester_position': position,
+                  'requester_hand': [c['id'] for c in runner['hand']],
+                  'treat_prepare_cost': 1, 'race_card_plays_used': 0})
+        self.emit('ASSISTANCE_PARTNER_SELECT', runner['player_id'], {
+                  'helper': helper['player_id'] if helper else None,
+                  'helper_position': helper_position,
+                  'reason': 'second_place_if_leading' if position == 1 else
+                            'current_leader' if helper else 'no_eligible_active_helper',
+                  'helper_hand': [c['id'] for c in helper['hand']] if helper else []})
+        runner['stats']['treat_prepare_actions'] += 1
+        self.emit('TREAT_PREPARE', runner['player_id'], {'action': 'assistance',
+                  'card_play_budget': 0, 'helper_action_cost': 0})
+        evaluations = []
+        if helper:
+            helper_score = self.choose_turn_plan(helper)['score']
+            for offered in sorted(runner['hand'], key=lambda c: c['id']):
+                for received in sorted(helper['hand'], key=lambda c: c['id']):
+                    if offered['family'] == 'Condition' or received['family'] == 'Condition':
+                        continue
+                    request_copy, helper_copy = copy.deepcopy(runner), copy.deepcopy(helper)
+                    request_copy['hand'].remove(next(c for c in request_copy['hand'] if c['id'] == offered['id']))
+                    request_copy['hand'].append(received)
+                    helper_copy['hand'].remove(next(c for c in helper_copy['hand'] if c['id'] == received['id']))
+                    helper_copy['hand'].append(offered)
+                    path = self.continuation_paths(request_copy, allow_treat=False,
+                                                   future_replenish=False)
+                    loss = helper_score - self.choose_turn_plan(helper_copy)['score']
+                    evaluations.append({'offered': offered['id'], 'received': received['id'],
+                                        'rescue': path['viable'], 'continuation': path['kind'],
+                                        'movement_quarters': path['movement_quarters'],
+                                        'helper_competitive_loss': round(loss, 6),
+                                        'received_card_value': self.prevalue(offered)})
+        rescues = [e for e in evaluations if e['rescue']]
+        selected = min(rescues, key=lambda e: (-e['movement_quarters'],
+                       e['helper_competitive_loss'], -e['received_card_value'],
+                       e['offered'], e['received'])) if rescues else None
+        self.emit('ASSISTANCE_SWAP_EVALUATE', runner['player_id'], {
+                  'legal_swaps': evaluations, 'rescue_capable_count': len(rescues),
+                  'selected': selected})
+        if selected:
+            offered = next(c for c in runner['hand'] if c['id'] == selected['offered'])
+            received = next(c for c in helper['hand'] if c['id'] == selected['received'])
+            runner['hand'].remove(offered)
+            helper['hand'].remove(received)
+            runner['hand'].append(received)
+            helper['hand'].append(offered)
+            path = self.continuation_paths(runner, allow_treat=False)
+            self.emit('ASSISTANCE_SWAP', runner['player_id'], {'helper': helper['player_id'],
+                      'offered': offered['id'], 'received': received['id'],
+                      'requester_energy': runner['energy'], 'helper_energy': helper['energy'],
+                      'requester_continuation': path, 'dnf_avoided': path['viable'],
+                      'helper_action_cost': 0, 'card_plays_used': 0})
+            return path['viable']
+        self.emit('ASSISTANCE_FAIL', runner['player_id'], {'helper': helper['player_id'] if helper else None,
+                  'reason': 'no_rescue_capable_swap' if helper else 'no_eligible_active_helper',
+                  'dnf_remains_possible': True})
+        return False
+
+    def evaluate_dnf(self, runner, assistance_evaluated=False, treat_available=True):
+        path = self.continuation_paths(runner, allow_treat=treat_available)
+        next_station = next((mile for kind in ('Water', 'Aid/Fuel')
+                            for mile in MILESTONES[self.cfg['race_format']][kind]
+                            if runner['quarter_mile_space'] < mile * 4), None)
+        reasons = {'energy_zero': runner['energy'] == 0,
+                   'will_spent': not runner['will_available'], 'continuation': path,
+                   'next_station': next_station, 'assistance_evaluated': assistance_evaluated}
+        exhausted = (reasons['energy_zero'] and reasons['will_spent'] and not path['viable']
+                     and assistance_evaluated)
+        self.emit('DNF_EVALUATION', runner['player_id'], {**reasons, 'dnf': exhausted})
+        if exhausted:
+            runner.update(race_status='DNF', dnf=True, dnf_reason='continuation_exhausted',
+                          dnf_round=self.round, dnf_turn=runner['race_turn_number'])
+            self.emit('DNF', runner['player_id'], {'reason': runner['dnf_reason'],
+                      'round': self.round, 'turn': runner['dnf_turn'],
+                      'distance': runner['distance_completed'], 'energy': runner['energy'],
+                      'will_available': runner['will_available'],
+                      'conditions': copy.deepcopy(runner['active_conditions'])})
+        return exhausted
+
     def form_packs(self):
         old = {runner['player_id']: runner['pack_state'] for runner in self.runners}
         for runner in self.runners:
@@ -1183,7 +1361,7 @@ class Sim:
             runner['pack_leader'] = None
         pack_number = 0
         for pace in PACE_ORDER:
-            available = sorted((runner for runner in self.runners if not runner['finished'] and runner['pace'] == pace
+            available = sorted((runner for runner in self.runners if not runner['finished'] and not runner.get('dnf') and runner['pace'] == pace
                                 and not any(event['card']['id'] == 'EV-030'
                                             for event in self.active_staged(runner))),
                                key=lambda runner: (-runner['quarter_mile_space'], runner['player_id']))
@@ -1232,7 +1410,7 @@ class Sim:
                 weather = {'EV-006': 'Heat', 'EV-010': 'Cold'}.get(event['card']['id'])
                 if weather:
                     for runner in self.runners:
-                        if runner['player_id'] != event['source'] or runner['finished']:
+                        if runner['player_id'] != event['source'] or runner['finished'] or runner.get('dnf'):
                             continue
                         protector = next((entry['card']['title'] for entry in runner['equipped_gear']
                                           if any(effect['type'] == 'weather_protection'
@@ -1246,7 +1424,7 @@ class Sim:
                                   'energy_before': before, 'energy_after': runner['energy'],
                                   'actual_loss': before - runner['energy']})
         for runner in self.runners:
-            if runner['finished']:
+            if runner['finished'] or runner.get('dnf'):
                 continue
             runner['round_start_position'] = runner['quarter_mile_space']
             runner['previous_pace'] = runner['pace']
@@ -1261,7 +1439,7 @@ class Sim:
                       'maximum_legal': self.maximum_legal_pace(runner)})
         self.form_packs()
         self.emit('ROUND_START', payload={'positions': {runner['player_id']: runner['round_start_position']
-                                                        for runner in self.runners if not runner['finished']},
+                                                        for runner in self.runners if not runner['finished'] and not runner.get('dnf')},
                                           'packs': self.round_pack_snapshot})
 
     def active_staged(self, runner):
@@ -1348,6 +1526,7 @@ class Sim:
         locked = {event['target'] for runner in self.runners for event in runner['staged_events']
                   if event.get('target_lock', True)}
         candidates = [runner for runner in self.runners if runner is not source and not runner['finished']
+                      and not runner.get('dnf')
                       and not runner['finish_pending']
                       and runner['player_id'] not in locked]
         return sorted(candidates, key=lambda runner: (-runner['quarter_mile_space'],
@@ -1355,7 +1534,7 @@ class Sim:
 
     def beneficial_target(self, source):
         candidates = [runner for runner in self.runners if runner is not source
-                      and not runner['finished'] and not runner['finish_pending']]
+                      and not runner['finished'] and not runner.get('dnf') and not runner['finish_pending']]
         return sorted(candidates, key=lambda runner: runner['player_id'])[0] if candidates else None
 
     def stage_other_event(self, source, card, target=None):
@@ -1393,7 +1572,7 @@ class Sim:
 
     def resolve_event_play(self, runner, card, target=None):
         event_id = card['id']
-        if target and (target is runner or target['finished'] or target['finish_pending']):
+        if target and (target is runner or target['finished'] or target.get('dnf') or target['finish_pending']):
             raise ValueError('Event requires a legal other Runner')
         if event_id == 'EV-018' and target and target['player_id'] not in self.round_pack_snapshot.get(
                 runner['player_id'], []):
@@ -1436,7 +1615,7 @@ class Sim:
         elif event_id == 'EV-018':
             members = self.round_pack_snapshot.get(runner['player_id'], [])
             recipient = target or next((r for r in self.runners if r['player_id'] in members
-                                        and r is not runner and not r['finished']), None)
+                                        and r is not runner and not r['finished'] and not r.get('dnf')), None)
             beneficiaries = [runner['player_id']] + ([recipient['player_id']] if recipient else [])
             self.apply_energy(runner, 1, 'High Five')
             if recipient:
@@ -1479,18 +1658,18 @@ class Sim:
         for mile in range(old_space // 4 + 1, new_space // 4 + 1):
             self.emit('MILE_CROSS', runner['player_id'], {'mile': mile})
             if mile in MILESTONES[self.cfg['race_format']]['Water']:
-                condition = self.condition_by_title(runner, 'Dehydrated')
-                if condition:
-                    self.named_remedy(runner, condition, 'Water')
+                for condition in list(runner['active_conditions']):
+                    if condition['title'] in self.station_zero_remedies['Water']:
+                        self.station_remedy(runner, condition, 'Water')
                 for item in runner['equipped_gear']:
                     if item['card']['title'] == 'Hydration Belt':
                         self.apply_energy(runner, 1, 'Hydration Belt at Water')
                 self.emit('MILESTONE', runner['player_id'], {'mile': mile, 'kind': 'Water'})
             if mile in MILESTONES[self.cfg['race_format']]['Aid/Fuel']:
-                eligible = [condition for condition in runner['active_conditions']
-                            if condition['title'] in ('Twisted Ankle', 'Heat Exhaustion', 'Nausea', 'Gashed Knee')]
-                if eligible:
-                    self.named_remedy(runner, max(eligible, key=lambda condition: condition['effective_severity']), 'Aid')
+                for condition in list(runner['active_conditions']):
+                    if (condition['title'] in self.station_zero_remedies['Aid'] or
+                            condition['title'] in self.station_aid_reductions):
+                        self.station_remedy(runner, condition, 'Aid')
                 self.emit('MILESTONE', runner['player_id'], {'mile': mile, 'kind': 'Aid/Fuel'})
             if mile in MILESTONES[self.cfg['race_format']]['Gut Check']:
                 check = gut_check(runner['hand'], self.installed_titles(runner, 'training'),
@@ -1527,7 +1706,7 @@ class Sim:
 
     def turn(self, runner, script=None):
         script = script or {}
-        if runner['finished'] or runner['finish_pending']:
+        if runner['finished'] or runner.get('dnf') or runner['finish_pending']:
             return None
         runner['race_turn_number'] += 1
         runner['round'] = self.round
@@ -1536,8 +1715,15 @@ class Sim:
                   'hand': [card['id'] for card in runner['hand']], 'energy': runner['energy'],
                   'pack': runner['pack_state']}, {'runner': public_runner(runner)})
         self.replenish(runner)
+        assistance_evaluated = False
+        assisted = False
+        if (runner['energy'] == 0 and not runner['will_available'] and
+                not self.continuation_paths(runner)['viable']):
+            assistance_evaluated = True
+            assisted = True
+            self.request_assistance(runner)
         capture = {} if self.ai_rationale_enabled and not script else None
-        ai_plan = self.choose_turn_plan(runner, capture) if not script else None
+        ai_plan = self.choose_turn_plan(runner, capture, allow_treat=not assisted) if not script else None
         plan = (script['treat_prepare'] if 'treat_prepare' in script else
                 None if 'movement_cards' in script else
                 ai_plan['treat_prepare'] if ai_plan else self.choose_treat_prepare(runner))
@@ -1554,7 +1740,9 @@ class Sim:
                 decision = describe_decision(self, runner, capture)
                 self.ai_decisions.append(decision)
                 self.emit('AI_TURN_RATIONALE', runner['player_id'], copy.deepcopy(decision))
-        used_plays = self.resolve_treat_prepare(runner, plan)
+        if assisted and plan:
+            raise ValueError('second Treat/Prepare action after assistance')
+        used_plays = 0 if assisted else self.resolve_treat_prepare(runner, plan)
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
         self.apply_installed_energy(runner)
@@ -1691,6 +1879,8 @@ class Sim:
         self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
                   'energy': runner['energy'], 'hand': [card['id'] for card in runner['hand']],
                   'finish_pending': runner['finish_pending']})
+        if not runner['finish_pending'] and runner['energy'] == 0 and not runner['will_available']:
+            self.evaluate_dnf(runner, assistance_evaluated, treat_available=not assisted)
         return resolved
 
     def resolve_same_round_finishers(self):
@@ -1707,6 +1897,7 @@ class Sim:
             group = groups[key]
             for runner in group:
                 runner['finished'] = True
+                runner['race_status'] = 'FINISHED'
                 runner['finish_pending'] = False
                 runner['finish_order'] = place
                 self.finish.append(runner['player_id'])
@@ -1728,7 +1919,8 @@ class Sim:
                 self.discard.append(event['card'])
                 self.emit('GLOBAL_EVENT_EXPIRE', payload={'card': event['card']['id']})
         for pack_id in sorted({runner['pack_state'] for runner in self.runners if runner['pack_state']}):
-            members = [runner for runner in self.runners if runner['pack_state'] == pack_id and not runner['finished']]
+            members = [runner for runner in self.runners if runner['pack_state'] == pack_id
+                       and not runner['finished'] and not runner.get('dnf')]
             original_members = [runner['player_id'] for runner in members]
             if members:
                 lead_position = max(runner['quarter_mile_space'] for runner in members)
@@ -1749,18 +1941,20 @@ class Sim:
         self.start_round(scripted_paces)
         scripts = scripts or {}
         for runner in self.runners:
-            if not runner['finished']:
+            if not runner['finished'] and not runner.get('dnf'):
                 self.turn(runner, scripts.get(runner['player_id']))
         self.end_round()
 
     def run(self):
         self.setup()
-        while len(self.finish) < len(self.runners):
+        while len(self.finish) + sum(r.get('dnf', False) for r in self.runners) < len(self.runners):
             if any(runner['race_turn_number'] >= self.cfg['max_turns_per_runner']
-                   for runner in self.runners if not runner['finished']):
+                   for runner in self.runners if not runner['finished'] and not runner.get('dnf')):
                 raise RuntimeError('turn cap')
             self.run_round()
-        self.emit('SIMULATION_END', payload={'finish_order': self.finish, 'rounds': self.round})
+        self.emit('SIMULATION_END', payload={'finish_order': self.finish,
+                  'dnf': [r['player_id'] for r in self.runners if r.get('dnf')],
+                  'rounds': self.round})
         return self.events
 
 
@@ -1808,9 +2002,15 @@ def diagnostics(sim):
 def summary(sim):
     lines = [f"# Simulation Summary\n\nSeed: `{sim.cfg['seed']}`\n\nStatus: completed in {sim.round} rounds.\n",
              '## Finish order']
-    for runner in sorted(sim.runners, key=lambda item: (item['finish_order'], item['player_id'])):
+    for runner in sorted((r for r in sim.runners if r['finished']),
+                         key=lambda item: (item['finish_order'], item['player_id'])):
         lines.append(f"{runner['finish_order']}. {runner['player_id']} {runner['profile']} — "
                      f"turn {runner['finish_turn']}, Energy {runner['energy']}")
+    lines.append('\n## Did Not Finish')
+    for runner in (r for r in sim.runners if r.get('dnf')):
+        lines.append(f"- {runner['player_id']} {runner['profile']} — round {runner['dnf_round']}, "
+                     f"turn {runner['dnf_turn']}, {runner['distance_completed']} miles; "
+                     f"{runner['dnf_reason']}")
     from engine.ai_rationale import rationale_metrics
     lines.append('\n## AI decision diagnostics')
     for key, value in rationale_metrics(sim.ai_decisions).items():

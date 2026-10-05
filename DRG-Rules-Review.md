@@ -31,3 +31,7 @@ Competitive marathon target ~25–35 rounds, center ~30; average effective movem
 ## Current implementation status
 
 The 2026-09-30 designer consolidation closes RR-11, RR-13, and RR-17 and marks RR-16 superseded by the redesign. Will now covers exact total turn Energy shortfall after reductions, including Movement cards. Historical audit reports retain the rules under which they were run; no new full marathon was run in this implementation pass.
+
+## v1.3 closures
+
+Station treatment applies to every eligible Condition. In-race assistance uses the requesting runner's Treat/Prepare action, no Race-card play slot, and no helper out-of-turn action cost. The requesting player may choose any eligible active helper. DNF requires exhausted practical continuation after assistance. These action-cost questions are closed.
