@@ -29,6 +29,8 @@ TRAINING_RESISTANCE = {
     'Form Drills': {'Hot Spot': 1, 'Sore Feet': 1},
 }
 OTHER_EVENTS = {'EV-001', 'EV-002', 'EV-011', 'EV-012', 'EV-019', 'EV-025', 'EV-030'}
+BENEFICIAL_OTHER_EVENTS = {'EV-015', 'EV-016', 'EV-019', 'EV-020'}
+TARGET_REQUIRED_EVENTS = OTHER_EVENTS | BENEFICIAL_OTHER_EVENTS | {'EV-018'}
 DIRECT_PLUS = {'EV-003', 'EV-004', 'EV-008', 'EV-013', 'EV-019', 'EV-023', 'EV-027'}
 AFTER_ENERGY = {'EV-007': 1, 'EV-015': 1, 'EV-016': 1, 'EV-021': 3, 'EV-022': 3,
                 'EV-024': 2, 'EV-028': 1, 'EV-029': 1}
@@ -888,11 +890,7 @@ class Sim:
                 choices.append(tuple({**card, 'use_mode': 'MOVEMENT'} for card in combo))
                 if any(card['family'] == 'Event' for card in combo):
                     event = next(card for card in combo if card['family'] == 'Event')
-                    if event['id'] in OTHER_EVENTS and not (
-                            self.beneficial_target(runner) if event['id'] == 'EV-019'
-                            else self.event_target(runner)):
-                        continue
-                    if event['id'] in ('EV-015', 'EV-016', 'EV-020') and not self.beneficial_target(runner):
+                    if event['id'] in TARGET_REQUIRED_EVENTS and not self.eligible_event_target(runner, event['id']):
                         continue
                     choices.append(tuple({**card, 'use_mode': 'EFFECT' if card['family'] == 'Event' else 'MOVEMENT'}
                                          for card in combo))
@@ -1525,7 +1523,8 @@ class Sim:
     def event_target(self, source):
         locked = {event['target'] for runner in self.runners for event in runner['staged_events']
                   if event.get('target_lock', True)}
-        candidates = [runner for runner in self.runners if runner is not source and not runner['finished']
+        candidates = [runner for runner in self.runners if runner['player_id'] != source['player_id']
+                      and not runner['finished']
                       and not runner.get('dnf')
                       and not runner['finish_pending']
                       and runner['player_id'] not in locked]
@@ -1533,9 +1532,24 @@ class Sim:
                                                       runner['player_id']))[0] if candidates else None
 
     def beneficial_target(self, source):
-        candidates = [runner for runner in self.runners if runner is not source
+        candidates = [runner for runner in self.runners if runner['player_id'] != source['player_id']
                       and not runner['finished'] and not runner.get('dnf') and not runner['finish_pending']]
         return sorted(candidates, key=lambda runner: runner['player_id'])[0] if candidates else None
+
+    def eligible_event_target(self, source, event_id):
+        if event_id == 'EV-018':
+            members = self.round_pack_snapshot.get(source['player_id'], [])
+            if not members:
+                return self.beneficial_target(source)
+            return next((runner for runner in self.runners
+                         if runner['player_id'] != source['player_id']
+                         and runner['player_id'] in members and not runner['finished']
+                         and not runner.get('dnf') and not runner['finish_pending']), None)
+        if event_id in BENEFICIAL_OTHER_EVENTS:
+            return self.beneficial_target(source)
+        if event_id in OTHER_EVENTS:
+            return self.event_target(source)
+        return None
 
     def stage_other_event(self, source, card, target=None):
         beneficial = card['id'] == 'EV-019'
@@ -1572,12 +1586,13 @@ class Sim:
 
     def resolve_event_play(self, runner, card, target=None):
         event_id = card['id']
-        if target and (target is runner or target['finished'] or target.get('dnf') or target['finish_pending']):
+        if target and (target['player_id'] == runner['player_id'] or target['finished']
+                       or target.get('dnf') or target['finish_pending']):
             raise ValueError('Event requires a legal other Runner')
-        if event_id == 'EV-018' and target and target['player_id'] not in self.round_pack_snapshot.get(
-                runner['player_id'], []):
+        if event_id == 'EV-018' and target and self.round_pack_snapshot.get(runner['player_id']) and (
+                target['player_id'] not in self.round_pack_snapshot[runner['player_id']]):
             raise ValueError('High Five recipient must be an eligible Pack member')
-        if event_id in ('EV-015', 'EV-016', 'EV-020') and not (target or self.beneficial_target(runner)):
+        if event_id in TARGET_REQUIRED_EVENTS and not (target or self.eligible_event_target(runner, event_id)):
             raise ValueError('Event requires another Runner')
         runner['stats']['events_played'] += 1
         if event_id in ('EV-011', 'EV-012', 'EV-025'):
@@ -1614,8 +1629,7 @@ class Sim:
                     self.apply_energy(recipient, 1, 'Crowd Support Runner')
         elif event_id == 'EV-018':
             members = self.round_pack_snapshot.get(runner['player_id'], [])
-            recipient = target or next((r for r in self.runners if r['player_id'] in members
-                                        and r is not runner and not r['finished'] and not r.get('dnf')), None)
+            recipient = target or self.eligible_event_target(runner, event_id)
             beneficiaries = [runner['player_id']] + ([recipient['player_id']] if recipient else [])
             self.apply_energy(runner, 1, 'High Five')
             if recipient:
