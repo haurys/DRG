@@ -3,7 +3,7 @@
   "seed": 20260924,
   "player_count": 8,
   "race_format": "marathon",
-  "starting_hand": 7,
+  "starting_hand": 6,
   "max_voluntary_plays": 2,
   "exchange_limit": 3,
   "starting_energy": 15,

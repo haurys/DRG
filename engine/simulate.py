@@ -17,15 +17,14 @@ CONDITION_DEFS = {
     'Cold Chills': (5, False),
 }
 TRAINING_DURATION = {}
-GEAR_DURATION = {'Tempo Shoes': 5, 'Carbon Racers': 3, 'GPS Watch': 2}
-FOOTWEAR = {'Running Shoes', 'Cushioned Shoes', 'Trail Shoes', 'Tempo Shoes', 'Carbon Racers'}
+GEAR_DURATION = {'Tempo Trainers': 5, 'Carbon Racers': 3, 'Pace Watch': 2}
 ATTACHMENT = {'Running Socks': ('Blister', 2), 'Compression Sleeves': ('Cramp', 2),
               'Recovery Sleeves': ('Tight Calf', 1)}
 TRAINING_RESISTANCE = {
     'Long Run': {'Dead Legs': 2},
     'Base Miles': {'Dead Legs': 1, 'Tight Calf': 1},
     'Strength Training': {'Cramp': 1, 'Tight Calf': 1},
-    'Pacing Practice': {'Side Stitch': 2},
+    'Pace Practice': {'Side Stitch': 2},
     'Form Drills': {'Hot Spot': 1, 'Sore Feet': 1},
 }
 OTHER_EVENTS = {'EV-001', 'EV-002', 'EV-011', 'EV-012', 'EV-019', 'EV-025', 'EV-030'}
@@ -521,11 +520,9 @@ class Sim:
 
     def replenish(self, runner):
         normal_draws, before = 0, len(runner['hand'])
-        while len(runner['hand']) < 7 and normal_draws < 2:
+        if len(runner['hand']) < self.cfg['starting_hand']:
             card = self.draw_one(runner)
-            if card is None:
-                break
-            normal_draws += 1
+            normal_draws = int(card is not None)
         self.emit('REPLENISH', runner['player_id'], {'hand_before': before,
                   'normal_cards_drawn': normal_draws, 'hand_after': len(runner['hand'])})
         return normal_draws
@@ -539,19 +536,10 @@ class Sim:
         for item in list(runner['attached_gear']):
             if item['condition_id'] == condition['id']:
                 runner['attached_gear'].remove(item)
-                item['condition_id'] = None
-                item['amount'] = 0
-                if len(runner['equipped_gear']) < self.cfg['gear_slots'] and not (
-                        item['card']['title'] in FOOTWEAR and
-                        any(entry['card']['title'] in FOOTWEAR for entry in runner['equipped_gear'])):
-                    runner['equipped_gear'].append(item)
-                    destination = 'equipped'
-                else:
-                    runner['hand'].append(item['card'])
-                    destination = 'hand'
+                self.discard.append(item['card'])
                 self.emit('GEAR_DETACH', runner['player_id'], {'card': item['card']['id'],
-                          'condition': condition['id'], 'destination': destination,
-                          'policy': 'PLAYTEST ASSUMPTION after Condition removal'})
+                          'condition': condition['id'], 'destination': 'discard',
+                          'policy': 'v1.4 committed Condition attachment'})
         self.discard.append(copy.deepcopy(self.card(condition['id'])))
         self.emit('CONDITION_REMOVE', runner['player_id'], {'condition': condition['id'], 'reason': reason})
 
@@ -572,7 +560,8 @@ class Sim:
                 raise ValueError('Training replacement required')
             runner['active_training'].remove(replaced)
             self.discard.append(replaced['card'])
-        entry = {'card': card, 'remaining_turns': TRAINING_DURATION.get(card['title'])}
+        entry = {'card': card, 'remaining_turns': TRAINING_DURATION.get(card['title']),
+                 'installed_turn': runner['race_turn_number']}
         runner['active_training'].append(entry)
         self.emit('TRAINING_INSTALL', runner['player_id'], {'card': card['id'],
                   'remaining_turns': entry['remaining_turns'],
@@ -594,9 +583,9 @@ class Sim:
 
     def equip_gear(self, runner, card, replace_id=None):
         replaced = None
-        if card['title'] in FOOTWEAR:
+        if card.get('is_footwear', False):
             existing = next((item for item in runner['equipped_gear']
-                             if item['card']['title'] in FOOTWEAR), None)
+                             if item['card'].get('is_footwear', False)), None)
             if existing:
                 runner['equipped_gear'].remove(existing)
                 self.discard.append(existing['card'])
@@ -608,7 +597,8 @@ class Sim:
                 raise ValueError('Gear replacement required')
             runner['equipped_gear'].remove(replaced)
             self.discard.append(replaced['card'])
-        entry = {'card': card, 'remaining_turns': GEAR_DURATION.get(card['title'])}
+        entry = {'card': card, 'remaining_turns': GEAR_DURATION.get(card['title']),
+                 'installed_turn': runner['race_turn_number']}
         runner['equipped_gear'].append(entry)
         self.emit('GEAR_EQUIP', runner['player_id'], {'card': card['id'],
                   'remaining_turns': entry['remaining_turns'],
@@ -738,8 +728,8 @@ class Sim:
             if card['family'] != 'Gear' or card['title'] in ATTACHMENT:
                 return False
             footwear = next((item for item in runner['equipped_gear']
-                             if item['card']['title'] in FOOTWEAR), None)
-            if card['title'] in FOOTWEAR and footwear:
+                             if item['card'].get('is_footwear', False)), None)
+            if card.get('is_footwear', False) and footwear:
                 return plan.get('replace_id') == footwear['card']['id']
             if len(runner['equipped_gear']) < self.cfg['gear_slots']:
                 return plan.get('replace_id') is None
@@ -781,8 +771,8 @@ class Sim:
                 candidates.extend({'card_id': card['id'], 'action': 'training', 'replace_id': old}
                                   for old in replacements)
             if card['family'] == 'Gear' and card['title'] not in ATTACHMENT:
-                footwear = next((item for item in runner['equipped_gear'] if item['card']['title'] in FOOTWEAR), None)
-                replacements = ([footwear['card']['id']] if card['title'] in FOOTWEAR and footwear
+                footwear = next((item for item in runner['equipped_gear'] if item['card'].get('is_footwear', False)), None)
+                replacements = ([footwear['card']['id']] if card.get('is_footwear', False) and footwear
                                 else [item['card']['id'] for item in runner['equipped_gear']]
                                 if len(runner['equipped_gear']) >= self.cfg['gear_slots'] else [None])
                 candidates.extend({'card_id': card['id'], 'action': 'gear', 'replace_id': old}
@@ -801,6 +791,8 @@ class Sim:
                          if entry['card']['id'] == plan['card_id']), None)
             if item is None:
                 raise ValueError('Gear relocation source is not installed')
+            if item in runner['attached_gear']:
+                raise ValueError('Condition attachment cannot be reassigned')
             old_condition = next((condition for condition in runner['active_conditions']
                                   if condition['id'] == item.get('condition_id')), None)
             if item in runner['equipped_gear']:
@@ -867,6 +859,7 @@ class Sim:
         scored = []
         for pace in candidates:
             preview = copy.deepcopy(runner)
+            preview['race_turn_number'] += 1  # Round Start previews the upcoming runner turn.
             preview['pace'] = pace
             preview['pack_state'] = None  # This round's Pack is formed after all Pace choices.
             plan = self.choose_turn_plan(preview)
@@ -881,7 +874,11 @@ class Sim:
         return scored, max(scored, key=lambda item: (item['score'], -PACE_ORDER.index(item['pace'])))['pace']
 
     def movement_candidates(self, runner, available_plays):
-        legal = [card for card in runner['hand'] if card.get('effort') is not None]
+        legal = [{**card, 'source': 'hand'} for card in runner['hand'] if card.get('effort') is not None]
+        for zone in ('active_training', 'equipped_gear'):
+            legal.extend({**item['card'], 'source': zone} for item in runner[zone]
+                         if item.get('installed_turn') is not None
+                         and runner['race_turn_number'] - item['installed_turn'] >= 2)
         choices = [()]
         for size in range(1, min(available_plays, len(legal)) + 1):
             for combo in itertools.combinations(legal, size):
@@ -895,6 +892,14 @@ class Sim:
                     choices.append(tuple({**card, 'use_mode': 'EFFECT' if card['family'] == 'Event' else 'MOVEMENT'}
                                          for card in combo))
         return choices
+
+    def preview_slot_sacrifice(self, runner, cards):
+        projected = copy.deepcopy(runner)
+        for card in cards:
+            if card.get('source') in ('active_training', 'equipped_gear'):
+                zone = projected[card['source']]
+                zone.remove(next(item for item in zone if item['card']['id'] == card['id']))
+        return projected
 
     def energy_gains_on_side(self, runner, side):
         """Visible trigger check; future evaluation uses current Pace only as a proxy."""
@@ -921,7 +926,7 @@ class Sim:
     def apply_installed_energy(self, runner):
         for card_id, amount in self.installed_energy(runner):
             self.apply_energy(runner, amount, f'Installed {card_id}')
-            if self.card(card_id)['title'] == 'GPS Watch':
+            if self.card(card_id)['title'] == 'Pace Watch':
                 item = next(i for i in runner['equipped_gear'] if i['card']['id'] == card_id)
                 self.emit('GPS_WATCH_TICK', runner['player_id'], {'card': card_id,
                           'round': self.round, 'nominal_gain': amount,
@@ -939,7 +944,8 @@ class Sim:
             if plan.get('replace_id'):
                 zone[:] = [item for item in zone if item['card']['id'] != plan['replace_id']]
             zone.append({'card': card, 'remaining_turns':
-                         (TRAINING_DURATION if action == 'training' else GEAR_DURATION).get(card['title'])})
+                         (TRAINING_DURATION if action == 'training' else GEAR_DURATION).get(card['title']),
+                         'installed_turn': projected['race_turn_number']})
             if action == 'training':
                 options = TRAINING_RESISTANCE.get(card['title'], {})
                 matching = [c for c in projected['active_conditions']
@@ -950,6 +956,8 @@ class Sim:
                     update_effective_severity(target)
                     if target['current_severity'] == 0 and not target['persistent']:
                         projected['active_conditions'].remove(target)
+                        projected['attached_gear'][:] = [item for item in projected['attached_gear']
+                                                         if item['condition_id'] != target['id']]
         elif action == 'attach':
             target = next(c for c in projected['active_conditions'] if c['id'] == plan['condition_id'])
             amount = ATTACHMENT[card['title']][1]
@@ -967,8 +975,12 @@ class Sim:
                     update_effective_severity(target)
                     if target['current_severity'] == 0 and not target['persistent']:
                         projected['active_conditions'].remove(target)
+                        projected['attached_gear'][:] = [item for item in projected['attached_gear']
+                                                         if item['condition_id'] != target['id']]
                 elif apply_remedy(target, card['title']) is None:
                     projected['active_conditions'].remove(target)
+                    projected['attached_gear'][:] = [item for item in projected['attached_gear']
+                                                     if item['condition_id'] != target['id']]
             else:
                 projected['energy'] = min(15, projected['energy'] + (card['energy'] or 0))
         return projected
@@ -1164,21 +1176,24 @@ class Sim:
             for cards in self.movement_candidates(prepared, allowance):
                 if not cards and prepared['hand']:
                     continue
+                liquidated = self.preview_slot_sacrifice(prepared, cards)
                 cost = sum(movement_energy_cost(card) for card in cards
                            if card['use_mode'] == 'MOVEMENT')
-                after_cards = self.preview_payment(prepared, cost)
+                after_cards = self.preview_payment(liquidated, cost)
                 if after_cards is None:
                     continue
                 resolved = self.preview_movement(after_cards, cards)
-                score, turns = self.plan_score(runner, prepared, after_cards, plan, cards, resolved)
+                score, turns = self.plan_score(runner, liquidated, after_cards, plan, cards, resolved)
                 candidates.append({'treat_prepare': plan,
                                    'movement_cards': [c['id'] for c in cards],
                                    'card_modes': [c['use_mode'] for c in cards],
+                                   'card_sources': [c['source'] for c in cards],
                                    'movement_energy_cost': cost,
                                    'movement_quarters': resolved['quarter_miles'],
                                    'expected_turns_remaining': turns, 'score': score})
         if not candidates:
             fallback = {'treat_prepare': None, 'movement_cards': [], 'card_modes': [],
+                        'card_sources': [],
                         'movement_energy_cost': 0, 'movement_quarters': 0,
                         'expected_turns_remaining': len(self.course) * 2, 'score': -1000}
             # The mandatory Movement override permits a recovery Treat when no
@@ -1249,6 +1264,18 @@ class Sim:
                 return {'viable': True, 'kind': 'legal_card_cycle', 'movement_quarters': 0}
             if treat and treat['action'] in ('training', 'gear', 'attach'):
                 return {'viable': True, 'kind': 'legal_preparation', 'movement_quarters': 0}
+        future_slot = copy.deepcopy(runner)
+        future_slot['race_turn_number'] += 1
+        future_slot['pace'] = 'Easy'
+        if any(item.get('installed_turn') is not None and
+               future_slot['race_turn_number'] - item['installed_turn'] >= 2
+               for zone in ('active_training', 'equipped_gear') for item in future_slot[zone]):
+            future_capture = {}
+            self.choose_turn_plan(future_slot, future_capture, allow_treat=False)
+            future_positive = [p for p in future_capture['candidates'] if p['movement_quarters'] > 0]
+            if future_positive:
+                return {'viable': True, 'kind': 'next_turn_slot_movement',
+                        'movement_quarters': max(p['movement_quarters'] for p in future_positive)}
         # A received Fuel/Training/Gear card needs the next Treat opportunity.
         if not allow_treat:
             following = copy.deepcopy(runner)
@@ -1257,7 +1284,7 @@ class Sim:
             if later['viable']:
                 return {'viable': True, 'kind': 'next_turn_' + later['kind'],
                         'movement_quarters': later['movement_quarters']}
-        if future_replenish and len(runner['hand']) < 7 and (self.draw or any(
+        if future_replenish and len(runner['hand']) < self.cfg['starting_hand'] and (self.draw or any(
                 c['id'] not in self.in_play_ids() for c in self.discard)):
             return {'viable': True, 'kind': 'future_replenishment', 'movement_quarters': 0}
         return {'viable': False, 'kind': 'exhausted_known_paths', 'movement_quarters': 0}
@@ -1451,8 +1478,8 @@ class Sim:
         gear = self.installed_titles(runner, 'gear')
         if pace == 'Race' and 'Long Run' in training:
             sources.append('Long Run')
-        if pace == 'Steady' and 'Pacing Practice' in training:
-            sources.append('Pacing Practice')
+        if pace == 'Steady' and 'Pace Practice' in training:
+            sources.append('Pace Practice')
         return sources
 
     def pace_cost(self, runner, pace):
@@ -1512,11 +1539,12 @@ class Sim:
         ranked = []
         for cards in choices:
             cost = sum(movement_energy_cost(c) for c in cards if c['use_mode'] == 'MOVEMENT')
-            after = self.preview_payment(runner, cost)
+            liquidated = self.preview_slot_sacrifice(runner, cards)
+            after = self.preview_payment(liquidated, cost)
             if after is None:
                 continue
             resolved = self.preview_movement(after, cards)
-            score, _ = self.plan_score(runner, runner, after, None, cards, resolved)
+            score, _ = self.plan_score(runner, liquidated, after, None, cards, resolved)
             ranked.append((score, resolved['quarter_miles'], tuple(c['id'] for c in cards), cards))
         return list(max(ranked, key=lambda row: row[:3])[-1]) if ranked else []
 
@@ -1747,6 +1775,7 @@ class Sim:
                       'movement_cards': planned_cards, 'predicted_movement_quarters':
                       ai_plan['movement_quarters'], 'score': ai_plan['score'],
                       'card_modes': ai_plan['card_modes'],
+                      'card_sources': ai_plan['card_sources'],
                       'movement_energy_cost': ai_plan['movement_energy_cost'],
                       'expected_turns_remaining': ai_plan['expected_turns_remaining']})
             if capture is not None:
@@ -1759,30 +1788,69 @@ class Sim:
         used_plays = 0 if assisted else self.resolve_treat_prepare(runner, plan)
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
-        self.apply_installed_energy(runner)
         available = 2 - used_plays
         if 'movement_cards' in script or planned_cards is not None:
             ids = script['movement_cards'] if 'movement_cards' in script else planned_cards
             if len(ids) > available:
                 raise ValueError('card-play budget exceeded')
-            played = [next(card for card in runner['hand'] if card['id'] == card_id) for card_id in ids]
+            sources = script.get('card_sources') if script else ai_plan['card_sources']
+            if sources is None:
+                sources = ['hand' if any(card['id'] == cid for card in runner['hand'])
+                           else next((zone for zone in ('active_training', 'equipped_gear')
+                                      if any(item['card']['id'] == cid for item in runner[zone])), None)
+                           for cid in ids]
+            if len(sources) != len(ids):
+                raise ValueError('card source count mismatch')
+            played = []
+            for cid, source in zip(ids, sources):
+                if source == 'hand':
+                    card = next((card for card in runner['hand'] if card['id'] == cid), None)
+                elif source in ('active_training', 'equipped_gear'):
+                    entry = next((item for item in runner[source] if item['card']['id'] == cid), None)
+                    card = entry['card'] if entry and entry.get('installed_turn') is not None and (
+                        runner['race_turn_number'] - entry['installed_turn'] >= 2) else None
+                else:
+                    card = None
+                if card is None:
+                    raise ValueError('Movement card not available from eligible zone')
+                played.append(card)
             if sum(card['family'] == 'Event' for card in played) > 1:
                 raise ValueError('more than one Event played')
             modes = script.get('card_modes', ['MOVEMENT'] * len(played)) if script else ai_plan['card_modes']
         else:
-            played = self.choose_movement_cards(runner, available)
-            modes = [card['use_mode'] for card in played]
-            played = [next(real for real in runner['hand'] if real['id'] == card['id']) for card in played]
+            chosen = self.choose_movement_cards(runner, available)
+            modes = [card['use_mode'] for card in chosen]
+            sources = [card['source'] for card in chosen]
+            played = [next(real for real in runner['hand'] if real['id'] == card['id'])
+                      if card['source'] == 'hand' else next(item['card'] for item in runner[card['source']]
+                                                           if item['card']['id'] == card['id'])
+                      for card in chosen]
         if len(modes) != len(played) or any(mode not in ('MOVEMENT', 'EFFECT') for mode in modes):
             raise ValueError('invalid card use modes')
         if any(mode == 'EFFECT' and card['family'] != 'Event' for card, mode in zip(played, modes)):
             raise ValueError('non-Event Effects use Treat/Prepare')
+        if any(source != 'hand' and mode != 'MOVEMENT' for source, mode in zip(sources, modes)):
+            raise ValueError('slotted card must use Movement mode')
+        if len({card['id'] for card in played}) != len(played):
+            raise ValueError('duplicate Movement card')
         card_cost = sum(movement_energy_cost(card) for card, mode in zip(played, modes)
                         if mode == 'MOVEMENT')
+        preview_cards = [{**card, 'source': source, 'use_mode': mode}
+                         for card, source, mode in zip(played, sources, modes)]
+        if self.preview_payment(self.preview_slot_sacrifice(runner, preview_cards), card_cost) is None:
+            raise ValueError('Movement Energy unavailable')
+        for card, source in zip(played, sources):
+            if source != 'hand':
+                runner[source].remove(next(item for item in runner[source] if item['card'] is card))
+                self.emit('SLOT_SACRIFICE', runner['player_id'], {'card': card['id'],
+                          'source': source, 'printed_effort': card['effort'],
+                          'effect_ended_before_movement': True})
+        self.apply_installed_energy(runner)
         _, will_used = self.pay_pace(runner, card_cost)
-        for card in played:
-            runner['hand'].remove(card)
-        for card, mode in zip(played, modes):
+        for card, source in zip(played, sources):
+            if source == 'hand':
+                runner['hand'].remove(card)
+        for card, mode, source in zip(played, modes, sources):
             card['use_mode'] = mode
             if mode == 'MOVEMENT':
                 cost = movement_energy_cost(card)
@@ -1800,6 +1868,7 @@ class Sim:
             runner['stats']['cards_played'] += 1
             runner['stats']['total_effort_used'] += card_effort(card)
             self.emit('PLAY', runner['player_id'], {'card': self.cardview(card), 'mode': mode,
+                      'source': source,
                       'movement_energy_cost': movement_energy_cost(card) if mode == 'MOVEMENT' else 0,
                       'effect_active': mode == 'EFFECT'})
         event_cards = [card for card in active_effect_cards(played) if card['family'] == 'Event']
@@ -1838,8 +1907,9 @@ class Sim:
             runner['stats']['zero_movement_turns'] += 1
         self.emit('MOVE', runner['player_id'], {'formula': 'Effort + installed/Event/Pace - Condition - Effective Difficulty',
                   'effort_cards': [{'id': card['id'], 'printed_effort': card.get('effort'),
+                                    'source': source,
                                     'used_effort': card_effort(card), 'mode': card['use_mode']}
-                                   for card in played],
+                                   for card, source in zip(played, sources)],
                   'movement_energy_cost': card_cost,
                   'total_effort': effort, 'installed_effort_bonus': installed_bonus,
                   'installed_effort_sources': installed_sources, 'event_effort_bonus': event_effort_bonus,
@@ -1888,7 +1958,8 @@ class Sim:
                                   'cap_prevented': resolved['cap_prevented'],
                                   'cap_prevented_quarters': resolved['cap_prevented_quarters'],
                                   'result_wasted_above_cap': resolved['result_wasted_above_cap'],
-                                  'hand_size_at_decision': len(runner['hand']) + len(played),
+                                  'hand_size_at_decision': len(runner['hand']) + sum(
+                                      source == 'hand' for source in sources),
                                   'effort_count': len(played), 'energy_effect_count': 0})
         self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
                   'energy': runner['energy'], 'hand': [card['id'] for card in runner['hand']],

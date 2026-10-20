@@ -30,14 +30,14 @@ def event_payloads(sim, event_type, player=None):
 
 
 class IntegratedRaceLoop(unittest.TestCase):
-    def test_replenish_draws_toward_seven_with_two_normal_limit_and_condition_chain(self):
+    def test_single_normal_draw_below_six_and_condition_chain(self):
         sim = make_sim(1)
         runner = sim.runners[0]
         runner['hand'] = [card('TR-001'), card('TR-002'), card('TR-003'), card('TR-004')]
         sim.draw = [card('FU-001'), card('FU-002'), card('CO-014')]
         drawn = sim.replenish(runner)
-        self.assertEqual(drawn, 2)
-        self.assertEqual(len(runner['hand']), 6)
+        self.assertEqual(drawn, 1)
+        self.assertEqual(len(runner['hand']), 5)
         self.assertEqual(runner['active_conditions'][0]['title'], 'Side Stitch')
 
     def test_turn_integrates_install_pack_will_event_boundary_and_direct_movement(self):
@@ -277,7 +277,7 @@ class IntegratedRaceLoop(unittest.TestCase):
     def test_live_deck_recycle_excludes_in_play_cards(self):
         sim = make_sim(1)
         runner = sim.runners[0]
-        runner['hand'] = [card('TR-001')] * 6
+        runner['hand'] = [card('TR-001')] * 5
         blocked = card('TR-009')
         eligible = card('FU-001')
         runner['active_training'] = [{'card': blocked, 'remaining_turns': None}]

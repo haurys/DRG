@@ -11,7 +11,7 @@ from engine import simulate as m
 ROOT = Path(__file__).resolve().parents[1]
 CFG = json.loads((ROOT / 'simulation/config.json').read_text())
 CARDS = {c['id']: c for c in json.loads((ROOT / 'data/race_cards.json').read_text())}
-PLAN_KEYS = {'treat_prepare', 'movement_cards', 'card_modes', 'movement_energy_cost',
+PLAN_KEYS = {'treat_prepare', 'movement_cards', 'card_modes', 'card_sources', 'movement_energy_cost',
              'movement_quarters', 'score', 'expected_turns_remaining'}
 
 
@@ -194,7 +194,7 @@ class Run06Repair(unittest.TestCase):
                          -m.PACE_ORDER.index(x['pace'])))['pace'])
         self.assertNotEqual(pace, 'Easy')
 
-    def test_run06_p1_round_one_aggressive_selection_unchanged(self):
+    def test_run06_seed_p1_round_one_uses_v14_six_card_opening(self):
         cfg = copy.deepcopy(CFG)
         cfg['seed'] = 20260930
         sim = m.Sim(ROOT, cfg)
@@ -203,7 +203,7 @@ class Run06Repair(unittest.TestCase):
         sim.turn(sim.runners[0])  # one bounded turn; no marathon
         plan = next(e['payload'] for e in sim.events if e['type'] == 'AI_TURN_PLAN')
         rationale = next(e['payload'] for e in sim.events if e['type'] == 'AI_TURN_RATIONALE')
-        self.assertEqual(plan['movement_cards'], ['GE-016', 'TR-019'])
+        self.assertEqual(plan['movement_cards'], ['GE-016', 'GE-007'])
         self.assertEqual(plan['card_modes'], ['MOVEMENT', 'MOVEMENT'])
         self.assertEqual(plan['movement_energy_cost'], 4)
         self.assertEqual(plan['predicted_movement_quarters'], 8)

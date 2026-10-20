@@ -60,7 +60,7 @@ class ApprovedBaseline(unittest.TestCase):
         plan = {'action': 'gear', 'card_id': 'GE-005', 'replace_id': 'GE-001'}
         self.assertTrue(sim.legal_treat_prepare(r, plan))
         sim.resolve_treat_prepare(r, plan)
-        self.assertEqual(sum(e['card']['title'] in m.FOOTWEAR for e in r['equipped_gear']), 1)
+        self.assertEqual(sum(e['card']['is_footwear'] for e in r['equipped_gear']), 1)
         self.assertIn('GE-001', [c['id'] for c in sim.discard])
 
     def test_fuel_all_titles_two_recovery_and_choices(self):

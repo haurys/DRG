@@ -89,8 +89,8 @@ Training cards are installed through the existing Training setup action. Their p
 | 2 | 8 | 2 | Intervals | `▶▶▶: +⚡` | While installed, at Push Pace gain 1 Energy once per runner-turn. |
 | 2 | 7 | 2 | Hill Repeats | `Incline: -2; Steep Incline: -1` | While installed, reduce Course Difficulty by 2 on Incline segments and by 1 on Steep Incline segments. Apply before Movement conversion. |
 | 2 | 5 | 1 | Strength Training | `Gut Check: +1; Cramp/Tight Calf: -1` | While installed, add +1 to every Gut Check total. On installation/acquisition, reduce Current Severity of one applicable active Cramp or Tight Calf by 1. |
-| 2 | 6 | 1 | Pacing Practice | `▶: No -⚡; Side Stitch: -2` | While installed, at Steady Pace prevent the 1-Energy Pace cost once per runner-turn. On installation/acquisition, if Side Stitch is active, reduce its Current Severity by 2. |
-| 2 | 5 | 1 | Trail Training | `Trail: +⚡` | While installed and running on Trail, gain 1 Energy once per runner-turn. |
+| 2 | 6 | 1 | Pace Practice | `▶: No -⚡; Side Stitch: -2` | While installed, at Steady Pace prevent the 1-Energy Pace cost once per runner-turn. On installation/acquisition, if Side Stitch is active, reduce its Current Severity by 2. |
+| 2 | 5 | 1 | Trail Runs | `Trail: +⚡` | While installed and running on Trail, gain 1 Energy once per runner-turn. |
 | 1 | 4 | 1 | Form Drills | `Flat: +⚡; Hot Spot/Sore Feet: -1` | While installed on Flat elevation, gain 1 Energy once per runner-turn. On installation/acquisition, reduce Current Severity of one applicable active Hot Spot or Sore Feet by 1. |
 | 1 | 5 | 1 | Downhill Practice | `Descent: -2; Steep Descent: -1` | While installed, reduce Course Difficulty by 2 on Descent segments and by 1 on Steep Descent segments. Apply before Movement conversion. |
 | 2 | 9 | 2 | Mental Toughness | `Gut Check: +3` | While installed, add +3 to every Gut Check total. |
@@ -107,31 +107,33 @@ Training cards are installed through the existing Training setup action. Their p
 
 Gear is equipped/attached through the existing Gear setup rules. Effects remain active while equipped unless temporary duration is specified.
 
+Playing new Gear from hand for equipment or a compatible Condition attachment consumes the one Treat/Prepare opportunity **and one of two Race-card plays**, yielding no printed Movement Effort. Broad `category` labels are descriptive; only `is_footwear` enforces the one-equipped-footwear limit. Road Trainers (both copies), Cushion Trainers, Trail Shoes, Tempo Trainers, and Carbon Racers are footwear; Running Socks are not. No other descriptive category restricts a slot.
+
 | Qty | Effort | Move Cost | Title | Printed Effect | Simulation Definition |
 |---:|---:|---:|---|---|---|
-| 2 | 7 | 2 | Running Shoes | `Asphalt: +⚡` | While equipped and running on Asphalt, gain 1 Energy once per runner-turn. |
-| 1 | 4 | 1 | Running Socks | `Blister: -2` | While attached/equipped for an active Blister, reduce its Effective Severity by 2 without changing underlying Current Severity unless the canonical Gear suppression rule says otherwise. |
-| 1 | 6 | 1 | Cushioned Shoes | `▶: +⚡` | While equipped at Steady Pace, gain 1 Energy once per runner-turn. |
+| 2 | 7 | 2 | Road Trainers | `Asphalt: +⚡` | While equipped and running on Asphalt, gain 1 Energy once per runner-turn. |
+| 1 | 4 | 1 | Running Socks | `Blister: -2` | While attached to an active Blister, reduce its Effective Severity by 2 without changing underlying Current Severity unless the canonical Gear suppression rule says otherwise. |
+| 1 | 6 | 1 | Cushion Trainers | `▶: +⚡` | While equipped at Steady Pace, gain 1 Energy once per runner-turn. |
 | 1 | 7 | 2 | Trail Shoes | `Trail: +⚡⚡` | While equipped and running on Trail, gain 2 Energy once per runner-turn. |
-| 1 | 5 | 1 | Running Cap | `No -⚡ for Heat/Rain` | While equipped, prevent one 1-Energy loss attributable to a Heat or Rain effect each time such an applicable effect resolves. |
-| 1 | 7 | 2 | Tempo Shoes | `▶/▶▶: +⚡ (5 Rounds)` | When equipped, remain active for 5 runner-rounds. At Steady or Race Pace, gain 1 Energy once per runner-turn while active. Expire after the fifth applicable round. |
+| 1 | 5 | 1 | All-Weather Cap | `No -⚡ for Heat/Rain` | While equipped, prevent one 1-Energy loss attributable to a Heat or Rain effect each time such an applicable effect resolves. |
+| 1 | 7 | 2 | Tempo Trainers | `▶/▶▶: +⚡ (5 Rounds)` | When equipped, remain active for 5 runner-rounds. At Steady or Race Pace, gain 1 Energy once per runner-turn while active. Expire after the fifth applicable round. |
 | 1 | 4 | 1 | Tech Shirt | `No -⚡ for Cold/Heat` | While equipped, prevent one 1-Energy loss attributable to a Cold or Heat effect each time such an applicable effect resolves. |
-| 1 | 5 | 1 | Running Shorts | `▶: +⚡` | While equipped at Steady Pace, gain 1 Energy once per runner-turn. |
-| 1 | 4 | 1 | Sunglasses | `No -⚡` | While equipped, prevent the applicable 1-Energy loss caused by Sun effects. |
+| 1 | 5 | 1 | Split Shorts | `▶: +⚡` | While equipped at Steady Pace, gain 1 Energy once per runner-turn. |
+| 1 | 4 | 1 | Glare Shades | `No -⚡` | While equipped, prevent the applicable 1-Energy loss caused by Sun effects. |
 | 1 | 8 | 2 | Carbon Racers | `▶▶/▶▶▶: +⚡⚡ (3 Rounds)` | When equipped, remain active for 3 runner-rounds. At Race or Push Pace, gain 2 Energy once per runner-turn while active. Expire after the third applicable round. |
 | 1 | 6 | 1 | Hydration Belt | `+⚡` | While equipped, gain 1 Energy when the runner resolves an applicable Water opportunity/milestone. Resolve at most once per Water opportunity. |
-| 1 | 6 | 1 | Running Jacket | `No -⚡ for Cold/Rain/Wind` | While equipped, prevent one 1-Energy loss attributable to a Cold, Rain, or Wind effect each time such an applicable effect resolves. |
+| 1 | 6 | 1 | Weather Shell | `No -⚡ for Cold/Rain/Wind` | While equipped, prevent one 1-Energy loss attributable to a Cold, Rain, or Wind effect each time such an applicable effect resolves. |
 | 1 | 5 | 1 | Anti-Chafe | `Prevent Hot Spot` | While equipped/active, prevent a new Hot Spot Condition from being applied. It does not remove an already-active Hot Spot unless another rule says so. |
 | 1 | 5 | 1 | Singlet | `No -⚡ Heat` | While equipped, prevent one 1-Energy loss attributable to Heat each time such an applicable effect resolves. |
-| 1 | 8 | 2 | GPS Watch | `+⚡ (2 Rounds)` | When equipped/activated, gain 1 Energy in each of the next 2 runner-rounds, then expire. Maximum total gain is 2 Energy. |
-| 1 | 5 | 1 | Recovery Sleeves | `Tight Calf: -1` | While attached/equipped for an active Tight Calf, reduce its Effective Severity by 1 without changing underlying Current Severity unless the canonical Gear suppression rule says otherwise. |
+| 1 | 8 | 2 | Pace Watch | `+⚡ (2 Rounds)` | When equipped/activated, gain 1 Energy in each of the next 2 runner-rounds, then expire. Maximum total gain is 2 Energy. |
+| 1 | 5 | 1 | Recovery Sleeves | `Tight Calf: -1` | While attached to an active Tight Calf, reduce its Effective Severity by 1 without changing underlying Current Severity unless the canonical Gear suppression rule says otherwise. |
 | 1 | 6 | 1 | Pace Band | `Gut Check: +2` | While equipped, add +2 to every Gut Check total. |
-| 1 | 5 | 1 | Compression Sleeves | `Cramp: -2` | While attached/equipped for an active Cramp, reduce its Effective Severity by 2 without changing underlying Current Severity unless the canonical Gear suppression rule says otherwise. |
-| 1 | 6 | 1 | Insoles | `Concrete: +⚡` | While equipped and running on Concrete, gain 1 Energy once per runner-turn. |
+| 1 | 5 | 1 | Compression Sleeves | `Cramp: -2` | While attached to an active Cramp, reduce its Effective Severity by 2 without changing underlying Current Severity unless the canonical Gear suppression rule says otherwise. |
+| 1 | 6 | 1 | Support Insoles | `Concrete: +⚡` | While equipped and running on Concrete, gain 1 Energy once per runner-turn. |
 
 ### Gear Notes
 
-- Running Jacket replaces the former second Hydration Belt slot.
+- Weather Shell replaces the former second Hydration Belt slot.
 - Only one Hydration Belt remains.
 - Weather protection prevents the named Energy loss; it does not generate Energy.
 - Temporary Gear duration is deterministic and must be logged on activation, tick, and expiry.
@@ -172,7 +174,7 @@ For any Fuel card with `or`, choose exactly one branch.
 ### Fuel Notes
 
 - Effect use never pays the printed Movement Energy cost.
-- Nausea's `No Fuel Allowed` restriction prevents Fuel **Effect use** while Nausea is active. Fuel cards remain legal Movement cards because Movement use ignores family Effect text.
+- Nausea prints `Cannot use Fuel`. **“Cannot use Fuel” means the runner cannot use Fuel for its printed Fuel Effect while Nausea is active. The card may still be used as a Movement card unless another rule prevents it.** Printed Effort and normal Movement Energy apply in that Movement mode.
 
 ---
 
@@ -236,7 +238,7 @@ Conditions remain active under the existing persistence/removal rules.
 | 2 | 2 | Hot Spot | `▶▶/▶▶▶: -→` | While active with Effective Severity above 0 and runner is at Race or Push Pace, apply -1 Movement to the runner's Movement resolution once per runner-turn. |
 | 1 | 4 | Sore Feet | `Concrete/Asphalt: +2` | While active with Effective Severity above 0 and runner is on Concrete or Asphalt, increase applicable Course Difficulty by 2 before Movement conversion. |
 | 1 | 5 | Dehydrated | `▶/▶▶/▶▶▶: -⚡` | While active with Effective Severity above 0 and runner is at Steady, Race, or Push Pace, lose 1 additional Energy once per runner-turn. |
-| 1 | 4 | Nausea | `No Fuel Allowed` | While active with Effective Severity above 0, the runner cannot play a Fuel card for its Effect. Fuel cards remain legal for Movement use. |
+| 1 | 4 | Nausea | `Cannot use Fuel` | While active with Effective Severity above 0, the runner cannot play a Fuel card for its Effect. Fuel cards remain legal for Movement use. |
 | 1 | 5 | Gashed Knee | `-→` | While active with Effective Severity above 0, apply -1 Movement to every applicable Movement resolution. |
 | 1 | 3 | Side Stitch | `▶▶/▶▶▶: -→` | While active with Effective Severity above 0 and runner is at Race or Push Pace, apply -1 Movement to the runner's Movement resolution once per runner-turn. |
 | 1 | 7 | Twisted Ankle | `Max ▶` | While active with Effective Severity above 0, maximum legal Pace is Steady. |
@@ -324,10 +326,10 @@ Other frozen remedies:
 
 | Weather | Hindrances | Protection / Counterplay |
 |---|---|---|
-| Heat | Hot Spell, Heat Exhaustion | Running Cap, Tech Shirt, Singlet, Water Bottle, Aid |
-| Cold | Cold Snap, Cold Chills | Tech Shirt, Running Jacket |
-| Rain | Sudden Rain | Running Cap, Running Jacket |
-| Wind | Headwind / Tailwind | Running Jacket |
+| Heat | Hot Spell, Heat Exhaustion | All-Weather Cap, Tech Shirt, Singlet, Water Bottle, Aid |
+| Cold | Cold Snap, Cold Chills | Tech Shirt, Weather Shell |
+| Rain | Sudden Rain | All-Weather Cap, Weather Shell |
+| Wind | Headwind / Tailwind | Weather Shell |
 
 Weather protection only prevents the applicable Energy loss unless another card explicitly says otherwise.
 
@@ -387,7 +389,7 @@ effect_target: self
 effect_timing: immediate
 ```
 
-### GPS Watch
+### Pace Watch
 
 ```yaml
 effect_type: recurring_energy
@@ -423,7 +425,7 @@ condition_required_active: Cold Chills
 
 Required current swaps:
 
-- second Hydration Belt → Running Jacket
+- second Hydration Belt → Weather Shell
 - EV-010 Congestion → Cold Snap
 - second Dehydrated → Cold Chills
 

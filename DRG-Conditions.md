@@ -15,7 +15,7 @@
 | CO-009 | Sore Feet | 4 | — | Concrete/Asphalt: +2 |
 | CO-010 | Dehydrated | 5 | — | ▶/▶▶/▶▶▶: -⚡ |
 | CO-011 | Cold Chills | 5 | — | ▶▶/▶▶▶: -⚡ |
-| CO-012 | Nausea | 4 | — | No Fuel Allowed |
+| CO-012 | Nausea | 4 | — | Cannot use Fuel |
 | CO-013 | Gashed Knee | 5 | — | -→ |
 | CO-014 | Side Stitch | 3 | — | ▶▶/▶▶▶: -→ |
 | CO-015 | Twisted Ankle | 7 | — | Max ▶ |

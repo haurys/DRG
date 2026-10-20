@@ -17,7 +17,7 @@ class Foundation(unittest.TestCase):
   for fmt,count,segments,quarters in [('marathon',13,26,104),('half',7,13,52)]:
    c=copy.deepcopy(self.cfg);c['race_format']=fmt;s=m.Sim(ROOT,c);s.build_course();self.assertEqual(len({x['course_card_id'] for x in s.course}),count);self.assertEqual(len(s.course),segments);self.assertEqual(sum(len(x['quarter_positions']) for x in s.course),quarters)
  def test_setup_rules(self):
-  s=m.Sim(ROOT,self.cfg);s.setup();self.assertTrue(all(len(r['hand'])==7 for r in s.runners));self.assertTrue(all(all(c['family']!='Condition' for c in r['hand']) for r in s.runners));self.assertTrue(all(r['exchanges_used']<=3 for r in s.runners));self.assertTrue(all(r['pace'] for r in s.runners))
+  s=m.Sim(ROOT,self.cfg);s.setup();self.assertTrue(all(len(r['hand'])==6 for r in s.runners));self.assertTrue(all(all(c['family']!='Condition' for c in r['hand']) for r in s.runners));self.assertTrue(all(r['exchanges_used']<=3 for r in s.runners));self.assertTrue(all(r['pace'] for r in s.runners))
  def test_modes_and_movement(self):
   self.assertEqual(m.movement(0),0);self.assertEqual(m.movement(1),1);self.assertEqual(m.movement(14),7);self.assertEqual(m.movement(15),8)
  def test_determinism(self):

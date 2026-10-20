@@ -30,6 +30,8 @@ def plan_class(sim, row):
         return 'Treat/Prepare + Move'
     if any(sim.card(cid)['family'] == 'Event' for cid in cards):
         return 'Event-related legal plan'
+    if any(source != 'hand' for source in row.get('card_sources', [])):
+        return 'Direct Slot Movement'
     return 'Move + Move' if len(cards) == 2 else 'Move' if cards else 'No card play'
 
 
@@ -53,10 +55,16 @@ def _position(sim, runner):
 def _detail(sim, runner, row, baseline, before_quarters):
     plan = row['treat_prepare']
     prepared = sim.preview_preparation(runner, plan)
-    paid = sim.preview_payment(prepared)
-    cards = [{**next(c for c in prepared['hand'] if c['id'] == cid), 'use_mode': mode}
-             for cid, mode in zip(row['movement_cards'], row.get('card_modes', ['MOVEMENT'] * len(row['movement_cards'])))]
-    after_cards = sim.preview_payment(prepared, row.get('movement_energy_cost', 0))
+    sources = row.get('card_sources', ['hand'] * len(row['movement_cards']))
+    cards = []
+    for cid, mode, source in zip(row['movement_cards'],
+                                 row.get('card_modes', ['MOVEMENT'] * len(row['movement_cards'])), sources):
+        original = (next(c for c in prepared['hand'] if c['id'] == cid) if source == 'hand'
+                    else next(item['card'] for item in prepared[source] if item['card']['id'] == cid))
+        cards.append({**original, 'use_mode': mode, 'source': source})
+    liquidated = sim.preview_slot_sacrifice(prepared, cards)
+    paid = sim.preview_payment(liquidated)
+    after_cards = sim.preview_payment(liquidated, row.get('movement_energy_cost', 0))
     result = sim.preview_movement(after_cards, cards)
     remaining_after = max(0, len(sim.course) * 4 - result['to_space'])
     rate = max(2, row['movement_quarters'] or 2)
@@ -64,7 +72,7 @@ def _detail(sim, runner, row, baseline, before_quarters):
                'printed_effort': sim.card(plan['card_id']).get('effort'),
                'role': plan['action'], 'replaces': plan.get('replace_id')}] if plan else [])
     roles += [{'id': c['id'], 'title': c['title'], 'printed_effort': c.get('effort'),
-               'role': c['use_mode'], 'movement_energy_cost':
+               'role': c['use_mode'], 'source': c['source'], 'movement_energy_cost':
                c['movement_energy_cost'] if c['use_mode'] == 'MOVEMENT' else 0} for c in cards]
     old_conditions = {c['id']: c['effective_severity'] for c in runner['active_conditions']}
     new_conditions = {c['id']: c['effective_severity'] for c in prepared['active_conditions']}
@@ -77,7 +85,7 @@ def _detail(sim, runner, row, baseline, before_quarters):
         duration = (TRAINING_DURATION if plan['action'] == 'training' else GEAR_DURATION).get(title)
         if duration:
             horizon *= min(1, duration / 6)
-    pace_cost = sim.pace_cost(prepared, prepared['pace'])
+    pace_cost = sim.pace_cost(liquidated, liquidated['pace'])
     setup_estimate = None
     if setup:
         visible = sim.course[min(runner['quarter_mile_space'] // 4, len(sim.course) - 1):][:6]
@@ -111,6 +119,7 @@ def _detail(sim, runner, row, baseline, before_quarters):
     gap = _position(sim, runner)['gap_to_leader_miles']
     return {'plan_type': plan_class(sim, row), 'treat_prepare': plan,
             'movement_cards': row['movement_cards'], 'card_modes': row.get('card_modes'),
+            'card_sources': sources,
             'cards_used': roles,
             'selected_pace': paid['pace'], 'projected_effort': sum(c['effort'] for c in cards
                                                                  if c['use_mode'] == 'MOVEMENT'),

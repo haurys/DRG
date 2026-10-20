@@ -18,34 +18,34 @@ Movement cost: Effort 1–3 = 0; 4–6 = ⚡ (1); 7+ = ⚡⚡ (2). Condition car
 | TR-010 | Training | Hill Repeats | 7 | ⚡⚡ (2) | Incline: -2; Steep Incline: -1 |
 | TR-011 | Training | Strength Training | 5 | ⚡ (1) | Gut Check: +1; Cramp/Tight Calf: -1 |
 | TR-012 | Training | Strength Training | 5 | ⚡ (1) | Gut Check: +1; Cramp/Tight Calf: -1 |
-| TR-013 | Training | Pacing Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
-| TR-014 | Training | Pacing Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
-| TR-015 | Training | Trail Training | 5 | ⚡ (1) | Trail: +⚡ |
-| TR-016 | Training | Trail Training | 5 | ⚡ (1) | Trail: +⚡ |
+| TR-013 | Training | Pace Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
+| TR-014 | Training | Pace Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
+| TR-015 | Training | Trail Runs | 5 | ⚡ (1) | Trail: +⚡ |
+| TR-016 | Training | Trail Runs | 5 | ⚡ (1) | Trail: +⚡ |
 | TR-017 | Training | Form Drills | 4 | ⚡ (1) | Flat: +⚡; Hot Spot/Sore Feet: -1 |
 | TR-018 | Training | Downhill Practice | 5 | ⚡ (1) | Descent: -2; Steep Descent: -1 |
 | TR-019 | Training | Mental Toughness | 9 | ⚡⚡ (2) | Gut Check: +3 |
 | TR-020 | Training | Mental Toughness | 9 | ⚡⚡ (2) | Gut Check: +3 |
-| GE-001 | Gear | Running Shoes | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
-| GE-002 | Gear | Running Shoes | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
+| GE-001 | Gear | Road Trainers | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
+| GE-002 | Gear | Road Trainers | 7 | ⚡⚡ (2) | Asphalt: +⚡ |
 | GE-003 | Gear | Running Socks | 4 | ⚡ (1) | Blister: -2 |
-| GE-004 | Gear | Cushioned Shoes | 6 | ⚡ (1) | ▶: +⚡ |
+| GE-004 | Gear | Cushion Trainers | 6 | ⚡ (1) | ▶: +⚡ |
 | GE-005 | Gear | Trail Shoes | 7 | ⚡⚡ (2) | Trail: +⚡⚡ |
-| GE-006 | Gear | Running Cap | 5 | ⚡ (1) | No -⚡ for Heat/Rain |
-| GE-007 | Gear | Tempo Shoes | 7 | ⚡⚡ (2) | ▶/▶▶: +⚡ (5 Rounds) |
+| GE-006 | Gear | All-Weather Cap | 5 | ⚡ (1) | No -⚡ for Heat/Rain |
+| GE-007 | Gear | Tempo Trainers | 7 | ⚡⚡ (2) | ▶/▶▶: +⚡ (5 Rounds) |
 | GE-008 | Gear | Tech Shirt | 4 | ⚡ (1) | No -⚡ for Cold/Heat |
-| GE-009 | Gear | Running Shorts | 5 | ⚡ (1) | ▶: +⚡ |
-| GE-010 | Gear | Sunglasses | 4 | ⚡ (1) | No -⚡ |
+| GE-009 | Gear | Split Shorts | 5 | ⚡ (1) | ▶: +⚡ |
+| GE-010 | Gear | Glare Shades | 4 | ⚡ (1) | No -⚡ |
 | GE-011 | Gear | Carbon Racers | 8 | ⚡⚡ (2) | ▶▶/▶▶▶: +⚡⚡ (3 Rounds) |
 | GE-012 | Gear | Hydration Belt | 6 | ⚡ (1) | +⚡ |
-| GE-013 | Gear | Running Jacket | 6 | ⚡ (1) | No -⚡ for Cold/Rain/Wind |
+| GE-013 | Gear | Weather Shell | 6 | ⚡ (1) | No -⚡ for Cold/Rain/Wind |
 | GE-014 | Gear | Anti-Chafe | 5 | ⚡ (1) | Prevent Hot Spot |
 | GE-015 | Gear | Singlet | 5 | ⚡ (1) | No -⚡ Heat |
-| GE-016 | Gear | GPS Watch | 8 | ⚡⚡ (2) | +⚡ (2 Rounds) |
+| GE-016 | Gear | Pace Watch | 8 | ⚡⚡ (2) | +⚡ (2 Rounds) |
 | GE-017 | Gear | Recovery Sleeves | 5 | ⚡ (1) | Tight Calf: -1 |
 | GE-018 | Gear | Pace Band | 6 | ⚡ (1) | Gut Check: +2 |
 | GE-019 | Gear | Compression Sleeves | 5 | ⚡ (1) | Cramp: -2 |
-| GE-020 | Gear | Insoles | 6 | ⚡ (1) | Concrete: +⚡ |
+| GE-020 | Gear | Support Insoles | 6 | ⚡ (1) | Concrete: +⚡ |
 | FU-001 | Fuel | Energy Gel | 3 | — | +⚡⚡ |
 | FU-002 | Fuel | Energy Gel | 5 | ⚡ (1) | +⚡⚡ |
 | FU-003 | Fuel | Energy Gel | 7 | ⚡⚡ (2) | +⚡⚡ |
@@ -109,7 +109,7 @@ Movement cost: Effort 1–3 = 0; 4–6 = ⚡ (1); 7+ = ⚡⚡ (2). Condition car
 | CO-009 | Condition | Sore Feet | 4 | — | Concrete/Asphalt: +2 |
 | CO-010 | Condition | Dehydrated | 5 | — | ▶/▶▶/▶▶▶: -⚡ |
 | CO-011 | Condition | Cold Chills | 5 | — | ▶▶/▶▶▶: -⚡ |
-| CO-012 | Condition | Nausea | 4 | — | No Fuel Allowed |
+| CO-012 | Condition | Nausea | 4 | — | Cannot use Fuel |
 | CO-013 | Condition | Gashed Knee | 5 | — | -→ |
 | CO-014 | Condition | Side Stitch | 3 | — | ▶▶/▶▶▶: -→ |
 | CO-015 | Condition | Twisted Ankle | 7 | — | Max ▶ |

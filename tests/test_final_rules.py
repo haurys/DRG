@@ -11,7 +11,7 @@ def card(cid):
 
 class FinalRules(unittest.TestCase):
  def test_gear_ids_efforts_and_family_counts(self):
-  self.assertEqual({i:(card(i)['title'],card(i)['effort']) for i in ['GE-004','GE-007','GE-011','GE-015','GE-017']},{'GE-004':('Cushioned Shoes',6),'GE-007':('Tempo Shoes',7),'GE-011':('Carbon Racers',8),'GE-015':('Singlet',5),'GE-017':('Recovery Sleeves',5)})
+  self.assertEqual({i:(card(i)['title'],card(i)['effort']) for i in ['GE-004','GE-007','GE-011','GE-015','GE-017']},{'GE-004':('Cushion Trainers',6),'GE-007':('Tempo Trainers',7),'GE-011':('Carbon Racers',8),'GE-015':('Singlet',5),'GE-017':('Recovery Sleeves',5)})
   cards=json.loads((ROOT/'data/race_cards.json').read_text());self.assertEqual(Counter(c['family'] for c in cards),Counter({'Training':20,'Gear':20,'Fuel':22,'Event':30,'Condition':16}))
  def test_course_distribution(self):
   sides=json.loads((ROOT/'data/course_cards.json').read_text());self.assertEqual(Counter(x['difficulty'] for x in sides),Counter({1:9,2:14,3:9,4:12,5:5,6:7,7:1,8:3}));self.assertEqual(sum(x['difficulty'] for x in sides),210)

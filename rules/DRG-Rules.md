@@ -6,14 +6,18 @@ See [`DRG-Canonical-Playtest-Rules.md`](../DRG-Canonical-Playtest-Rules.md). The
 
 ## Encoded
 
-- Seven-card concealed starting hands; Conditions auto-enter play by Severity and draw replacement cards.
+- Six-card concealed starting hands; Conditions auto-enter play by Severity and draw replacement cards.
+- One normal draw below the six-card hand maximum per turn; no minimum and no automatic refill. Empty draw recycles eligible discard; if both are empty, skip draw.
+- Eligible installed Training/Gear may move directly from a slot after two complete runner turns, ending its Effect before Movement. Attached Gear cannot move or be reassigned and discards when its Condition is removed.
+- One Treat/Prepare opportunity per runner turn. Playing a new Training/Gear/Fuel/treatment card from hand uses that opportunity **and one of two card plays**; relocation or assistance uses the opportunity without a new card play. Direct Slot Movement uses a card play and no Treat/Prepare.
+- One equipped footwear maximum, enforced by the Gear `is_footwear` flag; broad `category` labels are descriptive only. Nausea prints `Cannot use Fuel`, meaning Fuel Effect use is blocked but legal Fuel Movement remains available.
 - Up to three pre-race exchanges; replacements/acquired cards lock.
 - At most two cards per runner-turn and one Event.
 - Non-Condition card MOVEMENT mode uses printed Effort and pays per-card Energy by Effort band: 1–3→0, 4–6→1, 7+→2.
 - Non-Condition card EFFECT mode uses no Effort and pays no card Movement Energy; Training/Gear/Fuel use Treat/Prepare, Events use Movement.
 - Pace icons: `▷`, `▶`, `▶▶`, `▶▶▶`; Movement is `→`; Energy is `⚡`.
 - Pace Energy costs and starting Energy 15 remain unchanged.
-- Deterministic visible Course, quarter-mile state, Difficulty boundary recalculation, Gut Checks, Pack preservation, Will, and simultaneous same-round Finish remain.
+- Deterministic visible Course, quarter-mile state, Difficulty boundary recalculation, Gut Checks, Pack preservation, Will, and simultaneous same-round Finish remain. Marathon layout uses 13 connected **two-mile physical cards** from Start/Finish, one one-mile lane outward and the opposite lane back; the 60 data side records each represent one mile.
 
 ## Source discrepancy report
 

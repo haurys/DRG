@@ -33,7 +33,7 @@ class FrozenRedesign(unittest.TestCase):
                          Counter(Training=20, Gear=20, Fuel=22, Event=30, Condition=16))
         self.assertEqual((CARDS['GE-013']['title'], CARDS['EV-010']['title'],
                           CARDS['CO-011']['title'], CARDS['CO-013']['title']),
-                         ('Running Jacket', 'Cold Snap', 'Cold Chills', 'Gashed Knee'))
+                         ('Weather Shell', 'Cold Snap', 'Cold Chills', 'Gashed Knee'))
         self.assertEqual(sum(c['title'] == 'Dehydrated' for c in CARDS.values()), 1)
         self.assertEqual(sum(c['title'] == 'Hydration Belt' for c in CARDS.values()), 1)
         for c in CARDS.values():
@@ -294,7 +294,7 @@ class FrozenRedesign(unittest.TestCase):
         self.assertEqual(sim.pace_cost(r, 'Easy')['final'], 0)
         self.assertEqual(r['energy'], 5)
         self.assertEqual(next(e['payload']['protected_by'] for e in sim.events
-                              if e['type'] == 'GLOBAL_WEATHER'), 'Running Jacket')
+                              if e['type'] == 'GLOBAL_WEATHER'), 'Weather Shell')
         knee = m.make_condition(card('CO-013'))
         self.assertEqual(m.condition_effects(knee, 'Easy')['direct_movement'], -1)
         knee['current_severity'] = 0

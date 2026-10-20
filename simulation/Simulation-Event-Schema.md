@@ -9,3 +9,9 @@ JSON Lines, chronological. Required keys: `event_id`, `sequence`, `type`, `round
 ## v1.3 assistance and DNF events
 
 `ASSISTANCE_REQUEST` records requester position and hand; `ASSISTANCE_PARTNER_SELECT` records the simulation helper and position; `ASSISTANCE_SWAP_EVALUATE` records legal swaps, rescue viability, and scores; `ASSISTANCE_SWAP` records the exchange and continuation; `ASSISTANCE_FAIL` records no viable exchange. `DNF_EVALUATION` records exhaustion criteria; `DNF` preserves round, turn, distance, Energy, Will, Conditions, and reason. `CONDITION_REMEDY` is emitted for each station-eligible Condition independently.
+
+## v1.4 card-source and deck events
+
+`REPLENISH` records the one normal draw opportunity below six; `DRAW_FAILED` records the absence of eligible cards after checking draw and discard. A reshuffle uses eligible discard only, leaving hands, Training/Gear slots, Condition attachments, and staged cards outside the draw pile. `SLOT_SACRIFICE` records the physical card ID, `active_training` or `equipped_gear` source, printed Effort, and termination of its installed Effect before payment and Movement. `PLAY` identifies each card source; `AI_TURN_PLAN` and `AI_TURN_RATIONALE` retain the selected `card_sources` alongside IDs and modes. `MOVE` records the resulting Movement. On Condition removal, `GEAR_DETACH` records each attached card sent to discard; no attached card can become a Movement source. These fields let an audit distinguish a shrinking hand, a liquidated slot, and committed treatment.
+
+For historical event-schema continuity, the event code `GPS_WATCH_TICK` still denotes the GE-016 **Pace Watch** two-turn Energy trigger. This is an audit key, not the current printed card title. Gear category labels are descriptive; the one-shoe eligibility check uses `is_footwear`. The printed Nausea text `Cannot use Fuel` bars Fuel Effect use without barring legal Fuel Movement.

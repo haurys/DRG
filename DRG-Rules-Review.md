@@ -35,3 +35,9 @@ The 2026-09-30 designer consolidation closes RR-11, RR-13, and RR-17 and marks R
 ## v1.3 closures
 
 Station treatment applies to every eligible Condition. In-race assistance uses the requesting runner's Treat/Prepare action, no Race-card play slot, and no helper out-of-turn action cost. The requesting player may choose any eligible active helper. DNF requires exhausted practical continuation after assistance. These action-cost questions are closed.
+
+## v1.4 candidate qualification
+
+RR-11 is superseded **for Condition-attached Gear**: once attached it cannot relocate or return to hand/slot and discards on complete Condition removal. Moving an equipped Gear into a compatible attachment remains a Treat/Prepare action. The v1.4 candidate retains the unresolved historical direct-Movement boundary accounting item without changing the current engine resolution.
+
+**RESOLVED — descriptive Gear category versus footwear legality.** The prior `category` values marked Running Socks as Footwear, Tempo Trainers as Apparel, and Carbon Racers as Accessory, despite established shoe legality saying the opposite. The v1.4 remediation explicitly authorizes alignment: Gear now has `is_footwear` as the **only machine-readable category-like equip restriction**; the six physical shoe cards (Road Trainers ×2, Cushion Trainers, Trail Shoes, Tempo Trainers, Carbon Racers) are true, Running Socks is false. Descriptive categories have been aligned (`GE-003` Apparel, `GE-007`/`GE-011` Footwear) but do not enforce any restriction themselves. No apparel/accessory/technology/support slot limit exists. The historical direct-Movement boundary-accounting question remains RULES REVIEW and nonblocking; no new ruling was invented.

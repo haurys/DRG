@@ -1,6 +1,6 @@
 # Course Cards
 
-30 physical cards / 60 one-mile sides. No special rules were found in the source inventory.
+30 selectable physical cards, each with **two total race miles** on opposite one-mile lanes; 60 one-mile side records below. A marathon connects 13 physical cards long-side to long-side from the Start/Finish end, runs one lane outward and the opposite lane back, with four quarter-mile arrows/spaces per lane. The A/B rows describe physical sides, not separate one-mile cards. No special rules were found in the source inventory.
 
 | ID | Card | Side | Setting | Surface/Route/Condition | Elevation | Difficulty |
 |---|---|---|---|---|---|---|

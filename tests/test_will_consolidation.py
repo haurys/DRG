@@ -9,8 +9,8 @@ from engine import simulate as m
 from engine.ai_rationale import describe_decision
 
 ROOT = Path(__file__).resolve().parents[1]
-CFG = json.loads((ROOT / 'simulation/config.json').read_text())
-CARDS = {c['id']: c for c in json.loads((ROOT / 'data/race_cards.json').read_text())}
+CFG = json.loads((ROOT / 'simulation/config.json').read_text(encoding='utf-8'))
+CARDS = {c['id']: c for c in json.loads((ROOT / 'data/race_cards.json').read_text(encoding='utf-8'))}
 
 
 def card(cid):
@@ -190,9 +190,9 @@ class WillConsolidation(unittest.TestCase):
         self.assertTrue(r['finish_pending'])
 
     def test_canonical_rule_register_and_will_descriptor(self):
-        canonical = (ROOT / 'DRG-Canonical-Playtest-Rules.md').read_text()
-        review = (ROOT / 'DRG-Rules-Review.md').read_text()
-        config = json.loads((ROOT / 'simulation/config.json').read_text())
+        canonical = (ROOT / 'DRG-Canonical-Playtest-Rules.md').read_text(encoding='utf-8')
+        review = (ROOT / 'DRG-Rules-Review.md').read_text(encoding='utf-8')
+        config = json.loads((ROOT / 'simulation/config.json').read_text(encoding='utf-8'))
         for marker in ('exact remaining shortfall', 'nearest leader',
                        'Relocating already-played Gear', 'Remedy Dehydrated',
                        'Course endpoint with no positive legal Movement left'):

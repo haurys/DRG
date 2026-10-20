@@ -16,10 +16,10 @@
 | TR-010 | Hill Repeats | 7 | ⚡⚡ (2) | Incline: -2; Steep Incline: -1 |
 | TR-011 | Strength Training | 5 | ⚡ (1) | Gut Check: +1; Cramp/Tight Calf: -1 |
 | TR-012 | Strength Training | 5 | ⚡ (1) | Gut Check: +1; Cramp/Tight Calf: -1 |
-| TR-013 | Pacing Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
-| TR-014 | Pacing Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
-| TR-015 | Trail Training | 5 | ⚡ (1) | Trail: +⚡ |
-| TR-016 | Trail Training | 5 | ⚡ (1) | Trail: +⚡ |
+| TR-013 | Pace Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
+| TR-014 | Pace Practice | 6 | ⚡ (1) | ▶: No -⚡; Side Stitch: -2 |
+| TR-015 | Trail Runs | 5 | ⚡ (1) | Trail: +⚡ |
+| TR-016 | Trail Runs | 5 | ⚡ (1) | Trail: +⚡ |
 | TR-017 | Form Drills | 4 | ⚡ (1) | Flat: +⚡; Hot Spot/Sore Feet: -1 |
 | TR-018 | Downhill Practice | 5 | ⚡ (1) | Descent: -2; Steep Descent: -1 |
 | TR-019 | Mental Toughness | 9 | ⚡⚡ (2) | Gut Check: +3 |

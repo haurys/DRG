@@ -22,3 +22,9 @@ Current source: `DRG-Canonical-Playtest-Rules.md`, `DRG-Race-Card-Simulation-Eff
 ## v1.3 cleanup
 
 Water and Aid treat every eligible active Condition. In-race assistance is a one-for-one swap using the requester's Treat/Prepare action. The physical requester chooses any eligible active helper; the deterministic simulation selects the race leader or second place when the requester leads. Exhausted runners may be DNF without receiving a finishing place. See the canonical rules and simulation documents for action timing and audit events.
+
+## v1.4 candidate for review
+
+The uncommitted v1.4 candidate uses a six-card opening hand and one normal draw below the hand maximum, allows eligible installed Training/Gear to move directly after two complete runner turns, and commits Condition attachments until complete Condition removal. See [Executive Gameplay Summary](DRG-v1.4-Executive-Gameplay-Summary.md) and [Gameplay Validation Checklist](DRG-v1.4-Gameplay-Validation-Checklist.md). No multi-seed balance study has been run for this candidate.
+
+The physical marathon connects 13 two-mile Course cards long-side to long-side, with Start/Finish at one end. Each card has a one-mile outbound lane and a one-mile return lane in four quarter-mile spaces; structured data stores the 60 lanes separately. A new hand card installed or used for treatment consumes one Treat/Prepare and one of two card plays. Broad Gear categories are descriptive; only `is_footwear` limits equipment to one shoe card. Nausea's printed `Cannot use Fuel` blocks Fuel Effects but leaves legal Fuel Movement available.
