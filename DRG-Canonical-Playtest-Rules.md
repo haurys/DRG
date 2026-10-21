@@ -16,7 +16,7 @@ Race formats: marathon 26.2 miles; half marathon 13.1 miles. Supported base-game
 
 A round represents the **same race-time interval** for all runners; sequential resolution is administrative, not earlier race time. Track `round_start_position`, `current_resolution_position`, and `round_end_position`. Unless an explicit effect overrides it, same-round timing, eligibility, and Finish outcomes are simultaneous.
 
-1. **Round Start:** activate staged Global effects; all runners select Pace simultaneously; form eligible Packs from the established Pace and Round Start positions; snapshot position, Pace, Pack, and other public simultaneous state. Pace locks for the round.
+1. **Round Start:** activate staged Global effects; all runners select Pace simultaneously; from round 2 onward, form eligible Packs from the established Pace and Round Start positions; snapshot position, Pace, Pack, and other public simultaneous state. Pace locks for the round.
 2. **Each runner, sequentially:** Replenish → Treat/Prepare → Movement → End.
 3. **Round End:** record Pack cohesion without changing round membership; resolve simultaneous Finish places; expire Global/round effects; cleanup.
 
@@ -82,7 +82,7 @@ Training has two slots. Persistent remains until replaced; Temporary(N) occupies
 
 ## Pack — FROZEN
 
-At Round Start after Pace selection, runners with the same Pace may form a Pack only within 0.5 mile of its leader, measured directly without chaining. If multiple legal Packs are available, choose the nearest leader; an exact distance tie uses stable leader runner ID. A Pack requires at least two runners; equal-position leaders are co-leaders. Membership is fixed for that round, with no separate mid-round voluntary exit; eligibility and membership are reevaluated at the next Round Start. Round End cohesion is observational. Pack preserves **1 Pace Energy**, stacking with Training/Gear preservation to a floor of zero. A runner may voluntarily stop at a legal quarter-mile position to preserve future cohesion; unused movement is lost. No timer, anchor, cooldown, size cap, or breakaway penalty. Zero-cost Steady/Race/Push and preservation stacking are **BALANCE WATCH**, not defects.
+No Pack forms in round 1, including at the shared starting position; Pack membership and preservation first become available at the start of round 2. From round 2 onward, after Pace selection, runners with the same Pace may form a Pack only within 0.5 mile of its leader, measured directly without chaining. If multiple legal Packs are available, choose the nearest leader; an exact distance tie uses stable leader runner ID. A Pack requires at least two runners; equal-position leaders are co-leaders. Membership is fixed for that round, with no separate mid-round voluntary exit; eligibility and membership are reevaluated at the next Round Start. Round End cohesion is observational. Pack preserves **1 Pace Energy**, stacking with Training/Gear preservation to a floor of zero. A runner may voluntarily stop at a legal quarter-mile position to preserve future cohesion; unused movement is lost. No timer, anchor, cooldown, size cap, or breakaway penalty. Zero-cost Steady/Race/Push and preservation stacking are **BALANCE WATCH**, not defects.
 
 ## Gut Checks and milestones — FROZEN
 

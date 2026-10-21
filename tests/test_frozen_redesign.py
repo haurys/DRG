@@ -275,6 +275,7 @@ class FrozenRedesign(unittest.TestCase):
 
     def test_high_five_chooses_one_packmate_in_three_runner_pack(self):
         sim, actor = fixture(3)
+        sim.round = 1
         for runner in sim.runners:
             runner['energy'] = 5
         actor['hand'] = [card('EV-018')]

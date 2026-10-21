@@ -861,9 +861,9 @@ class Sim:
             preview = copy.deepcopy(runner)
             preview['race_turn_number'] += 1  # Round Start previews the upcoming runner turn.
             preview['pace'] = pace
-            preview['pack_state'] = None  # This round's Pack is formed after all Pace choices.
+            preview['pack_state'] = None  # Packs form after Pace choices, starting in round 2.
             plan = self.choose_turn_plan(preview)
-            pack_style = 0.4 if runner['profile'] == 'Pack Runner' and any(
+            pack_style = 0.4 if self.round >= 2 and runner['profile'] == 'Pack Runner' and any(
                 other is not runner and not other['finished'] and not other.get('dnf')
                 and abs(other['quarter_mile_space'] - runner['quarter_mile_space']) <= 2
                 and (other['previous_pace'] or other['pace']) == pace
@@ -1386,7 +1386,7 @@ class Sim:
             runner['pack_leader'] = None
         pack_number = 0
         for pace in PACE_ORDER:
-            available = sorted((runner for runner in self.runners if not runner['finished'] and not runner.get('dnf') and runner['pace'] == pace
+            available = sorted((runner for runner in self.runners if self.round >= 2 and not runner['finished'] and not runner.get('dnf') and runner['pace'] == pace
                                 and not any(event['card']['id'] == 'EV-030'
                                             for event in self.active_staged(runner))),
                                key=lambda runner: (-runner['quarter_mile_space'], runner['player_id']))

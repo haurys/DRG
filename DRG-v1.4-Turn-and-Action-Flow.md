@@ -28,7 +28,7 @@ Each new-card Treat/Prepare play has **zero Movement Effort**. No second Treat/P
 
 ## Before the turn: same-time round setup
 
-1. Activate staged Global effects. Each active runner selects one legal Pace simultaneously; record Round Start positions and Pace. Form same-Pace Packs within 0.5 mile of a leader. This is **mandatory once per round**; Pace selection is not a Race-card play.
+1. Activate staged Global effects. Each active runner selects one legal Pace simultaneously; record Round Start positions and Pace. From round 2 onward, form same-Pace Packs within 0.5 mile of a leader; no Pack forms in round 1. Pace selection is **mandatory once per round** and is not a Race-card play.
 2. Resolve each runner’s turn sequentially; this administrative order does not make their race times sequential. FINISHED and DNF runners have no turn.
 
 ## Your turn in order

@@ -30,6 +30,30 @@ def event_payloads(sim, event_type, player=None):
 
 
 class IntegratedRaceLoop(unittest.TestCase):
+    def test_pack_starts_in_round_two(self):
+        sim = make_sim(2)
+        sim.runners[0]['hand'] = [card('FU-001'), card('FU-002')]
+        sim.start_round({'P1': 'Push', 'P2': 'Push'})
+        self.assertEqual(sim.round, 1)
+        self.assertEqual(sim.round_pack_snapshot, {'P1': [], 'P2': []})
+        self.assertFalse(event_payloads(sim, 'PACK_ENTER'))
+        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 2)
+        sim.turn(sim.runners[0], {'movement_cards': ['FU-001']})
+        first_payment = event_payloads(sim, 'PACE_PAYMENT', 'P1')[-1]
+        self.assertEqual((first_payment['base'], first_payment['final'], first_payment['paid']), (2, 2, 2))
+        self.assertNotIn('Pack', first_payment['preservation_sources'])
+        sim.end_round()
+        sim.runners[1]['quarter_mile_space'] = sim.runners[0]['quarter_mile_space']
+        sim.start_round({'P1': 'Push', 'P2': 'Push'})
+        self.assertEqual(sim.round, 2)
+        self.assertEqual(sim.round_pack_snapshot, {'P1': ['P1', 'P2'], 'P2': ['P1', 'P2']})
+        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 1)
+        self.assertEqual([e['round'] for e in sim.events if e['type'] == 'PACK_ENTER'], [2, 2])
+        sim.turn(sim.runners[0], {'movement_cards': ['FU-002']})
+        second_payment = event_payloads(sim, 'PACE_PAYMENT', 'P1')[-1]
+        self.assertEqual((second_payment['base'], second_payment['final'], second_payment['paid']), (2, 1, 1))
+        self.assertIn('Pack', second_payment['preservation_sources'])
+
     def test_single_normal_draw_below_six_and_condition_chain(self):
         sim = make_sim(1)
         runner = sim.runners[0]
@@ -42,6 +66,7 @@ class IntegratedRaceLoop(unittest.TestCase):
 
     def test_turn_integrates_install_pack_will_event_boundary_and_direct_movement(self):
         sim = make_sim(2)
+        sim.round = 1  # Set up the Pack-eligible second round.
         sim.course[0].update({'difficulty': 1, 'elevation': 'Flat', 'surface': 'Asphalt'})
         sim.course[1].update({'difficulty': 4, 'elevation': 'Incline', 'surface': 'Asphalt'})
         first, second = sim.runners
@@ -64,6 +89,7 @@ class IntegratedRaceLoop(unittest.TestCase):
 
     def test_pack_preservation_changes_live_pace_cost(self):
         sim = make_sim(3)
+        sim.round = 1
         sim.runners[0]['quarter_mile_space'] = sim.runners[1]['quarter_mile_space'] = 0
         sim.runners[2]['quarter_mile_space'] = 8
         sim.start_round({'P1': 'Push', 'P2': 'Push', 'P3': 'Push'})
@@ -241,6 +267,7 @@ class IntegratedRaceLoop(unittest.TestCase):
 
     def test_high_five_uses_pack_snapshot_and_immediate_award(self):
         sim = make_sim(2)
+        sim.round = 1
         for runner in sim.runners:
             runner['energy'] = 5
         sim.runners[0]['hand'] = [card('EV-018')]

@@ -30,7 +30,7 @@ Six normal Race cards maximum, no minimum. At Replenish, if below six, draw exac
 
 ## E. Round structure
 
-Round Start activates staged Global effects, locks simultaneous Pace choices and Round Start positions, forms Packs, and snapshots public state. Runners resolve Replenish → Treat/Prepare → Movement → End sequentially in the same race-time interval. Round End observes cohesion, assigns simultaneous Finish places, expires effects, and cleans up.
+Round Start activates staged Global effects, locks simultaneous Pace choices and Round Start positions, forms Packs from round 2 onward, and snapshots public state. Runners resolve Replenish → Treat/Prepare → Movement → End sequentially in the same race-time interval. Round End observes cohesion, assigns simultaneous Finish places, expires effects, and cleans up.
 
 ## F. Runner turn structure
 
@@ -102,7 +102,7 @@ An Effect requiring another runner needs an eligible other ACTIVE runner (neithe
 
 ## W. Packs
 
-At Round Start, same-Pace runners within 0.5 mile of a Pack leader form a Pack of at least two without distance chaining; tie by nearest leader then ID. Membership locks for the round. Save one Pace Energy, stack preservation to floor zero; Round End cohesion is observational.
+No Pack forms in round 1. From round 2 onward, at Round Start, same-Pace runners within 0.5 mile of a Pack leader form a Pack of at least two without distance chaining; tie by nearest leader then ID. Membership locks for the round. Save one Pace Energy, stack preservation to floor zero; Round End cohesion is observational.
 
 ## X. Treat / Prepare
 
@@ -154,7 +154,7 @@ When a normal draw requires a card and draw pile is empty, shuffle eligible Race
 
 ## AJ. Player-facing quick reference
 
-Round Start choose Pace and form Packs; on your turn draw one if below six, optionally Treat/Prepare once, play up to two cards with normally one Movement, pay Energy/Will, resolve Course/stations/Gut Checks/Finish, End. Decide before installation whether the card can wait through two full turns. Keep attached cards committed until Condition removal.
+Round Start choose Pace and form Packs from round 2 onward; on your turn draw one if below six, optionally Treat/Prepare once, play up to two cards with normally one Movement, pay Energy/Will, resolve Course/stations/Gut Checks/Finish, End. Decide before installation whether the card can wait through two full turns. Keep attached cards committed until Condition removal.
 
 ## v1.3.2 → v1.4 rule change ledger
 
@@ -170,7 +170,7 @@ Round Start choose Pace and form Packs; on your turn draw one if below six, opti
 | Nausea `Cannot use Fuel` text | CLARIFICATION | Printed wording changes; Fuel Effect blocked, Fuel Movement legal. |
 | Gear category/footwear metadata | CLARIFICATION | `is_footwear` enforces existing one-shoe rule; broad category descriptive. |
 | Course physical layout | CLARIFICATION | 13 two-mile cards out and back; simulation stores 26 one-mile lanes. |
-| Four Paces, printed costs, Will, stations, Packs, Finish, assistance, targeted Event legality, three pre-race exchanges | UNCHANGED / REAFFIRMED | Prior frozen rules continue. |
+| Four Paces, printed costs, Will, stations, Pack benefit after formation, Finish, assistance, targeted Event legality, three pre-race exchanges | UNCHANGED / REAFFIRMED | Prior frozen rules continue except Pack formation now begins in round 2. |
 | Course inventory and visibility | UNCHANGED / REAFFIRMED | No Course-side mechanics or title field changed. |
 
 The full old/new title ledger is in **DRG-v1.4-Race-Card-Family-Lists.md**; implementation specifics and known open review items are in the report and Rules Review.
