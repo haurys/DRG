@@ -3,6 +3,7 @@ import copy
 import json
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from engine.simulate import Sim, make_condition, prepared_gut_check, set_suppression
 
@@ -32,7 +33,116 @@ def events(sim, name):
     return [e['payload'] for e in sim.events if e['type'] == name]
 
 
+def budget_fixture(recovery_play=True):
+    sim = fixture(effort=10, energy=2)
+    runner = sim.runners[0]
+    runner['quarter_mile_space'] = 40
+    runner['energy'] = 0 if recovery_play else 15
+    runner['will_available'] = False
+    runner['hand'] = [card(cid) for cid in (('FU-004', 'TR-001') if recovery_play
+                                           else ('TR-001', 'TR-002'))]
+    runner['active_training'] = [{'card': card('TR-011'), 'remaining_turns': None,
+                                  'installed_turn': -1}]
+    runner['equipped_gear'] = [{'card': card('GE-004'), 'remaining_turns': None,
+                                'installed_turn': -1}]
+    runner['gut_stall'] = {'mile': 10, 'recovery_turns_used': 0, 'recovery_turns_allowed': 4,
+                           'failure_type': 'energy_only' if recovery_play else 'effort_only',
+                           'prepared_effort': 11, 'energy': runner['energy'],
+                           'exchange_used': False, 'assistance_used': False,
+                           'fuel_used': False, 'will_used': False,
+                           'arrival_round': 0, 'arrival_turn': 0}
+    sim.draw = []
+    sim.start_round({'P1': 'Easy'})
+    return sim, runner
+
+
 class GutRecovery(unittest.TestCase):
+    def test_recovery_budget_zero_one_two_and_preview_live_parity(self):
+        for recovery_play, expected_max in ((False, 2), (True, 1)):
+            with self.subTest(recovery_play=recovery_play):
+                sim, runner = budget_fixture(recovery_play)
+                sim.turn(runner)
+                plan = events(sim, 'AI_TURN_PLAN')[-1]
+                self.assertEqual(len(plan['movement_cards']), expected_max)
+                self.assertEqual(sim.turn_records[-1]['cards_played'], 2)
+                self.assertEqual(plan['card_sources'],
+                                 [e['payload']['source'] for e in sim.events
+                                  if e['type'] == 'PLAY' and e['player_id'] == 'P1'][-expected_max:])
+                self.assertIsNone(runner['gut_stall'])
+
+        sim, runner = budget_fixture()
+        # The present recovery action offers at most one new card play; this
+        # synthetic return tests the shared zero-capacity continuation boundary.
+        def two_plays(r, script):
+            r['gut_stall'] = None
+            return 2, True, True, False
+        with patch.object(sim, 'recover_gut', side_effect=two_plays):
+            sim.turn(runner)
+        self.assertEqual(events(sim, 'AI_TURN_PLAN')[-1]['movement_cards'], [])
+        self.assertEqual(sim.turn_records[-1]['cards_played'], 2)
+
+    def test_recovery_play_mixed_sources_and_live_budget_guard(self):
+        for ids, sources in ((['TR-001', 'TR-002'], ['hand', 'hand']),
+                             (['TR-001', 'TR-011'], ['hand', 'active_training']),
+                             (['TR-011', 'GE-004'], ['active_training', 'equipped_gear'])):
+            with self.subTest(zero_recovery_play=sources):
+                sim, runner = budget_fixture(False)
+                sim.turn(runner, {'gut_treat_prepare': None, 'movement_cards': ids,
+                                  'card_sources': sources})
+                self.assertEqual(sim.turn_records[-1]['cards_played'], 2)
+        for source, movement_id in (('hand', 'TR-001'), ('active_training', 'TR-011'),
+                                    ('equipped_gear', 'GE-004')):
+            with self.subTest(source=source):
+                sim, runner = budget_fixture()
+                sim.turn(runner, {'gut_treat_prepare': {'action': 'fuel', 'card_id': 'FU-004',
+                                                       'choice': 'energy'},
+                                  'movement_cards': [movement_id], 'card_sources': [source]})
+                self.assertEqual(sim.turn_records[-1]['cards_played'], 2)
+        for ids, sources in ((['TR-001', 'TR-002'], ['hand', 'hand']),
+                             (['TR-001', 'TR-011'], ['hand', 'active_training']),
+                             (['TR-011', 'GE-004'], ['active_training', 'equipped_gear'])):
+            with self.subTest(illegal_sources=sources):
+                sim, runner = budget_fixture()
+                with self.assertRaisesRegex(ValueError, 'card-play budget exceeded'):
+                    sim.turn(runner, {'gut_treat_prepare': {'action': 'fuel', 'card_id': 'FU-004',
+                                                           'choice': 'energy'},
+                                      'movement_cards': ids, 'card_sources': sources})
+                self.assertEqual(len(events(sim, 'GUT_RECOVER')), 1)
+                self.assertEqual(len(events(sim, 'PLAY')), 0)
+
+    def test_non_play_recovery_actions_keep_two_card_capacity(self):
+        sim = fixture(effort=100, energy=2)
+        runner = sim.runners[0]
+        runner['quarter_mile_space'] = 40
+        runner['hand'] = [card(cid) for cid in ('FU-001', 'FU-002', 'FU-003',
+                                               'FU-004', 'FU-005', 'FU-006')]
+        runner['gut_stall'] = {'mile': 10, 'recovery_turns_used': 0,
+                               'recovery_turns_allowed': 4, 'exchange_used': False,
+                               'assistance_used': False, 'fuel_used': False,
+                               'will_used': False, 'arrival_round': 0, 'arrival_turn': 0}
+        sim.draw = [card('EV-023')]
+        sim.start_round({'P1': 'Easy'})
+        sim.turn(runner, {'gut_treat_prepare': None, 'gut_exchange': 'FU-001',
+                          'movement_cards': []})
+        self.assertEqual(len(events(sim, 'GUT_EXCHANGE')), 1)
+        self.assertEqual(sim.turn_records[-1]['cards_played'], 0)
+
+        sim = fixture(players=2, effort=18, energy=0)
+        runner, helper = sim.runners
+        runner['quarter_mile_space'] = 40
+        runner['hand'], helper['hand'] = [card('FU-001')], [card('TR-001')]
+        helper['energy'] = 0
+        runner['active_training'] = [{'card': card('TR-019'), 'remaining_turns': None,
+                                      'installed_turn': -2}]
+        runner['gut_stall'] = {'mile': 10, 'recovery_turns_used': 0,
+                               'recovery_turns_allowed': 4, 'exchange_used': False,
+                               'assistance_used': False, 'fuel_used': False,
+                               'will_used': False, 'arrival_round': 0, 'arrival_turn': 0}
+        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.turn(runner, {'gut_treat_prepare': None, 'movement_cards': []})
+        self.assertEqual(len(events(sim, 'GUT_ASSISTANCE_SWAP')), 1)
+        self.assertEqual(sim.turn_records[-1]['cards_played'], 0)
+
     def test_counted_zones_failures_and_will(self):
         training = [{'card': card('TR-019')}]
         gear = [{'card': card('GE-018')}]

@@ -1237,11 +1237,16 @@ class Sim:
             score += 0.2
         return score, turns
 
-    def choose_turn_plan(self, runner, rationale=None, allow_treat=True):
+    def remaining_card_plays(self, used):
+        return self.cfg['max_voluntary_plays'] - used
+
+    def choose_turn_plan(self, runner, rationale=None, allow_treat=True, card_plays_used=0):
         candidates = []
         for plan in (self.treat_candidates(runner) if allow_treat else [None]):
             prepared = self.preview_preparation(runner, plan)
-            allowance = self.cfg['max_voluntary_plays'] - bool(plan)
+            # Relocation uses Treat/Prepare but plays no new card.
+            allowance = self.remaining_card_plays(card_plays_used +
+                                                  (bool(plan) and plan['action'] != 'relocate'))
             for cards in self.movement_candidates(prepared, allowance):
                 if not cards and prepared['hand']:
                     continue
@@ -2059,7 +2064,8 @@ class Sim:
             assisted = True
             self.request_assistance(runner)
         capture = {} if self.ai_rationale_enabled and not script else None
-        ai_plan = self.choose_turn_plan(runner, capture, allow_treat=not assisted) if not script else None
+        ai_plan = self.choose_turn_plan(runner, capture, allow_treat=not assisted,
+                                        card_plays_used=recovery_plays) if not script else None
         plan = (None if assisted else script['treat_prepare'] if 'treat_prepare' in script else
                 None if 'movement_cards' in script else
                 ai_plan['treat_prepare'] if ai_plan else self.choose_treat_prepare(runner))
@@ -2082,7 +2088,7 @@ class Sim:
         used_plays = recovery_plays + (0 if assisted else self.resolve_treat_prepare(runner, plan))
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
-        available = self.cfg['max_voluntary_plays'] - used_plays
+        available = self.remaining_card_plays(used_plays)
         if 'movement_cards' in script or planned_cards is not None:
             ids = script['movement_cards'] if 'movement_cards' in script else planned_cards
             if len(ids) > available:
