@@ -190,8 +190,11 @@ class IntegratedRaceLoop(unittest.TestCase):
         check = [payload['gut_check'] for payload in event_payloads(sim, 'MILESTONE', 'P1')
                  if payload['kind'] == 'Gut Check'][0]
         self.assertEqual(check['hand_effort'], 22)
-        self.assertEqual(check['modifiers'], 5)
-        self.assertEqual(check['total'], 27)
+        self.assertEqual(check['bonus_effort'], 5)
+        self.assertEqual(check['training_effort'], card('TR-019')['effort'])
+        self.assertEqual(check['gear_effort'], card('GE-018')['effort'])
+        self.assertEqual(check['prepared_effort'], 27 + check['training_effort'] + check['gear_effort'])
+        self.assertEqual(check['energy_threshold'], 4)
         self.assertTrue(check['passed'])
 
     def test_all_events_have_integrated_coverage_classification(self):

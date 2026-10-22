@@ -53,7 +53,7 @@ class FinalRules(unittest.TestCase):
   self.assertIn('EV-020',[c['id'] for c in sim.discard])
  def test_gut_check_hand_total_thresholds_empty_and_modifiers(self):
   hand=[card('TR-001'),card('FU-001')];x=m.gut_check(hand,['Strength Training','Mental Toughness'],['Pace Band'],16);self.assertEqual((x['hand_effort'],x['modifiers'],x['total']),(10,6,16));self.assertTrue(x['passed'])
-  self.assertEqual(m.gut_check([],threshold=25)['energy_loss'],2);self.assertEqual(m.GUT_CHECK_THRESHOLDS['marathon'],{10:25,18:30,23:35})
+  self.assertEqual(m.gut_check([],threshold=25)['energy_loss'],2);self.assertEqual(m.GUT_CHECK_THRESHOLDS['half'],{6:9,11:11})
  def test_direct_movement_separate(self):
   x=m.resolve_movement(3,4,[1,8,1],12,direct_movement=1);self.assertEqual(x['direct_quarter_miles'],1);self.assertEqual(x['quarter_miles'],x['base_quarter_miles']+1)
  def test_training_difficulty_and_boundary(self):

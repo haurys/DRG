@@ -8,7 +8,8 @@ MILESTONES = {
     'marathon': {'Water': [4, 8, 12, 16, 20, 24], 'Aid/Fuel': [8, 16, 24], 'Gut Check': [10, 18, 23]},
     'half': {'Water': [3, 6, 9], 'Aid/Fuel': [6], 'Gut Check': [6, 11]},
 }
-GUT_CHECK_THRESHOLDS = {'marathon': {10: 25, 18: 30, 23: 35}, 'half': {6: 9, 11: 11}}
+GUT_CHECK_THRESHOLDS = {'half': {6: 9, 11: 11}}
+GUT_RECOVERY_TURNS = {10: 4, 18: 3, 23: 2}
 CONDITION_DEFS = {
     'Cramp': (4, False), 'Tight Calf': (3, True), 'Dead Legs': (5, True),
     'Blister': (3, True), 'Hot Spot': (2, True), 'Sore Feet': (4, True),
@@ -171,6 +172,7 @@ def effective_difficulty(segment, conditions=(), training=(), course_bonus=0):
 
 
 def gut_check(hand, active_training=(), active_gear=(), threshold=0):
+    """Legacy Half Marathon hand-only check and shared specialist calculation."""
     cards = [card for card in hand if card.get('family') != 'Condition']
     hand_effort = sum(card.get('effort') or 0 for card in cards)
     modifier_sources = ([{'card': title, 'value': value} for title in active_training
@@ -186,6 +188,29 @@ def gut_check(hand, active_training=(), active_gear=(), threshold=0):
             'modifier_sources': modifier_sources, 'total': total,
             'threshold': threshold, 'passed': total >= threshold,
             'energy_loss': 0 if total >= threshold else 2}
+
+
+def prepared_gut_check(hand, training=(), gear=(), energy=0, effort_threshold=0,
+                       energy_threshold=0, will_available=False):
+    """Evaluate counted zones without consuming cards or stored Energy."""
+    base = gut_check(hand, [item['card']['title'] for item in training],
+                     [item['card']['title'] for item in gear], effort_threshold)
+    training_effort = sum(item['card']['effort'] for item in training)
+    gear_effort = sum(item['card']['effort'] for item in gear)
+    total = base['hand_effort'] + training_effort + gear_effort + base['modifiers']
+    effort_ok = total >= effort_threshold
+    energy_shortfall = max(0, energy_threshold - energy)
+    use_will = effort_ok and bool(energy_shortfall) and will_available
+    energy_ok = not energy_shortfall or use_will
+    return {'hand_effort': base['hand_effort'], 'training_effort': training_effort,
+            'gear_effort': gear_effort, 'bonus_effort': base['modifiers'],
+            'bonus_sources': base['modifier_sources'], 'prepared_effort': total,
+            'energy': energy, 'effort_threshold': effort_threshold,
+            'energy_threshold': energy_threshold, 'energy_shortfall': energy_shortfall,
+            'will_used': use_will, 'passed': effort_ok and energy_ok,
+            'failure_type': None if effort_ok and energy_ok else
+                            'both' if not effort_ok and not energy_ok else
+                            'effort_only' if not effort_ok else 'energy_only'}
 
 
 def tough_decision_cycle(hand, event_id='EV-017', limit=2):
@@ -327,6 +352,10 @@ class Sim:
             if kind in self.station_zero_remedies:
                 self.station_zero_remedies[kind].add(title)
         self.station_aid_reductions = rule_conditions['aid_severity_reduction']
+        self.marathon_gut = {int(mile): values for mile, values in
+                             cfg.get('marathon_gut_provisional_thresholds', {}).items()}
+        if cfg['race_format'] == 'marathon' and set(self.marathon_gut) != set(GUT_RECOVERY_TURNS):
+            raise ValueError('three provisional Marathon Gut thresholds required')
 
     def emit(self, event_type, player=None, payload=None, state=None):
         self.seq += 1
@@ -399,6 +428,7 @@ class Sim:
             'dnf_round': None, 'dnf_turn': None,
             'finish_order': None, 'finish_turn': None, 'finish_round': None,
             'locked_ids': set(), 'exchanges_used': 0, 'stats': stats,
+            'gut_cleared': [], 'gut_stall': None, 'gut_history': [],
         }
 
     def setup(self):
@@ -1051,6 +1081,31 @@ class Sim:
             if 'Hydration Belt' in self.installed_titles(runner, 'gear') else 0)
         return resolved
 
+    def preview_gut_progress(self, runner, resolved):
+        """Apply the same counted-zone checkpoint test to a paid candidate plan."""
+        if self.cfg['race_format'] != 'marathon':
+            return resolved
+        start, end = runner['quarter_mile_space'], resolved['to_space']
+        for mile in GUT_RECOVERY_TURNS:
+            if not start < mile * 4 <= end or mile in runner['gut_cleared']:
+                continue
+            water = sum(start < station * 4 <= mile * 4 for station in
+                        MILESTONES['marathon']['Water']) if 'Hydration Belt' in self.installed_titles(
+                            runner, 'gear') else 0
+            check = prepared_gut_check(runner['hand'], runner['active_training'],
+                        runner['equipped_gear'], min(15, runner['energy'] + water),
+                        self.marathon_gut[mile]['prepared_effort'],
+                        self.marathon_gut[mile]['energy'], runner['will_available'])
+            resolved['gut_preview'] = {'mile': mile, **check}
+            if not check['passed']:
+                resolved['to_space'] = mile * 4
+                resolved['quarter_miles'] = mile * 4 - start
+                resolved['gut_movement_lost_quarters'] = end - mile * 4
+                resolved['positive_finish_movement'] = False
+                resolved['milestone_energy_gain'] = water
+                return resolved
+        return resolved
+
     def plan_score(self, runner, prepared, paid, plan, cards, movement_result):
         moved = movement_result['quarter_miles']
         remaining = max(0, len(self.course) * 4 - movement_result['to_space'])
@@ -1141,20 +1196,34 @@ class Sim:
         if 'EV-018' in effect_ids:
             event_gain += 1
         energy = min(15, energy + event_gain + movement_result['milestone_energy_gain'])
-        for mile in MILESTONES[self.cfg['race_format']]['Gut Check']:
-            if runner['quarter_mile_space'] < mile * 4 <= movement_result['to_space']:
-                hand = [c for c in prepared['hand'] if c not in cards]
-                check = gut_check(hand, self.installed_titles(prepared, 'training'),
-                                  self.installed_titles(prepared, 'gear'),
-                                  GUT_CHECK_THRESHOLDS[self.cfg['race_format']][mile])
-                energy = max(0, energy - check['energy_loss'])
+        if movement_result.get('gut_preview'):
+            check = movement_result['gut_preview']
+            if not check['passed']:
+                score -= 70 + 3 * movement_result.get('gut_movement_lost_quarters', 0)
+            elif check['will_used']:
+                score -= 3
+        upcoming = next((mile for mile in GUT_RECOVERY_TURNS
+                         if self.cfg['race_format'] == 'marathon' and
+                         runner['quarter_mile_space'] < mile * 4 and
+                         mile not in runner['gut_cleared']), None)
+        if upcoming is not None and runner['quarter_mile_space'] < upcoming * 4:
+            distance = upcoming * 4 - runner['quarter_mile_space']
+            if distance <= 12:
+                prepared_effort = sum(c['effort'] for c in paid['hand']) + sum(
+                    item['card']['effort'] for kind in ('active_training', 'equipped_gear')
+                    for item in paid[kind]) + gut_check([], self.installed_titles(
+                    paid, 'training'), self.installed_titles(paid, 'gear'))['modifiers']
+                need = self.marathon_gut[upcoming]
+                score += (12 - distance) / 12 * (min(prepared_effort, need['prepared_effort']) * 1.3
+                         + min(energy, need['energy']) * 3)
         score += min(energy, 5) * 0.8 + max(0, energy - 5) * 0.15
         if energy == 0 and remaining > 0:
             score -= 4
         if runner['will_available'] and not paid['will_available']:
             score -= 3
         if remaining:
-            held = sum(c.get('effort') or 0 for c in prepared['hand'] if c not in cards)
+            consumed = {c['id'] for c in cards if c.get('source', 'hand') == 'hand'}
+            held = sum(c.get('effort') or 0 for c in prepared['hand'] if c['id'] not in consumed)
             score += min(1.0, held * 0.025) * min(1, remaining / 16)
         if runner['profile'] in ('Aggressive', 'Front Runner'):
             score += 0.55 * PACE_ORDER.index(paid['pace'])
@@ -1177,12 +1246,15 @@ class Sim:
                 if not cards and prepared['hand']:
                     continue
                 liquidated = self.preview_slot_sacrifice(prepared, cards)
+                consumed = {c['id'] for c in cards if c['source'] == 'hand'}
+                liquidated['hand'] = [c for c in liquidated['hand'] if c['id'] not in consumed]
                 cost = sum(movement_energy_cost(card) for card in cards
                            if card['use_mode'] == 'MOVEMENT')
                 after_cards = self.preview_payment(liquidated, cost)
                 if after_cards is None:
                     continue
                 resolved = self.preview_movement(after_cards, cards)
+                resolved = self.preview_gut_progress(after_cards, resolved)
                 score, turns = self.plan_score(runner, liquidated, after_cards, plan, cards, resolved)
                 candidates.append({'treat_prepare': plan,
                                    'movement_cards': [c['id'] for c in cards],
@@ -1696,6 +1768,199 @@ class Sim:
                     self.draw_one(runner, True)
                 self.emit('TOUGH_DECISION', runner['player_id'], {'cycled': [card['id'] for card in cycled]})
 
+    def gut_state(self, runner, mile, allow_will=True):
+        thresholds = self.marathon_gut[mile]
+        return prepared_gut_check(runner['hand'], runner['active_training'], runner['equipped_gear'],
+                                  runner['energy'], thresholds['prepared_effort'],
+                                  thresholds['energy'], runner['will_available'] and allow_will)
+
+    def evaluate_gut(self, runner, mile, phase, recovery_turn=0, allow_will=True):
+        check = self.gut_state(runner, mile, allow_will)
+        if check['will_used']:
+            runner['will_available'] = False
+            runner['stats']['will_used'] += 1
+            if runner.get('gut_stall'):
+                runner['gut_stall']['will_used'] = True
+            self.emit('WILL_USE', runner['player_id'], {'source': 'Gut Check', 'mile': mile,
+                      'shortfall': check['energy_shortfall'], 'stored_energy_after': runner['energy']})
+        stall = runner.get('gut_stall')
+        self.emit('GUT_EVALUATION', runner['player_id'], {'mile': mile, 'phase': phase,
+                  'round': self.round, 'turn': runner['race_turn_number'],
+                  'recovery_turn': recovery_turn,
+                  'recovery_turns_remaining': max(0, GUT_RECOVERY_TURNS[mile] - recovery_turn),
+                  'exchange_used': bool(stall and stall['exchange_used']),
+                  'assistance_used': bool(stall and stall['assistance_used']),
+                  'fuel_used': bool(stall and stall['fuel_used']), **check})
+        if check['passed']:
+            if mile not in runner['gut_cleared']:
+                runner['gut_cleared'].append(mile)
+            if stall:
+                runner['gut_history'].append({**stall,
+                                              'recovery_turns_used': recovery_turn,
+                                              'pass_round': self.round,
+                                              'pass_turn': runner['race_turn_number']})
+                runner['gut_stall'] = None
+                self.emit('GUT_RECOVER', runner['player_id'], {'mile': mile,
+                          'recovery_turn': recovery_turn, 'passed': True})
+            else:
+                runner['gut_history'].append({'mile': mile, 'pass_round': self.round,
+                                              'pass_turn': runner['race_turn_number'],
+                                              'recovery_turns_used': 0,
+                                              'will_used': check['will_used']})
+        elif phase == 'crossing':
+            runner['gut_stall'] = {'mile': mile, 'recovery_turns_used': 0,
+                                   'recovery_turns_allowed': GUT_RECOVERY_TURNS[mile],
+                                   'failure_type': check['failure_type'],
+                                   'prepared_effort': check['prepared_effort'],
+                                   'energy': check['energy'], 'exchange_used': False,
+                                   'assistance_used': False, 'fuel_used': False,
+                                   'will_used': False, 'arrival_round': self.round,
+                                   'arrival_turn': runner['race_turn_number']}
+        return check
+
+    def gut_exchange(self, runner, card_id):
+        stall = runner.get('gut_stall')
+        if stall is None:
+            raise ValueError('no active Gut stall')
+        if (stall['recovery_turns_used'] != 0 or stall['exchange_used'] or
+                len(runner['hand']) != self.cfg['starting_hand']):
+            raise ValueError('Gut exchange requires first recovery turn and full hand')
+        card = next((c for c in runner['hand'] if c['id'] == card_id), None)
+        if card is None:
+            raise ValueError('Gut exchange card not in hand')
+        before = self.gut_state(runner, stall['mile'])
+        runner['hand'].remove(card)
+        self.discard.append(card)
+        runner['stats']['cards_discarded'] += 1
+        stall['exchange_used'] = True
+        replacement = self.draw_one(runner, True)
+        after = self.gut_state(runner, stall['mile'])
+        self.emit('GUT_EXCHANGE', runner['player_id'], {'mile': stall['mile'],
+                  'discarded': card['id'], 'replacement': replacement['id'] if replacement else None,
+                  'prepared_before': before['prepared_effort'],
+                  'prepared_after': after['prepared_effort'], 'energy_before': before['energy'],
+                  'energy_after': after['energy'], 'passed_after': after['passed']})
+
+    def request_gut_assistance(self, runner):
+        stall = runner['gut_stall']
+        mile = stall['mile']
+        before = self.gut_state(runner, mile)
+        helper, _, _ = self.assistance_helper(runner)
+        self.emit('GUT_ASSISTANCE_REQUEST', runner['player_id'], {'mile': mile,
+                  'helper': helper['player_id'] if helper else None,
+                  'requester_hand': [c['id'] for c in runner['hand']],
+                  'treat_prepare_cost': 1, 'card_play_cost': 0})
+        candidates = []
+        if helper:
+            for offered in runner['hand']:
+                for received in helper['hand']:
+                    updated = [c for c in runner['hand'] if c is not offered] + [received]
+                    outcome = prepared_gut_check(updated, runner['active_training'],
+                                runner['equipped_gear'], runner['energy'],
+                                self.marathon_gut[mile]['prepared_effort'],
+                                self.marathon_gut[mile]['energy'], runner['will_available'])
+                    # An active helper does not trade away a card that destroys its
+                    # own currently viable checkpoint reserve.
+                    helper_mile = next((m for m in GUT_RECOVERY_TURNS
+                                        if m * 4 > helper['quarter_mile_space'] and
+                                        m not in helper['gut_cleared']), None)
+                    if helper_mile:
+                        helper_before = self.gut_state(helper, helper_mile)['prepared_effort']
+                        helper_after = helper_before - received['effort'] + offered['effort']
+                        if (helper_before >= self.marathon_gut[helper_mile]['prepared_effort'] >
+                                helper_after):
+                            continue
+                    helper_value = (offered['effort'] - received['effort'] +
+                                    (4 if helper['energy'] <= 2 else 1) *
+                                    (movement_energy_cost(received) - movement_energy_cost(offered)))
+                    if helper_value < 0:
+                        continue
+                    gain = outcome['prepared_effort'] - before['prepared_effort']
+                    if outcome['passed'] and not before['passed'] or gain > 0:
+                        candidates.append((outcome['passed'], gain, offered['id'], received['id'],
+                                           offered, received, outcome))
+        selected = max(candidates, default=None, key=lambda c: (c[0], c[1], c[2], c[3]))
+        self.emit('GUT_ASSISTANCE_OPPORTUNITY', runner['player_id'], {'mile': mile,
+                  'helper': helper['player_id'] if helper else None,
+                  'legal_improving_swaps': len(candidates),
+                  'prepared_before': before['prepared_effort'],
+                  'energy': before['energy']})
+        if selected:
+            _, _, _, _, offered, received, outcome = selected
+            runner['hand'].remove(offered)
+            helper['hand'].remove(received)
+            runner['hand'].append(received)
+            helper['hand'].append(offered)
+            stall['assistance_used'] = True
+            self.emit('GUT_ASSISTANCE_SWAP', runner['player_id'], {'mile': mile,
+                      'helper': helper['player_id'], 'offered': offered['id'],
+                      'received': received['id'], 'prepared_before': before['prepared_effort'],
+                      'prepared_after': outcome['prepared_effort'],
+                      'energy': outcome['energy'], 'passed_after': outcome['passed']})
+            return True
+        return False
+
+    def recover_gut(self, runner, script):
+        stall = runner['gut_stall']
+        mile = stall['mile']
+        recovery_turn = stall['recovery_turns_used'] + 1
+        self.emit('GUT_RECOVERY_START', runner['player_id'], {'mile': mile,
+                  'recovery_turn': recovery_turn, 'allowed': stall['recovery_turns_allowed']})
+        check = self.evaluate_gut(runner, mile, 'recovery', recovery_turn, allow_will=False)
+        used_plays, used_treat, assistance_attempted = 0, False, False
+        if not check['passed']:
+            choices = []
+            for plan in self.treat_candidates(runner):
+                if not plan or not self.legal_treat_prepare(runner, plan):
+                    continue
+                projected = self.preview_preparation(runner, plan)
+                future = self.gut_state(projected, mile, allow_will=False)
+                requirement = self.marathon_gut[mile]
+                gain = (max(0, requirement['prepared_effort'] - check['prepared_effort']) -
+                        max(0, requirement['prepared_effort'] - future['prepared_effort']) +
+                        3 * (max(0, requirement['energy'] - check['energy']) -
+                             max(0, requirement['energy'] - future['energy'])))
+                if future['passed'] or (gain > 0 and not self.gut_state(runner, mile)['passed']):
+                    choices.append((future['passed'], gain, str(plan), plan))
+            plan = script.get('gut_treat_prepare') if 'gut_treat_prepare' in script else (
+                max(choices, default=None) or (None, None, None, None))[3]
+            if plan:
+                used_plays = self.resolve_treat_prepare(runner, plan)
+                used_treat = True
+                if plan['action'] == 'fuel':
+                    stall['fuel_used'] = True
+            check = self.evaluate_gut(runner, mile, 'recovery_after_treat', recovery_turn)
+        if not check['passed'] and recovery_turn == 1 and len(runner['hand']) == self.cfg['starting_hand']:
+            chosen = (script['gut_exchange'] if 'gut_exchange' in script else
+                      min(runner['hand'], key=lambda c: (c['effort'], c['id']))['id'])
+            if chosen:
+                self.gut_exchange(runner, chosen)
+                check = self.evaluate_gut(runner, mile, 'recovery_after_exchange', recovery_turn)
+        if not check['passed'] and not used_treat:
+            runner['stats']['treat_prepare_actions'] += 1
+            used_treat = True
+            assistance_attempted = True
+            self.emit('TREAT_PREPARE', runner['player_id'], {'action': 'gut_assistance',
+                      'card_play_budget': 0, 'helper_action_cost': 0})
+            self.request_gut_assistance(runner)
+            check = self.evaluate_gut(runner, mile, 'recovery_after_assistance', recovery_turn)
+        if check['passed']:
+            return used_plays, used_treat, True, assistance_attempted
+        stall['recovery_turns_used'] = recovery_turn
+        self.emit('GUT_RECOVERY_END', runner['player_id'], {'mile': mile,
+                  'recovery_turns_used': recovery_turn,
+                  'remaining': stall['recovery_turns_allowed'] - recovery_turn,
+                  'failure_type': check['failure_type']})
+        if recovery_turn == stall['recovery_turns_allowed']:
+            runner.update(race_status='DNF', dnf=True, dnf_reason='failed_gut_check',
+                          dnf_round=self.round, dnf_turn=runner['race_turn_number'])
+            runner['gut_history'].append({**stall, 'dnf_round': self.round,
+                                          'dnf_turn': runner['race_turn_number']})
+            self.emit('DNF', runner['player_id'], {'reason': 'failed_gut_check',
+                      'mile': mile, 'round': self.round, 'turn': runner['dnf_turn'],
+                      'distance': runner['distance_completed']})
+        return used_plays, used_treat, False, assistance_attempted
+
     def resolve_milestones(self, runner, old_space, new_space):
         for mile in range(old_space // 4 + 1, new_space // 4 + 1):
             self.emit('MILE_CROSS', runner['player_id'], {'mile': mile})
@@ -1714,13 +1979,23 @@ class Sim:
                         self.station_remedy(runner, condition, 'Aid')
                 self.emit('MILESTONE', runner['player_id'], {'mile': mile, 'kind': 'Aid/Fuel'})
             if mile in MILESTONES[self.cfg['race_format']]['Gut Check']:
-                check = gut_check(runner['hand'], self.installed_titles(runner, 'training'),
-                                  self.installed_titles(runner, 'gear'),
-                                  GUT_CHECK_THRESHOLDS[self.cfg['race_format']][mile])
-                if check['energy_loss']:
-                    self.apply_energy(runner, -check['energy_loss'], 'Gut Check failure')
+                if self.cfg['race_format'] == 'marathon':
+                    if mile in runner['gut_cleared']:
+                        continue
+                    runner['quarter_mile_space'] = mile * 4
+                    runner['distance_completed'] = mile
+                    check = self.evaluate_gut(runner, mile, 'crossing')
+                else:
+                    check = gut_check(runner['hand'], self.installed_titles(runner, 'training'),
+                                      self.installed_titles(runner, 'gear'),
+                                      GUT_CHECK_THRESHOLDS['half'][mile])
+                    if check['energy_loss']:
+                        self.apply_energy(runner, -check['energy_loss'], 'Gut Check failure')
                 self.emit('MILESTONE', runner['player_id'], {'mile': mile, 'kind': 'Gut Check',
                                                               'gut_check': check})
+                if self.cfg['race_format'] == 'marathon' and not check['passed']:
+                    return mile
+        return None
 
     def expire_temporary(self, runner):
         for item in list(runner['active_training']):
@@ -1759,14 +2034,33 @@ class Sim:
         self.replenish(runner)
         assistance_evaluated = False
         assisted = False
-        if (runner['energy'] == 0 and not runner['will_available'] and
+        recovery_plays = 0
+        if runner.get('gut_stall') and self.cfg['race_format'] == 'marathon':
+            recovery_plays, assisted, recovered, assistance_evaluated = self.recover_gut(runner, script)
+            if not recovered:
+                runner['stats']['zero_movement_turns'] += 1
+                self.expire_temporary(runner)
+                self.consume_staged_events(runner)
+                self.locate(runner)
+                self.turn_records.append({'round': self.round, 'player_id': runner['player_id'],
+                       'movement_quarters': 0, 'movement_result': 0,
+                       'cards_played': recovery_plays, 'pace': runner['pace'], 'boundaries': [],
+                       'cap_prevented': False, 'cap_prevented_quarters': 0,
+                       'result_wasted_above_cap': 0, 'hand_size_at_decision': len(runner['hand']),
+                       'effort_count': 0, 'energy_effect_count': 0,
+                       'gut_recovery_turn': True})
+                self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
+                          'energy': runner['energy'], 'hand': [c['id'] for c in runner['hand']],
+                          'gut_stall': copy.deepcopy(runner['gut_stall']), 'dnf': runner['dnf']})
+                return None
+        if (not assisted and runner['energy'] == 0 and not runner['will_available'] and
                 not self.continuation_paths(runner)['viable']):
             assistance_evaluated = True
             assisted = True
             self.request_assistance(runner)
         capture = {} if self.ai_rationale_enabled and not script else None
         ai_plan = self.choose_turn_plan(runner, capture, allow_treat=not assisted) if not script else None
-        plan = (script['treat_prepare'] if 'treat_prepare' in script else
+        plan = (None if assisted else script['treat_prepare'] if 'treat_prepare' in script else
                 None if 'movement_cards' in script else
                 ai_plan['treat_prepare'] if ai_plan else self.choose_treat_prepare(runner))
         planned_cards = ai_plan['movement_cards'] if ai_plan else None
@@ -1785,10 +2079,10 @@ class Sim:
                 self.emit('AI_TURN_RATIONALE', runner['player_id'], copy.deepcopy(decision))
         if assisted and plan:
             raise ValueError('second Treat/Prepare action after assistance')
-        used_plays = 0 if assisted else self.resolve_treat_prepare(runner, plan)
+        used_plays = recovery_plays + (0 if assisted else self.resolve_treat_prepare(runner, plan))
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
-        available = 2 - used_plays
+        available = self.cfg['max_voluntary_plays'] - used_plays
         if 'movement_cards' in script or planned_cards is not None:
             ids = script['movement_cards'] if 'movement_cards' in script else planned_cards
             if len(ids) > available:
@@ -1900,6 +2194,23 @@ class Sim:
         old_space = runner['quarter_mile_space']
         resolved = resolve_movement(old_space, result_value, difficulties, len(self.course) * 4,
                                     turn_cap=turn_cap, direct_movement=direct)
+        stopped_at = self.resolve_milestones(runner, old_space, resolved['to_space'])
+        if stopped_at is not None:
+            original_to = resolved['to_space']
+            stop_space = stopped_at * 4
+            original_quarters = resolved['quarter_miles']
+            resolved['to_space'] = stop_space
+            resolved['quarter_miles'] = stop_space - old_space
+            resolved['base_quarter_miles'] = min(resolved['base_quarter_miles'], resolved['quarter_miles'])
+            resolved['direct_quarter_miles'] = resolved['quarter_miles'] - resolved['base_quarter_miles']
+            resolved['boundaries'] = [b for b in resolved['boundaries']
+                                      if b['boundary_space'] <= stop_space]
+            resolved['positive_finish_movement'] = False
+            resolved['gut_movement_lost_quarters'] = original_quarters - resolved['quarter_miles']
+            resolved['gut_original_destination'] = original_to
+            self.emit('GUT_MOVEMENT_STOP', runner['player_id'], {'mile': stopped_at,
+                      'position': stop_space, 'lost_quarters': resolved['gut_movement_lost_quarters'],
+                      'original_destination': original_to})
         runner['quarter_mile_space'] = resolved['to_space']
         runner['distance_completed'] = runner['quarter_mile_space'] / 4
         runner['stats']['distance_moved'] += resolved['quarter_miles'] / 4
@@ -1925,7 +2236,6 @@ class Sim:
             self.emit('AI_TURN_OUTCOME', runner['player_id'], outcome)
         for boundary in resolved['boundaries']:
             self.emit('MOVE_BOUNDARY', runner['player_id'], boundary)
-        self.resolve_milestones(runner, old_space, runner['quarter_mile_space'])
         self.after_movement_events(runner, event_cards, event_states)
         for card in played:
             state = event_states.get(card['id'])
@@ -1964,7 +2274,8 @@ class Sim:
         self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
                   'energy': runner['energy'], 'hand': [card['id'] for card in runner['hand']],
                   'finish_pending': runner['finish_pending']})
-        if not runner['finish_pending'] and runner['energy'] == 0 and not runner['will_available']:
+        if (not runner['finish_pending'] and not runner.get('gut_stall') and
+                runner['energy'] == 0 and not runner['will_available']):
             self.evaluate_dnf(runner, assistance_evaluated, treat_available=not assisted)
         return resolved
 

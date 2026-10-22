@@ -22,6 +22,8 @@ This is a historical boundary document. The [2026-09-30 canonical rules](DRG-Can
 
 The current Pace, Course, Pack, Will, hand, draw, Finish, and milestone rules are in the canonical document. The former Pace-only Will fallback is superseded: Will now covers exact combined Pace and Movement-card Energy shortfall after reductions.
 
+The former Marathon hand-only Gut thresholds 25/30/35 and automatic −2 Energy failure penalty are superseded by the configurable two-requirement Prepared Effort/Energy check with a stop at the checkpoint and a 4/3/2 recovery window. Current configured pairs 25/4, 30/2, 35/1 are provisional implementation inputs, not approved balance. Half Marathon retains its existing hand-only thresholds and failure behavior.
+
 Any earlier description treating a whole Course card as a one-mile segment is superseded. A physical Course card contributes two total miles in opposing one-mile lanes; the data keeps one record per lane. The marathon assembles 13 cards from Start/Finish and returns on their opposite lanes.
 
 ## v1.3 supersessions

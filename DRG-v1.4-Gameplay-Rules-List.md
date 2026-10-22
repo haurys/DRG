@@ -114,7 +114,7 @@ A stranded requester can seek one-for-one hand swap with any eligible active run
 
 ## Z. Will
 
-One Will use per runner per race covers the exact Energy shortfall for an otherwise-legal Pace/Movement turn after stored Energy and preservation. It neither adds stored Energy nor Effort nor an illegal card/action. It can pay for slot-derived Movement. A spent Will cannot pay again.
+One Will use per runner per race covers the exact Energy shortfall for an otherwise-legal Pace/Movement turn after stored Energy and preservation, or the exact Energy shortfall at a Marathon Gut Check when Prepared Effort passes. It neither adds stored Energy nor Effort nor an illegal card/action. It can pay for slot-derived Movement. A spent Will cannot pay again.
 
 ## AA. Water
 
@@ -126,7 +126,7 @@ Marathon mile 8/16/24; half mile 6. Treat every eligible active Condition: Nause
 
 ## AC. Gut Checks
 
-Marathon mile 10/18/23 thresholds 25/30/35; half mile 6/11 thresholds 9/11. Pause crossing, total printed Effort on cards still in hand plus Strength +1, Mental Toughness +3, Pace Band +2 if active. Played/slotted/attached cards do not count. Failure costs 2 Energy; cards are not consumed.
+Marathon miles 10/18/23 require both Prepared Effort and Energy. Prepared Effort counts unplayed hand cards, normal installed Training/Gear printed Effort, and active Strength +1, Mental Toughness +3, Pace Band +2 bonuses. Attachments, consumed cards and staged/discarded cards do not count. An unspent Will can cover only the exact missing Gut Energy. On passage clear the checkpoint permanently and continue unused crossing Movement. On failure stop at that marker, lose unused Movement, and do not apply the old −2 Energy penalty. Initial arrival is not a recovery turn. Subsequent recovery windows are 4/3/2 turns; on each replenish, optionally Treat/Prepare, recalculate both requirements, use legal recovery options, and resume Movement that turn if passing. On the first recovery turn only, after ordinary Replenish/Treat, if still failing with a full six-card hand, an optional one-card discard/replacement is available once; it does not use a play or return a slot card to hand. Existing one-for-one assistance uses the available Treat/Prepare instead. Final failure is `DNF — Failed Gut Check`. Configured test thresholds 25/4, 30/2, 35/1 are **provisional**, not final print values. Half miles 6/11 remain hand-only at Effort 9/11 with their old −2 Energy failure and continuation.
 
 ## AD. Course Difficulty
 
@@ -142,7 +142,7 @@ Course endpoint is 26.0/13.0, not Finish. A positive remaining legal quarter-mil
 
 ## AG. DNF
 
-Only after Energy 0, Will spent, no meaningful legal hand or eligible-slot forward Movement, no legal self-recovery, cycling, reachable Water/Aid route, or successful final assistance path. A received card that can legally recover next turn prevents premature DNF. Mark explicit DNF, preserve position/resources/Conditions/reason, stop turns, assign no place.
+Outside a Marathon Gut stall: only after Energy 0, Will spent, no meaningful legal hand or eligible-slot forward Movement, no legal self-recovery, cycling, reachable Water/Aid route, or successful final assistance path. A received card that can legally recover next turn prevents premature DNF. Inside a Marathon Gut stall, generic DNF is deferred; final failed recovery turn produces separate `failed_gut_check` DNF. Mark explicit DNF, preserve position/resources/Conditions/reason, stop turns, assign no place.
 
 ## AH. Race end / placing
 

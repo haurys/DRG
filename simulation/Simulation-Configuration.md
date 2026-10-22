@@ -8,6 +8,8 @@ The now-canonical `pack_resolution` descriptor records no round-1 Pack, nearest-
 
 The existing 400-turn maximum remains a safety guard. Assistance uses one requester Treat/Prepare action and zero Race-card plays; the helper has no action debt. A DNF runner is removed from active round decisions. Neither the deck values nor the Pace/Energy configuration changes.
 
+Marathon Gut threshold inputs are `marathon_gut_provisional_thresholds` in `simulation/config.json`, keyed by mile 10/18/23 with separate `prepared_effort` and `energy` values. Current **provisional test inputs** are 25/4, 30/2, 35/1, not approved print thresholds. Recovery windows are fixed at four/three/two runner turns following the crossing failure. Half uses its existing hand-only thresholds 9/11 and old failure behavior; Marathon uses the explicit provisional pair map.
+
 ## v1.4 candidate configuration
 
 `starting_hand` is 6 and also the hand ceiling for the single normal Replenish draw; `exchange_limit` remains 3. Deck recycling uses only eligible discard cards, and empty draw plus empty eligible discard skips the draw. Four Pace costs and Movement Energy bands are unchanged.

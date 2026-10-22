@@ -32,6 +32,8 @@ Competitive marathon target ~25–35 rounds, center ~30; average effective movem
 
 The 2026-09-30 designer consolidation closes RR-11, RR-13, and RR-17 and marks RR-16 superseded by the redesign. Will now covers exact total turn Energy shortfall after reductions, including Movement cards. Historical audit reports retain the rules under which they were run; no new full marathon was run in this implementation pass.
 
+Marathon Gut recovery is now implemented with Prepared Effort in hand and normal slots plus specialist bonuses, a separate Energy requirement, exact-shortfall Will, a checkpoint stop, and four/three/two recovery turns. The first-turn full-hand special exchange is one card after Replenish/Treat; assistance remains a one-for-one use of the available Treat/Prepare. The 25/4, 30/2, 35/1 test pairs are provisional configuration values pending calibration. Half Marathon keeps the hand-only check. Older historical audit results predate both this implementation and the round-1 Pack restriction.
+
 ## v1.3 closures
 
 Station treatment applies to every eligible Condition. In-race assistance uses the requesting runner's Treat/Prepare action, no Race-card play slot, and no helper out-of-turn action cost. The requesting player may choose any eligible active helper. DNF requires exhausted practical continuation after assistance. These action-cost questions are closed.

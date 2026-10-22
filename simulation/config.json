@@ -30,13 +30,13 @@
   "difficulty_transition_rule": "stop at each Difficulty boundary; carry positive excess Movement Result; adjust by new Difficulty minus previous Difficulty",
   "condition_draw_rule": "no active-condition maximum; reveal/place immediately and continue replacement draw",
   "deck_exhaustion_rule": "shuffle eligible discard into draw pile with seeded RNG; exclude every card still in play",
-  "gut_check_thresholds": {
-    "10": 25,
-    "18": 30,
-    "23": 35
+  "marathon_gut_provisional_thresholds": {
+    "10": {"prepared_effort": 25, "energy": 4},
+    "18": {"prepared_effort": 30, "energy": 2},
+    "23": {"prepared_effort": 35, "energy": 1}
   },
   "finish_resolution": "positive legal movement beyond 26.0/13.0 completes the 0.2/0.1 Finish extension; same-round tiebreak at Round End",
-  "milestone_resolution": "Water and Aid apply named Condition remedies; Gut Checks use Hand Effort",
+  "milestone_resolution": "Water and Aid apply named Condition remedies; Marathon Gut Checks require Prepared Effort and Energy with recovery windows; Half retains hand-only Gut Checks",
   "will_resolution": "single-use exact Energy shortfall for an otherwise-legal turn after Pace and Movement-card costs and preservation",
   "pack_resolution": "no Pack in round 1; from round 2, after Pace selection at Round Start, join nearest same-Pace Pack within 0.5 mile of leader; stable leader ID tie; membership fixed for round; Pack preserves 1 Pace Energy",
   "effect_resolution": "Event Effects execute only in EFFECT mode; Movement mode uses printed Effort and pays the card Energy cost",
