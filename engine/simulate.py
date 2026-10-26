@@ -706,7 +706,7 @@ class Sim:
             raise ValueError('Fuel choice required')
         recovery = (card.get('energy') or 0) if choice in (None, 'energy') else 0
         old = runner['energy']
-        runner['energy'] = min(15, runner['energy'] + recovery)
+        runner['energy'] += recovery
         if title == 'Electrolytes' and choice == 'remedy':
             condition = self.condition_by_title(runner, 'Dehydrated')
             if condition:
@@ -883,6 +883,11 @@ class Sim:
                 maximum = min(maximum, effect['max_pace'], key=PACE_ORDER.index)
         return maximum
 
+    def payable_pace(self, runner):
+        """Condition limits are checked after Replenish and Treat/Prepare."""
+        maximum = self.maximum_legal_pace(runner)
+        return min(runner['pace'], maximum, key=PACE_ORDER.index)
+
     def choose_pace(self, runner):
         maximum = self.maximum_legal_pace(runner)
         candidates = PACE_ORDER[:PACE_ORDER.index(maximum) + 1]
@@ -965,6 +970,7 @@ class Sim:
     def preview_preparation(self, runner, plan):
         projected = copy.deepcopy(runner)
         if not plan:
+            projected['pace'] = self.payable_pace(projected)
             return projected
         card = next(c for c in projected['hand'] if c['id'] == plan['card_id'])
         projected['hand'].remove(card)
@@ -1012,13 +1018,14 @@ class Sim:
                     projected['attached_gear'][:] = [item for item in projected['attached_gear']
                                                      if item['condition_id'] != target['id']]
             else:
-                projected['energy'] = min(15, projected['energy'] + (card['energy'] or 0))
+                projected['energy'] += card['energy'] or 0
+        projected['pace'] = self.payable_pace(projected)
         return projected
 
     def preview_payment(self, runner, movement_cost=0):
         projected = copy.deepcopy(runner)
-        projected['energy'] = min(15, projected['energy'] +
-                                  sum(amount for _, amount in self.installed_energy(projected)))
+        projected['pace'] = self.payable_pace(projected)
+        projected['energy'] += sum(amount for _, amount in self.installed_energy(projected))
         cost = self.pace_cost(projected, projected['pace'])['final']
         total = cost + movement_cost
         if total > projected['energy']:
@@ -1093,7 +1100,7 @@ class Sim:
                         MILESTONES['marathon']['Water']) if 'Hydration Belt' in self.installed_titles(
                             runner, 'gear') else 0
             check = prepared_gut_check(runner['hand'], runner['active_training'],
-                        runner['equipped_gear'], min(15, runner['energy'] + water),
+                        runner['equipped_gear'], runner['energy'] + water,
                         self.marathon_gut[mile]['prepared_effort'],
                         self.marathon_gut[mile]['energy'], runner['will_available'])
             resolved['gut_preview'] = {'mile': mile, **check}
@@ -1127,9 +1134,11 @@ class Sim:
                 setup_card['title'])
             if duration:
                 horizon *= min(1, duration / 6)
-            cost_delta = self.pace_cost(runner, runner['pace'])['final'] - self.pace_cost(prepared, prepared['pace'])['final']
+            current = copy.deepcopy(runner)
+            current['pace'] = self.payable_pace(current)
+            cost_delta = self.pace_cost(current, current['pace'])['final'] - self.pace_cost(prepared, prepared['pace'])['final']
             energy_delta = sum(amount for _, amount in self.installed_energy(prepared)) - sum(
-                amount for _, amount in self.installed_energy(runner))
+                amount for _, amount in self.installed_energy(current))
             visible = self.course[min(runner['quarter_mile_space'] // 4, len(self.course) - 1):]
             visible = visible[:min(6, len(visible))]
             effort_delta = (sum(self.movement_effort_bonus(prepared, s)[0]
@@ -1142,7 +1151,7 @@ class Sim:
                                     for s in visible) / len(visible)) if visible else 0
             future_sides = visible[1:]
             future_energy_delta = (sum(sum(v for _, v in self.energy_gains_on_side(prepared, s))
-                                       - sum(v for _, v in self.energy_gains_on_side(runner, s))
+                                       - sum(v for _, v in self.energy_gains_on_side(current, s))
                                        for s in future_sides) / len(future_sides)) if future_sides else 0
             # Already-staged next-round weather is public; unseen weather draws are not.
             water_delta = sum(
@@ -1195,7 +1204,7 @@ class Sim:
             event_gain += 2
         if 'EV-018' in effect_ids:
             event_gain += 1
-        energy = min(15, energy + event_gain + movement_result['milestone_energy_gain'])
+        energy += event_gain + movement_result['milestone_energy_gain']
         if movement_result.get('gut_preview'):
             check = movement_result['gut_preview']
             if not check['passed']:
@@ -1321,10 +1330,10 @@ class Sim:
                     'movement_quarters': max(p['movement_quarters'] for p in positive)}
         if allow_treat and not options and capture['selected']['treat_prepare']:
             return {'viable': True, 'kind': 'treat_recovery', 'movement_quarters': 0}
-        if self.installed_energy(runner):
-            projected = copy.deepcopy(runner)
-            projected['energy'] = min(15, projected['energy'] + sum(
-                amount for _, amount in self.installed_energy(runner)))
+        projected = copy.deepcopy(runner)
+        projected['pace'] = self.payable_pace(projected)
+        if self.installed_energy(projected):
+            projected['energy'] += sum(amount for _, amount in self.installed_energy(projected))
             if projected['energy'] > runner['energy']:
                 return {'viable': True, 'kind': 'installed_energy', 'movement_quarters': 0}
         # A playable recovery, treatment, or card cycle can create a next-turn path.
@@ -1570,9 +1579,7 @@ class Sim:
                 'preservation_sources': sources, 'final': final}
 
     def pay_pace(self, runner, movement_cost=0):
-        maximum = self.maximum_legal_pace(runner)
-        if PACE_ORDER.index(runner['pace']) > PACE_ORDER.index(maximum):
-            runner['pace'] = maximum
+        runner['pace'] = self.payable_pace(runner)
         cost = self.pace_cost(runner, runner['pace'])
         will_used = False
         total = cost['final'] + movement_cost
@@ -1753,7 +1760,7 @@ class Sim:
 
     def apply_energy(self, runner, amount, source):
         before = runner['energy']
-        runner['energy'] = min(15, max(0, runner['energy'] + amount))
+        runner['energy'] = max(0, runner['energy'] + amount)
         delta = runner['energy'] - before
         if delta >= 0:
             runner['stats']['energy_gained'] += delta
@@ -2145,6 +2152,9 @@ class Sim:
                 self.emit('SLOT_SACRIFICE', runner['player_id'], {'card': card['id'],
                           'source': source, 'printed_effort': card['effort'],
                           'effect_ended_before_movement': True})
+        # Installed triggers and payment must use the same legal Pace as the AI
+        # preview, including Conditions revealed on this turn's draw.
+        runner['pace'] = self.payable_pace(runner)
         self.apply_installed_energy(runner)
         _, will_used = self.pay_pace(runner, card_cost)
         for card, source in zip(played, sources):

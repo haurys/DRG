@@ -85,12 +85,13 @@ def _detail(sim, runner, row, baseline, before_quarters):
         duration = (TRAINING_DURATION if plan['action'] == 'training' else GEAR_DURATION).get(title)
         if duration:
             horizon *= min(1, duration / 6)
-    pace_cost = sim.pace_cost(liquidated, liquidated['pace'])
+    pace_cost = sim.pace_cost(paid, paid['pace'])
     setup_estimate = None
     if setup:
         visible = sim.course[min(runner['quarter_mile_space'] // 4, len(sim.course) - 1):][:6]
+        current = sim.preview_preparation(runner, None)
         effort_delta = (sum(sim.movement_effort_bonus(prepared, side)[0]
-                            - sim.movement_effort_bonus(runner, side)[0]
+                            - sim.movement_effort_bonus(current, side)[0]
                             for side in visible) / len(visible)) if visible else 0
         old_titles = sim.installed_titles(runner, 'training')
         new_titles = sim.installed_titles(prepared, 'training')
@@ -101,13 +102,13 @@ def _detail(sim, runner, row, baseline, before_quarters):
             'visible_segments_sampled': len(visible),
             'mean_effort_gain': effort_delta,
             'mean_difficulty_reduction': difficulty_delta,
-            'pace_energy_cost_reduction': sim.pace_cost(runner, runner['pace'])['final']
+            'pace_energy_cost_reduction': sim.pace_cost(current, current['pace'])['final']
                                           - sim.pace_cost(prepared, prepared['pace'])['final'],
             'installed_energy_this_turn': sum(amount for _, amount in sim.installed_energy(prepared))
-                                          - sum(amount for _, amount in sim.installed_energy(runner)),
+                                          - sum(amount for _, amount in sim.installed_energy(current)),
             'future_visible_energy_gain_at_current_pace':
             (sum(sum(amount for _, amount in sim.energy_gains_on_side(prepared, side))
-                 - sum(amount for _, amount in sim.energy_gains_on_side(runner, side))
+                 - sum(amount for _, amount in sim.energy_gains_on_side(current, side))
                  for side in visible[1:]) / len(visible[1:])) if len(visible) > 1 else 0,
             'future_visible_water_opportunity_delta':
             sum(('Hydration Belt' in sim.installed_titles(prepared, 'gear'))
@@ -130,8 +131,8 @@ def _detail(sim, runner, row, baseline, before_quarters):
             'projected_energy_after_pace': paid['energy'],
             'projected_energy_after_action': None if any(c['family'] == 'Event' and c['use_mode'] == 'EFFECT'
                                                          for c in cards) else
-            min(15, max(0, after_cards['energy'] - result['staged_energy_cost'])
-                + result['milestone_energy_gain']),
+            max(0, after_cards['energy'] - result['staged_energy_cost'])
+            + result['milestone_energy_gain'],
             'energy_after_note': 'Event and checkpoint effects resolve in the live turn; preview score estimates them.',
             'projected_condition_impact': condition_impact,
             'projected_setup_benefit': setup_estimate,

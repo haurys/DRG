@@ -41,7 +41,6 @@ class WillConsolidation(unittest.TestCase):
         sim.turn(runner, {'movement_cards': list(ids)})
         self.assertTrue(events(sim, 'TURN_END'))
         self.assertGreaterEqual(runner['energy'], 0)
-        self.assertLessEqual(runner['energy'], 15)
         return sim, runner
 
     def test_pace_only_shortfall(self):
