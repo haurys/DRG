@@ -38,7 +38,12 @@ class NoHelperReason(unittest.TestCase):
                                     requester['quarter_mile_space'], requester['will_available'],
                                     requester['active_conditions'], other))
             self.assertEqual(sim.assistance_helper(requester), (None, 1, None))
-            self.assertFalse(sim.request_assistance(requester))
+            self.assertFalse(sim.evaluate_dnf(requester, assistance_evaluated=True,
+                                             treat_available=False))
+            sim.turn(requester)
+            self.assertEqual(requester['race_status'], 'STOPPED')
+            sim.round += 1
+            sim.turn(requester)
             selected = [e for e in sim.events if e['type'] == 'ASSISTANCE_PARTNER_SELECT'][-1]
             self.assertEqual(selected['payload']['helper'], None)
             self.assertEqual(selected['payload']['reason'], 'no_eligible_active_helper')
@@ -47,13 +52,12 @@ class NoHelperReason(unittest.TestCase):
                                       requester['quarter_mile_space'], requester['will_available'],
                                       requester['active_conditions'], other))
             self.assertEqual(requester['stats']['treat_prepare_actions'], 1)
-            self.assertTrue(sim.evaluate_dnf(requester, assistance_evaluated=True,
-                                             treat_available=False))
             evaluation = [e for e in sim.events if e['type'] == 'DNF_EVALUATION'][-1]['payload']
             self.assertTrue(evaluation['assistance_evaluated'])
             self.assertEqual(evaluation['continuation']['kind'], 'exhausted_known_paths')
+            self.assertFalse(evaluation['dnf'])
             self.assertEqual((requester['race_status'], requester['distance_completed'],
-                              requester['energy'], requester['dnf_turn']), ('DNF', 23.0, 0, 50))
+                              requester['energy'], requester['dnf_turn']), ('DNF', 23.0, 0, 52))
             return [e for e in sim.events if e['type'].startswith('ASSISTANCE')
                     or e['type'] in ('TREAT_PREPARE', 'DNF_EVALUATION', 'DNF')]
 

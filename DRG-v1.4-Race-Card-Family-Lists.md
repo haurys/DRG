@@ -20,7 +20,7 @@ An installed Training card can provide its printed Effect immediately. After two
 |---|---|---|---|---|---|---|---|---|---|---|
 | TR-001 | Long Run | 7 | 2 | ▶▶: No -⚡; Dead Legs: -2 | — | Race | Dead Legs | 2 | No | No |
 | TR-002 | Long Run | 7 | 2 | ▶▶: No -⚡; Dead Legs: -2 | — | Race | Dead Legs | 2 | No | No |
-| TR-003 | Base Miles | 6 | 1 | ▷: +⚡; Dead Legs/Tight Calf: -1 | — | Easy | — | 1 | No | No |
+| TR-003 | Base Miles | 6 | 1 | Steady: +⚡; Dead Legs/Tight Calf: -1 | — | Steady | — | 1 | No | No |
 | TR-004 | Negative Split | 8 | 2 | ▶▶: +⚡ | — | Race | — | 1 | No | No |
 | TR-005 | Tempo Run | 6 | 1 | ▶: +⚡ | — | Steady | — | 2 | No | No |
 | TR-006 | Tempo Run | 6 | 1 | ▶: +⚡ | — | Steady | — | 2 | No | No |
@@ -163,7 +163,7 @@ Base Severity is printed. Current Severity falls through permanent treatment; Ef
 | CO-013 | Gashed Knee | 5 | -→ | — | — | Aid | No | Yes | No | Committed until complete removal |
 | CO-014 | Side Stitch | 3 | ▶▶/▶▶▶: -→ | Race, Push | — | Training/other legal relief | No | No | No | Committed until complete removal |
 | CO-015 | Twisted Ankle | 7 | Max ▶ | Steady | — | Aid | No | Yes | Yes | Committed until complete removal |
-| CO-016 | Heat Exhaustion | 8 | Max ▷ | Easy | — | Aid, Water Bottle Severity -2 | No | Yes | No | Committed until complete removal |
+| CO-016 | Heat Exhaustion | 8 | Maximum Steady | Steady | — | Aid, Water Bottle Severity -2 | No | Yes | No | Committed until complete removal |
 
 **What this means:** the table lists every physical ID, including duplicate titles. **Why it matters:** quantities, costs, and target/zone rules can be checked without opening structured data.
 

@@ -53,11 +53,11 @@ class FrozenRedesign(unittest.TestCase):
         sim, r = fixture()
         r['energy'] = 9
         r['hand'] = [card('FU-002'), card('EV-021')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'movement_cards': ['FU-002', 'EV-021']})
         payments = [e['payload']['cost'] for e in sim.events if e['type'] == 'MOVEMENT_ENERGY_PAYMENT']
         self.assertEqual(payments, [1, 2])
-        self.assertEqual(r['energy'], 6)
+        self.assertEqual(r['energy'], 5)
         self.assertEqual([e['payload']['mode'] for e in sim.events if e['type'] == 'PLAY'],
                          ['MOVEMENT', 'MOVEMENT'])
         self.assertFalse(any(e['type'] == 'ENERGY_CHANGE' and e['payload']['source'] == 'Second Wind'
@@ -67,21 +67,24 @@ class FrozenRedesign(unittest.TestCase):
         sim, r = fixture()
         r['energy'] = 5
         r['hand'] = [card('EV-021'), card('FU-001')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'movement_cards': ['EV-021', 'FU-001'],
                      'card_modes': ['EFFECT', 'MOVEMENT']})
         move = next(e['payload'] for e in sim.events if e['type'] == 'MOVE')
         self.assertEqual(move['total_effort'], 3)
         self.assertEqual(sum(e['payload']['cost'] for e in sim.events
                              if e['type'] == 'MOVEMENT_ENERGY_PAYMENT'), 0)
-        self.assertEqual(r['energy'], 8)
+        self.assertEqual(r['energy'], 7)
 
     def test_will_qualifies_card_but_spent_will_rejects_unaffordable_card(self):
         sim, r = fixture()
         r['energy'] = 0
         r['hand'] = [card('TR-001'), card('EV-029')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         self.assertIn('TR-001', sim.choose_turn_plan(r)['movement_cards'])
+        sim.turn(r, {'movement_cards': ['TR-001']})
+        self.assertEqual(r['race_status'], 'STOPPED')
+        sim.round += 1
         sim.turn(r, {'movement_cards': ['TR-001']})
         self.assertFalse(r['will_available'])
         self.assertEqual(r['energy'], 0)
@@ -89,10 +92,10 @@ class FrozenRedesign(unittest.TestCase):
         r['energy'] = 0
         r['will_available'] = False
         r['hand'] = [card('TR-001'), card('EV-029')]
-        sim.start_round({'P1': 'Easy'})
-        self.assertEqual(sim.choose_turn_plan(r)['movement_cards'], ['EV-029'])
-        with self.assertRaisesRegex(ValueError, 'Movement Energy unavailable'):
-            sim.turn(r, {'movement_cards': ['TR-001']})
+        sim.start_round({'P1': 'Steady'})
+        self.assertEqual(sim.choose_turn_plan(r)['movement_cards'], [])
+        sim.turn(r, {'movement_cards': ['TR-001']})
+        self.assertEqual(r['race_status'], 'STOPPED')
 
     def test_fuel_two_energy_and_alternative_severity(self):
         sim, r = fixture()
@@ -108,14 +111,14 @@ class FrozenRedesign(unittest.TestCase):
         r['hand'] = [card('FU-002')]
         self.assertFalse(sim.legal_treat_prepare(r, {'action': 'fuel', 'card_id': 'FU-002', 'choice': 'energy'}))
         r['energy'] = 5
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'movement_cards': ['FU-002']})
         self.assertTrue(any(e['type'] == 'PLAY' and e['payload']['mode'] == 'MOVEMENT'
                             for e in sim.events))
 
     def test_conditions_direct_difficulty_caps_and_aid(self):
         self.assertEqual(m.condition_effects(m.make_condition(card('CO-004')), 'Race')['direct_movement'], -1)
-        self.assertEqual(m.condition_effects(m.make_condition(card('CO-013')), 'Easy')['direct_movement'], -1)
+        self.assertEqual(m.condition_effects(m.make_condition(card('CO-013')), 'Steady')['direct_movement'], -1)
         self.assertEqual(m.condition_effects(m.make_condition(card('CO-009')), surface='Concrete')['difficulty_penalty'], 2)
         self.assertEqual(m.condition_effects(m.make_condition(card('CO-011')), 'Push')['extra_energy'], 1)
         twist = m.make_condition(card('CO-015'))
@@ -138,9 +141,9 @@ class FrozenRedesign(unittest.TestCase):
         r['equipped_gear'] = [installed('GE-008'), installed('GE-013')]
         sim.global_events = [{'card': card('EV-006'), 'activate_round': 2, 'source': 'P1'},
                              {'card': card('EV-010'), 'activate_round': 2, 'source': 'P1'}]
-        sim.start_round({'P1': 'Easy'})
-        p = sim.pace_cost(r, 'Easy')
-        self.assertEqual(p['final'], 0)
+        sim.start_round({'P1': 'Steady'})
+        p = sim.pace_cost(r, 'Steady')
+        self.assertEqual(p['final'], 1)
         self.assertEqual(r['energy'], 5)
         self.assertEqual([e['payload']['actual_loss'] for e in sim.events
                           if e['type'] == 'GLOBAL_WEATHER'], [0, 0])
@@ -155,7 +158,7 @@ class FrozenRedesign(unittest.TestCase):
         self.assertEqual(sum(v for _, v in sim.installed_energy(r)), 4)
         projected = sim.preview_payment(r)
         sim.apply_installed_energy(r)
-        self.assertEqual(r['energy'], projected['energy'])
+        self.assertEqual(r['energy'] - 1, projected['energy'])  # Preview includes Pace payment.
         self.assertEqual(r['energy'], 8)
         sim.expire_temporary(r)
         self.assertEqual(r['equipped_gear'][-1]['remaining_turns'], 1)
@@ -166,32 +169,32 @@ class FrozenRedesign(unittest.TestCase):
         sim, r = fixture()
         r['hand'] = [card('EV-023'), card('FU-001')]
         r['energy'] = 9
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'movement_cards': ['FU-001', 'EV-023'], 'card_modes': ['MOVEMENT', 'EFFECT']})
         move = next(e['payload'] for e in sim.events if e['type'] == 'MOVE')
         self.assertEqual(move['total_effort'], 3)
         self.assertEqual(move['direct_requested'], 2)
-        self.assertEqual(r['energy'], 9)
+        self.assertEqual(r['energy'], 8)
 
     def test_gps_watch_two_distinct_runner_turn_ticks_then_expiry(self):
         sim, r = fixture()
         r['energy'] = 4
         r['hand'] = [card('GE-016'), card('FU-001')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'treat_prepare': {'action': 'gear', 'card_id': 'GE-016'},
                      'movement_cards': ['FU-001']})
-        self.assertEqual(r['energy'], 5)
+        self.assertEqual(r['energy'], 4)
         sim.end_round()
         r['hand'] = [card('FU-001')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'treat_prepare': None, 'movement_cards': ['FU-001']})
-        self.assertEqual(r['energy'], 6)
+        self.assertEqual(r['energy'], 4)
         self.assertFalse(r['equipped_gear'])
         sim.end_round()
         r['hand'] = [card('FU-001')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'treat_prepare': None, 'movement_cards': ['FU-001']})
-        self.assertEqual(r['energy'], 6)
+        self.assertEqual(r['energy'], 3)
         gains = [e for e in sim.events if e['type'] == 'ENERGY_CHANGE'
                  and e['payload']['source'] == 'Installed GE-016']
         self.assertEqual([e['payload']['delta'] for e in gains], [1, 1])
@@ -202,21 +205,21 @@ class FrozenRedesign(unittest.TestCase):
         second = sim.runners[1]
         first['energy'], second['energy'] = 4, 4
         first['hand'] = [card('EV-015')]
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         sim.turn(first, {'movement_cards': ['EV-015'], 'card_modes': ['EFFECT']})
-        self.assertEqual((first['energy'], second['energy']), (5, 5))
+        self.assertEqual((first['energy'], second['energy']), (4, 5))
         self.assertEqual(first['quarter_mile_space'], 0)  # E5 is ignored.
 
         sim, first = fixture(2)
         second = sim.runners[1]
         first['energy'], second['energy'] = 4, 4
         first['hand'] = [card('EV-019')]
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         sim.turn(first, {'movement_cards': ['EV-019'], 'card_modes': ['EFFECT']})
         self.assertEqual(first['quarter_mile_space'], 1)
         self.assertEqual(second['staged_events'][0]['card']['id'], 'EV-019')
         sim.end_round()
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         second['hand'] = [card('FU-001')]
         sim.turn(second, {'movement_cards': ['FU-001']})
         self.assertEqual(next(e['payload']['direct_requested'] for e in sim.events
@@ -225,37 +228,37 @@ class FrozenRedesign(unittest.TestCase):
         cold, r = fixture()
         r['energy'] = 4
         r['hand'] = [card('EV-010')]
-        cold.start_round({'P1': 'Easy'})
+        cold.start_round({'P1': 'Steady'})
         cold.turn(r, {'movement_cards': ['EV-010'], 'card_modes': ['EFFECT']})
         self.assertEqual(cold.global_events[0]['activate_round'], cold.round + 1)
         cold.end_round()
-        cold.start_round({'P1': 'Easy'})
-        self.assertEqual(r['energy'], 3)
-        self.assertEqual(cold.pace_cost(r, 'Easy')['final'], 0)
+        cold.start_round({'P1': 'Steady'})
+        self.assertEqual(r['energy'], 2)
+        self.assertEqual(cold.pace_cost(r, 'Steady')['final'], 1)
         heat, actor = fixture(2)
         other = heat.runners[1]
         actor['energy'] = other['energy'] = 5
         actor['hand'] = [card('EV-006')]
-        heat.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        heat.start_round({'P1': 'Steady', 'P2': 'Steady'})
         heat.turn(actor, {'movement_cards': ['EV-006'], 'card_modes': ['EFFECT']})
         heat.end_round()
-        heat.start_round({'P1': 'Easy', 'P2': 'Easy'})
-        self.assertEqual((actor['energy'], other['energy']), (4, 5))
+        heat.start_round({'P1': 'Steady', 'P2': 'Steady'})
+        self.assertEqual((actor['energy'], other['energy']), (3, 5))
 
     def test_other_target_and_card_mode_remain_exclusive(self):
         sim, first = fixture(2)
         second = sim.runners[1]
         first['energy'] = second['energy'] = 6
         first['hand'] = [card('EV-011')]
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         sim.turn(first, {'movement_cards': ['EV-011'], 'card_modes': ['EFFECT']})
         self.assertEqual(second['energy'], 5)
         self.assertFalse(second['staged_events'])
-        self.assertEqual(first['energy'], 6)
+        self.assertEqual(first['energy'], 5)
         self.assertEqual(first['quarter_mile_space'], 0)
         self.assertFalse(any(e['type'] == 'MOVEMENT_ENERGY_PAYMENT' for e in sim.events))
         sim.end_round()
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         second['hand'] = [card('FU-001')]
         sim.turn(second, {'movement_cards': ['FU-001']})
         self.assertEqual(second['energy'], 5)  # The immediate choice is not charged again.
@@ -263,12 +266,12 @@ class FrozenRedesign(unittest.TestCase):
         victim = forced.runners[1]
         victim['energy'] = 0
         attacker['hand'] = [card('EV-025')]
-        forced.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        forced.start_round({'P1': 'Steady', 'P2': 'Steady'})
         forced.turn(attacker, {'movement_cards': ['EV-025'], 'card_modes': ['EFFECT']})
         self.assertEqual(victim['staged_events'][0]['card']['id'], 'EV-025')
         forced.end_round()
         victim['hand'] = [card('FU-001')]
-        forced.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        forced.start_round({'P1': 'Steady', 'P2': 'Steady'})
         forced.turn(victim, {'movement_cards': ['FU-001']})
         self.assertEqual([e['payload']['direct_requested'] for e in forced.events
                           if e['type'] == 'MOVE' and e['player_id'] == 'P2'][-1], -1)
@@ -279,7 +282,7 @@ class FrozenRedesign(unittest.TestCase):
         for runner in sim.runners:
             runner['energy'] = 5
         actor['hand'] = [card('EV-018')]
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy', 'P3': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady', 'P3': 'Steady'})
         sim.turn(actor, {'movement_cards': ['EV-018'], 'card_modes': ['EFFECT']})
         self.assertEqual([runner['energy'] for runner in sim.runners], [6, 6, 5])
         self.assertEqual(next(e['payload']['beneficiaries'] for e in sim.events
@@ -291,16 +294,16 @@ class FrozenRedesign(unittest.TestCase):
         r['equipped_gear'] = [installed('GE-013')]
         sim.round = 1
         sim.global_events = [{'card': card('EV-010'), 'activate_round': 2, 'source': 'P1'}]
-        sim.start_round({'P1': 'Easy'})
-        self.assertEqual(sim.pace_cost(r, 'Easy')['final'], 0)
+        sim.start_round({'P1': 'Steady'})
+        self.assertEqual(sim.pace_cost(r, 'Steady')['final'], 1)
         self.assertEqual(r['energy'], 5)
         self.assertEqual(next(e['payload']['protected_by'] for e in sim.events
                               if e['type'] == 'GLOBAL_WEATHER'), 'Weather Shell')
         knee = m.make_condition(card('CO-013'))
-        self.assertEqual(m.condition_effects(knee, 'Easy')['direct_movement'], -1)
+        self.assertEqual(m.condition_effects(knee, 'Steady')['direct_movement'], -1)
         knee['current_severity'] = 0
         m.update_effective_severity(knee)
-        self.assertEqual(m.condition_effects(knee, 'Easy')['direct_movement'], 0)
+        self.assertEqual(m.condition_effects(knee, 'Steady')['direct_movement'], 0)
 
     def test_training_installation_reduces_one_active_condition_and_preview_matches(self):
         sim, r = fixture()
@@ -320,7 +323,7 @@ class FrozenRedesign(unittest.TestCase):
         r['equipped_gear'] = [installed('GE-012')]
         r['energy'] = 5
         r['quarter_mile_space'] = 15
-        r['pace'] = 'Easy'
+        r['pace'] = 'Steady'
         self.assertEqual(sim.installed_energy(r), [])
         r['hand'] = [card('TR-001'), card('EV-023')]
         sim.round = 1
@@ -338,7 +341,7 @@ class FrozenRedesign(unittest.TestCase):
                 sim, runner = fixture(2)
                 runner['energy'] = sim.runners[1]['energy'] = 8
                 runner['hand'] = [card(cid)]
-                sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+                sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
                 sim.turn(runner, {'movement_cards': [cid], 'card_modes': ['EFFECT']})
                 play = next(e['payload'] for e in sim.events if e['type'] == 'PLAY')
                 self.assertEqual((play['mode'], play['effect_active'],
@@ -359,7 +362,7 @@ class FrozenRedesign(unittest.TestCase):
     def test_future_visible_terrain_and_staged_weather_enter_setup_value(self):
         sim, r = fixture()
         r['energy'] = 5
-        r['pace'] = 'Easy'
+        r['pace'] = 'Steady'
         r['hand'] = [card('GE-005'), card('FU-001')]
         sim.round = 1
         for side in sim.course[:6]:

@@ -44,7 +44,7 @@ class TrailRouteRegression(unittest.TestCase):
         sim, runner = fixture('C-12-A', 'C-11-A')
         runner['hand'] = [copy.deepcopy(CARDS['TR-015']), copy.deepcopy(CARDS['TR-001'])]
         runner['energy'] = 5
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(runner, {'treat_prepare': {'card_id': 'TR-015', 'action': 'training'},
                           'movement_cards': ['TR-001']})
         self.assertEqual(move_payload(sim)['installed_effort_bonus'], 0)
@@ -55,7 +55,7 @@ class TrailRouteRegression(unittest.TestCase):
         sim, runner = fixture('C-26-B', 'C-11-A')
         runner['hand'] = [copy.deepcopy(CARDS['GE-005']), copy.deepcopy(CARDS['TR-001'])]
         runner['energy'] = 5
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(runner, {'treat_prepare': {'card_id': 'GE-005', 'action': 'gear'},
                           'movement_cards': ['TR-001']})
         self.assertEqual(move_payload(sim)['installed_effort_bonus'], 0)
@@ -88,7 +88,7 @@ class TrailRouteRegression(unittest.TestCase):
                     runner['quarter_mile_space'] = 3
                     runner['hand'] = [copy.deepcopy(CARDS['TR-001']),
                                       copy.deepcopy(CARDS['TR-002'])]
-                    sim.start_round({'P1': 'Easy'})
+                    sim.start_round({'P1': 'Steady'})
                     sim.turn(runner, {'treat_prepare': None, 'movement_cards': ['TR-001']})
                     first_move = move_payload(sim)
                     self.assertGreaterEqual(runner['quarter_mile_space'], 4)
@@ -99,7 +99,7 @@ class TrailRouteRegression(unittest.TestCase):
                     self.assertTrue(any(event['type'] == 'MOVE_BOUNDARY' for event in sim.events))
                     sim.end_round()
                     runner['quarter_mile_space'] = 4
-                    sim.start_round({'P1': 'Easy'})
+                    sim.start_round({'P1': 'Steady'})
                     sim.turn(runner, {'treat_prepare': None, 'movement_cards': ['TR-002']})
                     gains = [e for e in sim.events if e['type'] == 'ENERGY_CHANGE'
                              and e['payload']['source'] == 'Installed '+card_id]

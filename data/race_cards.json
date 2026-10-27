@@ -84,7 +84,7 @@
     "category": "Endurance",
     "effort": 6,
     "energy": null,
-    "effect_text": "▷: +⚡; Dead Legs/Tight Calf: -1",
+    "effect_text": "Steady: +⚡; Dead Legs/Tight Calf: -1",
     "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
@@ -97,7 +97,7 @@
     "effect_components": [
       {
         "type": "energy_gain",
-        "pace": "Easy",
+        "pace": "Steady",
         "energy_delta": 1
       },
       {
@@ -3349,7 +3349,7 @@
     "category": "",
     "effort": null,
     "energy": null,
-    "effect_text": "Max ▷",
+    "effect_text": "Maximum Steady",
     "effect_type": "pace_cap",
     "effect_value": null,
     "effect_target": null,
@@ -3362,7 +3362,7 @@
     "effect_components": [
       {
         "type": "pace_cap",
-        "pace": "Easy"
+        "pace": "Steady"
       }
     ],
     "movement_energy_icon": null

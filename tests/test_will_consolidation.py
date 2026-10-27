@@ -39,35 +39,39 @@ class WillConsolidation(unittest.TestCase):
         sim, runner = fixture(energy, pace, ids, position)
         runner.update(kwargs)
         sim.turn(runner, {'movement_cards': list(ids)})
+        if runner['race_status'] == 'STOPPED':
+            self.assertTrue(runner['will_available'])
+            sim.round += 1
+            sim.turn(runner, {'movement_cards': list(ids)})
         self.assertTrue(events(sim, 'TURN_END'))
         self.assertGreaterEqual(runner['energy'], 0)
         return sim, runner
 
     def test_pace_only_shortfall(self):
         sim, r = self.scripted(0, 'Push', ('FU-001',))  # Effort 3 costs zero
-        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 2)
+        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 3)
         self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['paid'], 0)
         self.assertEqual(events(sim, 'MOVEMENT_ENERGY_PAYMENT')[0]['covered_by_will'], 0)
         self.assertEqual((r['energy'], r['will_available']), (0, False))
 
     def test_movement_only_shortfall(self):
-        sim, r = self.scripted(0, 'Easy', ('TR-001',))
-        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 2)
+        sim, r = self.scripted(0, 'Steady', ('TR-001',))
+        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 5)
         self.assertEqual(events(sim, 'MOVEMENT_ENERGY_PAYMENT')[0]['covered_by_will'], 2)
         self.assertEqual((r['energy'], r['will_available']), (0, False))
 
     def test_combined_shortfall_and_multiple_card_costs(self):
         sim, r = self.scripted(1, 'Push', ('TR-001',))
-        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 3)
+        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 4)
         self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['paid'], 1)
         self.assertEqual(events(sim, 'MOVEMENT_ENERGY_PAYMENT')[0]['covered_by_will'], 2)
         self.assertEqual(r['stats']['energy_spent'], 1)
-        sim2, r2 = self.scripted(1, 'Easy', ('TR-001', 'FU-005'))
+        sim2, r2 = self.scripted(1, 'Steady', ('TR-001', 'FU-005'))
         pays = events(sim2, 'MOVEMENT_ENERGY_PAYMENT')
         self.assertEqual([p['cost'] for p in pays], [2, 1])
-        self.assertEqual([p['paid'] for p in pays], [1, 0])
-        self.assertEqual([p['covered_by_will'] for p in pays], [1, 1])
-        self.assertEqual(events(sim2, 'WILL_USE')[0]['shortfall'], 2)
+        self.assertEqual([p['paid'] for p in pays], [0, 0])
+        self.assertEqual([p['covered_by_will'] for p in pays], [2, 1])
+        self.assertEqual(events(sim2, 'WILL_USE')[0]['shortfall'], 3)
         self.assertEqual(r2['energy'], 0)
 
     def test_exact_stored_payment_and_spent_will(self):
@@ -76,13 +80,13 @@ class WillConsolidation(unittest.TestCase):
         self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['paid'], 1)
         self.assertEqual(events(sim, 'MOVEMENT_ENERGY_PAYMENT')[0]['paid'], 2)
         self.assertEqual((r['energy'], r['will_available']), (0, True))
-        sim2, r2 = fixture(0, 'Easy', ('TR-001',))
+        sim2, r2 = fixture(0, 'Steady', ('TR-001',))
         r2['will_available'] = False
-        with self.assertRaisesRegex(ValueError, 'Movement Energy unavailable'):
-            sim2.turn(r2, {'movement_cards': ['TR-001']})
+        sim2.turn(r2, {'movement_cards': ['TR-001']})
+        self.assertEqual((r2['race_status'], r2['pace']), ('STOPPED', None))
 
     def test_pack_training_gear_apply_before_shortfall(self):
-        sim, r = fixture(0, 'Race', ('TR-001',))
+        sim, r = fixture(2, 'Race', ('TR-001',))
         sim.course[0]['surface'] = 'Asphalt'
         r['pack_state'] = 'PACK-R1-1'
         r['active_training'] = [{'card': card('TR-001'), 'remaining_turns': None}]
@@ -93,16 +97,19 @@ class WillConsolidation(unittest.TestCase):
         self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['final'], 0)
         self.assertIn('Pack', events(sim, 'PACE_PAYMENT')[0]['preservation_sources'])
         self.assertIn('Long Run', events(sim, 'PACE_PAYMENT')[0]['preservation_sources'])
-        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 1)
-        self.assertEqual(events(sim, 'MOVEMENT_ENERGY_PAYMENT')[0]['paid'], 1)
-        self.assertEqual((r['energy'], r['will_available']), (0, False))
+        self.assertFalse(events(sim, 'WILL_USE'))
+        self.assertEqual(events(sim, 'MOVEMENT_ENERGY_PAYMENT')[0]['paid'], 2)
+        self.assertEqual((r['energy'], r['will_available']), (1, True))
 
     def test_final_segment_will_and_repeatability(self):
         outputs = []
         for _ in range(2):
-            sim, r = fixture(0, 'Easy', ('TR-001',), position=103)
+            sim, r = fixture(0, 'Steady', ('TR-001',), position=103)
             plan = sim.choose_turn_plan(r)
             sim.turn(r)
+            if r['race_status'] == 'STOPPED':
+                sim.round += 1
+                sim.turn(r)
             sim.end_round()
             self.assertEqual((r['energy'], r['will_available'], r['finish_order']), (0, False, 1))
             outputs.append((plan, [(e['type'], e['payload']) for e in sim.events],
@@ -111,7 +118,7 @@ class WillConsolidation(unittest.TestCase):
 
     def test_pace_movement_and_combined_replay_with_rationale(self):
         for energy, pace, ids in ((0, 'Push', ('FU-001',)),
-                                  (0, 'Easy', ('TR-001',)),
+                                  (0, 'Steady', ('TR-001',)),
                                   (1, 'Push', ('TR-001',))):
             outputs = []
             for _ in range(2):
@@ -125,7 +132,7 @@ class WillConsolidation(unittest.TestCase):
             self.assertEqual(outputs[0], outputs[1])
 
     def test_pack_fixed_until_next_round_and_nearest_leader(self):
-        sim, _ = fixture(15, 'Easy', ())
+        sim, _ = fixture(15, 'Steady', ())
         sim.runners = [sim.new_runner(i, 'Balanced', []) for i in range(4)]
         for runner, pos in zip(sim.runners, (8, 7, 6, 3)):
             runner['quarter_mile_space'] = pos
@@ -143,7 +150,7 @@ class WillConsolidation(unittest.TestCase):
     def test_electrolytes_salt_tabs_exclusive_branches(self):
         for cid, condition_id in (('FU-016', 'CO-010'), ('FU-019', 'CO-001')):
             with self.subTest(card=cid):
-                sim, r = fixture(5, 'Easy', (cid,))
+                sim, r = fixture(5, 'Steady', (cid,))
                 self.assertTrue(sim.legal_treat_prepare(r, {'card_id': cid, 'action': 'fuel',
                                                            'choice': 'energy'}))
                 self.assertFalse(sim.legal_treat_prepare(r, {'card_id': cid, 'action': 'fuel',
@@ -156,7 +163,7 @@ class WillConsolidation(unittest.TestCase):
                 self.assertEqual(events(sim, 'FUEL_USE')[-1]['recovery'], 0)
 
     def test_gear_relocation_occupies_action_but_allows_two_card_plays(self):
-        sim, r = fixture(15, 'Easy', ('TR-001', 'FU-005'))
+        sim, r = fixture(15, 'Steady', ('TR-001', 'FU-005'))
         r['equipped_gear'] = [{'card': card('GE-003'), 'remaining_turns': None}]
         r['active_conditions'] = [m.make_condition(card('CO-005'))]
         sim.turn(r, {'treat_prepare': {'action': 'relocate', 'card_id': 'GE-003',
@@ -168,7 +175,7 @@ class WillConsolidation(unittest.TestCase):
         self.assertEqual(r['stats']['treat_prepare_actions'], 1)
 
     def test_exact_course_endpoint_needs_later_positive_movement(self):
-        sim, r = fixture(0, 'Easy', ('EV-027',), position=103)
+        sim, r = fixture(0, 'Steady', ('EV-027',), position=103)
         sim.turn(r, {'movement_cards': [], 'card_modes': []})
         self.assertFalse(r['finish_pending'])
         r['quarter_mile_space'] = 104
@@ -178,7 +185,7 @@ class WillConsolidation(unittest.TestCase):
         self.assertTrue(r['finish_pending'])
 
     def test_half_marathon_exact_endpoint_needs_extra_unit(self):
-        sim, r = fixture(2, 'Easy', ('TR-001',), position=52)
+        sim, r = fixture(2, 'Steady', ('TR-001',), position=52)
         sim.cfg['race_format'] = 'half'
         sim.course = sim.course[:13]
         sim.course[-1]['difficulty'] = 1

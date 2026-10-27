@@ -46,7 +46,7 @@ class TargetedEventLegality(unittest.TestCase):
         self.assertEqual(modes(sim, source, 'EV-015'), {'MOVEMENT'})
         plan = sim.choose_turn_plan(source)
         self.assertNotIn(('EV-015', 'EFFECT'), zip(plan['movement_cards'], plan['card_modes']))
-        sim.start_round({'P8': 'Easy'})
+        sim.start_round({'P8': 'Steady'})
         sim.turn(source)
         plays = [e['payload'] for e in sim.events if e['type'] == 'PLAY']
         self.assertEqual([(p['card']['id'], p['mode']) for p in plays], [('EV-015', 'MOVEMENT')])
@@ -98,10 +98,10 @@ class TargetedEventLegality(unittest.TestCase):
         source, target = sim.runners
         source['energy'] = target['energy'] = 4
         source['hand'] = [copy.deepcopy(CARDS['EV-018'])]
-        sim.start_round({'P1': 'Easy', 'P2': 'Race'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Race'})
         self.assertEqual(sim.round_pack_snapshot['P1'], [])
         sim.turn(source, {'movement_cards': ['EV-018'], 'card_modes': ['EFFECT']})
-        self.assertEqual((source['energy'], target['energy']), (5, 5))
+        self.assertEqual((source['energy'], target['energy']), (4, 5))
 
     def test_target_lock_filters_negative_effect_but_not_movement(self):
         sim = fixture(2)

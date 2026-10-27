@@ -23,7 +23,7 @@ def fixture(profile='Balanced', difficulty=5, elevation='Flat'):
     sim.runners = [runner]
     sim.draw = []
     sim.discard = []
-    runner['pace'] = 'Easy'
+    runner['pace'] = 'Steady'
     sim.round = 1
     return sim, runner
 
@@ -34,7 +34,7 @@ class VictoryDirective(unittest.TestCase):
         runner['hand'] = [card('TR-008'), card('FU-014')]
         setup = {'card_id': 'TR-008', 'action': 'training', 'replace_id': None}
         prepared = sim.preview_preparation(runner, setup)
-        self.assertEqual(sim.preview_movement(prepared, [prepared['hand'][0]])['quarter_miles'], 0)
+        self.assertEqual(sim.preview_movement(prepared, [prepared['hand'][0]])['quarter_miles'], 1)
         before, rng_state, event_count = copy.deepcopy(runner), sim.rng.getstate(), len(sim.events)
         plan = sim.choose_turn_plan(runner)
         self.assertEqual(plan, sim.choose_turn_plan(runner))

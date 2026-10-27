@@ -19,4 +19,4 @@
 | CO-013 | Gashed Knee | 5 | — | -→ |
 | CO-014 | Side Stitch | 3 | — | ▶▶/▶▶▶: -→ |
 | CO-015 | Twisted Ankle | 7 | — | Max ▶ |
-| CO-016 | Heat Exhaustion | 8 | — | Max ▷ |
+| CO-016 | Heat Exhaustion | 8 | — | Maximum Steady |

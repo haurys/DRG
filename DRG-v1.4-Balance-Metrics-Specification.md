@@ -70,7 +70,7 @@ Hand depletion, slot timing and attachment lock-up are the new v1.4 questions; r
 
 | Metric | Capture | What it tells us |
 |---|---|---|
-| Easy/Steady/Race/Push usage | Counts by phase, profile, Energy and Course | A Pace unused everywhere may be dominated or AI-overlooked. |
+| Steady/Race/Push usage | Counts by phase, profile, Energy and Course | A Pace unused everywhere may be dominated or AI-overlooked. |
 | Pace changes and preservation | Round-to-round choices, Pack/slot cost modifiers | Distinguish tactical adjustment from cost exploit. |
 
 ## Course interaction

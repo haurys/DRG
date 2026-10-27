@@ -3,7 +3,7 @@
 from pathlib import Path
 import argparse, collections, copy, hashlib, itertools, json, random, statistics
 
-PACE_ORDER = ['Easy', 'Steady', 'Race', 'Push']
+PACE_ORDER = ['Steady', 'Race', 'Push']
 MILESTONES = {
     'marathon': {'Water': [4, 8, 12, 16, 20, 24], 'Aid/Fuel': [8, 16, 24], 'Gut Check': [10, 18, 23]},
     'half': {'Water': [3, 6, 9], 'Aid/Fuel': [6], 'Gut Check': [6, 11]},
@@ -147,7 +147,7 @@ def condition_effects(condition, pace=None, surface=None):
     if title == 'Twisted Ankle':
         result['max_pace'] = 'Steady'
     if title == 'Heat Exhaustion':
-        result['max_pace'] = 'Easy'
+        result['max_pace'] = 'Steady'
     if title == 'Nausea':
         result['fuel_available'] = False
     return result
@@ -418,13 +418,14 @@ class Sim:
             'distance_completed': 0.0, 'quarter_mile_space': 0,
             'current_course_card': self.course[0]['course_card_id'],
             'current_course_side': self.course[0]['side'], 'current_mile': 1,
-            'current_difficulty': self.course[0]['difficulty'], 'pace': 'Easy',
+            'current_difficulty': self.course[0]['difficulty'], 'pace': 'Steady',
             'previous_pace': None, 'energy': self.cfg['starting_energy'], 'will_available': True,
             'hand': hand, 'active_conditions': [], 'active_training': [],
             'equipped_gear': [], 'attached_gear': [], 'staged_events': [],
             'active_effects': [], 'pack_state': None, 'pack_members_snapshot': [],
             'pack_leader': None, 'finished': False, 'finish_pending': False,
-            'race_status': 'ACTIVE', 'dnf': False, 'dnf_reason': None,
+            'race_status': 'RUNNING', 'energy_recovery': None,
+            'round_start_pace': None, 'dnf': False, 'dnf_reason': None,
             'dnf_round': None, 'dnf_turn': None,
             'finish_order': None, 'finish_turn': None, 'finish_round': None,
             'locked_ids': set(), 'exchanges_used': 0, 'stats': stats,
@@ -886,7 +887,8 @@ class Sim:
     def payable_pace(self, runner):
         """Condition limits are checked after Replenish and Treat/Prepare."""
         maximum = self.maximum_legal_pace(runner)
-        return min(runner['pace'], maximum, key=PACE_ORDER.index)
+        intended = runner['pace'] or maximum
+        return min(intended, maximum, key=PACE_ORDER.index)
 
     def choose_pace(self, runner):
         maximum = self.maximum_legal_pace(runner)
@@ -1022,28 +1024,50 @@ class Sim:
         projected['pace'] = self.payable_pace(projected)
         return projected
 
-    def preview_payment(self, runner, movement_cost=0):
+    def preview_payment(self, runner, movement_cost=0, allow_will=True):
         projected = copy.deepcopy(runner)
-        projected['pace'] = self.payable_pace(projected)
+        selected = self.resolve_payment_pace(projected, movement_cost, allow_will)
+        if selected is None:
+            return None
+        projected['pace'] = selected
+        self.drop_adjusted_pack(projected)
         projected['energy'] += sum(amount for _, amount in self.installed_energy(projected))
         cost = self.pace_cost(projected, projected['pace'])['final']
         total = cost + movement_cost
         if total > projected['energy']:
-            if projected['will_available']:
+            if allow_will and projected['will_available']:
                 projected['will_available'] = False
                 projected['energy'] = 0
             else:
-                if cost > projected['energy']:
-                    affordable = [pace for pace in PACE_ORDER[:PACE_ORDER.index(projected['pace']) + 1]
-                                  if self.pace_cost(projected, pace)['final'] <= projected['energy']]
-                    projected['pace'] = affordable[-1] if affordable else 'Easy'
-                total = self.pace_cost(projected, projected['pace'])['final'] + movement_cost
-                if total > projected['energy']:
-                    return None
-                projected['energy'] -= total
+                return None
         else:
             projected['energy'] -= total
         return projected
+
+    def drop_adjusted_pack(self, runner, log=False):
+        if runner.get('round_start_pace') and runner['pace'] != runner['round_start_pace']:
+            former_pack = runner['pack_state']
+            if log and former_pack:
+                runner['stats']['pack_exits'] += 1
+                self.emit('PACK_EXIT', runner['player_id'], {'from': former_pack,
+                          'to': None, 'members': [], 'leader': None,
+                          'pace_preservation': 0, 'reason': 'pace_adjustment'})
+            runner['pack_state'] = None
+            runner['pack_members_snapshot'] = []
+            runner['pack_leader'] = None
+
+    def resolve_payment_pace(self, runner, movement_cost=0, allow_will=True):
+        """Price each legal Pace with its own installed gain and Pack eligibility."""
+        limit = self.payable_pace(runner)
+        for pace in reversed(PACE_ORDER[:PACE_ORDER.index(limit) + 1]):
+            candidate = copy.deepcopy(runner)
+            candidate['pace'] = pace
+            self.drop_adjusted_pack(candidate)
+            energy = candidate['energy'] + sum(amount for _, amount in self.installed_energy(candidate))
+            if (energy >= self.pace_cost(candidate, pace)['final'] + movement_cost or
+                    allow_will and candidate['will_available']):
+                return pace
+        return None
 
     def preview_movement(self, runner, cards):
         """Estimate this legal plan from visible state, without mutation or random draws."""
@@ -1257,7 +1281,7 @@ class Sim:
             allowance = self.remaining_card_plays(card_plays_used +
                                                   (bool(plan) and plan['action'] != 'relocate'))
             for cards in self.movement_candidates(prepared, allowance):
-                if not cards and prepared['hand']:
+                if not cards:
                     continue
                 liquidated = self.preview_slot_sacrifice(prepared, cards)
                 consumed = {c['id'] for c in cards if c['source'] == 'hand'}
@@ -1282,23 +1306,6 @@ class Sim:
                         'card_sources': [],
                         'movement_energy_cost': 0, 'movement_quarters': 0,
                         'expected_turns_remaining': len(self.course) * 2, 'score': -1000}
-            # The mandatory Movement override permits a recovery Treat when no
-            # payable Movement exists. It uses one card, never a second Treat.
-            if allow_treat:
-                recovery = []
-                for plan in self.treat_candidates(runner):
-                    if plan and plan['action'] == 'fuel':
-                        prepared = self.preview_preparation(runner, plan)
-                        gain = prepared['energy'] - runner['energy']
-                        relief = sum(c['effective_severity'] - next(
-                            (n['effective_severity'] for n in prepared['active_conditions']
-                             if n['id'] == c['id']), 0) for c in runner['active_conditions'])
-                        if gain > 0 or relief > 0:
-                            recovery.append((gain, relief, plan['card_id'], plan))
-                if recovery:
-                    best = max(recovery, key=lambda row: (row[0], row[1], row[2]))
-                    fallback['treat_prepare'] = best[3]
-                    fallback['score'] = -100 + best[0] * 2 + best[1]
             if rationale is not None:
                 rationale.update({'candidates': [], 'eligible': [], 'selected': fallback,
                                   'emergency': False})
@@ -1352,7 +1359,7 @@ class Sim:
                 return {'viable': True, 'kind': 'legal_preparation', 'movement_quarters': 0}
         future_slot = copy.deepcopy(runner)
         future_slot['race_turn_number'] += 1
-        future_slot['pace'] = 'Easy'
+        future_slot['pace'] = 'Steady'
         if any(item.get('installed_turn') is not None and
                future_slot['race_turn_number'] - item['installed_turn'] >= 2
                for zone in ('active_training', 'equipped_gear') for item in future_slot[zone]):
@@ -1365,7 +1372,7 @@ class Sim:
         # A received Fuel/Training/Gear card needs the next Treat opportunity.
         if not allow_treat:
             following = copy.deepcopy(runner)
-            following['pace'] = 'Easy'
+            following['pace'] = 'Steady'
             later = self.continuation_paths(following, allow_treat=True, future_replenish=False)
             if later['viable']:
                 return {'viable': True, 'kind': 'next_turn_' + later['kind'],
@@ -1383,8 +1390,17 @@ class Sim:
         helper = next((r for r in active if r is not requester), None)
         return helper, position, next((i + 1 for i, r in enumerate(active) if r is helper), None)
 
-    def request_assistance(self, runner):
+    def request_assistance(self, runner, emergency=False, acceptance=None):
         helper, position, helper_position = self.assistance_helper(runner)
+        if emergency and helper and helper['race_status'] != 'RUNNING':
+            helper = next((r for r in sorted(self.runners,
+                          key=lambda r: (-r['quarter_mile_space'], r['player_id']))
+                          if r is not runner and r['race_status'] == 'RUNNING'
+                          and not r['finished'] and not r.get('dnf')), None)
+            active = sorted((r for r in self.runners if not r['finished'] and not r.get('dnf')
+                             and not r['finish_pending']),
+                            key=lambda r: (-r['quarter_mile_space'], r['player_id']))
+            helper_position = next((i + 1 for i, r in enumerate(active) if r is helper), None)
         self.emit('ASSISTANCE_REQUEST', runner['player_id'], {'requester_position': position,
                   'requester_hand': [c['id'] for c in runner['hand']],
                   'treat_prepare_cost': 1, 'race_card_plays_used': 0})
@@ -1409,15 +1425,25 @@ class Sim:
                     request_copy['hand'].append(received)
                     helper_copy['hand'].remove(next(c for c in helper_copy['hand'] if c['id'] == received['id']))
                     helper_copy['hand'].append(offered)
-                    path = self.continuation_paths(request_copy, allow_treat=False,
-                                                   future_replenish=False)
+                    if emergency:
+                        plan = self.ordinary_movement_plan(request_copy, allow_will=False)
+                        path = {'viable': plan is not None,
+                                'kind': 'assisted_final_movement' if plan else 'unaffordable',
+                                'movement_quarters': plan['movement_quarters'] if plan else 0}
+                    else:
+                        path = self.continuation_paths(request_copy, allow_treat=False,
+                                                       future_replenish=False)
                     loss = helper_score - self.choose_turn_plan(helper_copy)['score']
                     evaluations.append({'offered': offered['id'], 'received': received['id'],
                                         'rescue': path['viable'], 'continuation': path['kind'],
                                         'movement_quarters': path['movement_quarters'],
                                         'helper_competitive_loss': round(loss, 6),
                                         'received_card_value': self.prevalue(offered)})
-        rescues = [e for e in evaluations if e['rescue']]
+        rescues = [e for e in evaluations if e['rescue'] and (
+                   not emergency or acceptance is True or (
+                       acceptance is None and e['helper_competitive_loss'] <= 0))]
+        if emergency and acceptance is False:
+            rescues = []
         selected = min(rescues, key=lambda e: (-e['movement_quarters'],
                        e['helper_competitive_loss'], -e['received_card_value'],
                        e['offered'], e['received'])) if rescues else None
@@ -1431,7 +1457,9 @@ class Sim:
             helper['hand'].remove(received)
             runner['hand'].append(received)
             helper['hand'].append(offered)
-            path = self.continuation_paths(runner, allow_treat=False)
+            path = ({'viable': True, 'kind': 'assisted_final_movement',
+                     'movement_quarters': selected['movement_quarters']} if emergency else
+                    self.continuation_paths(runner, allow_treat=False))
             self.emit('ASSISTANCE_SWAP', runner['player_id'], {'helper': helper['player_id'],
                       'offered': offered['id'], 'received': received['id'],
                       'requester_energy': runner['energy'], 'helper_energy': helper['energy'],
@@ -1444,6 +1472,7 @@ class Sim:
         return False
 
     def evaluate_dnf(self, runner, assistance_evaluated=False, treat_available=True):
+        """Legacy continuation diagnostic; Stage 2R DNF is resolved by the stopped turn."""
         path = self.continuation_paths(runner, allow_treat=treat_available)
         next_station = next((mile for kind in ('Water', 'Aid/Fuel')
                             for mile in MILESTONES[self.cfg['race_format']][kind]
@@ -1451,18 +1480,62 @@ class Sim:
         reasons = {'energy_zero': runner['energy'] == 0,
                    'will_spent': not runner['will_available'], 'continuation': path,
                    'next_station': next_station, 'assistance_evaluated': assistance_evaluated}
-        exhausted = (reasons['energy_zero'] and reasons['will_spent'] and not path['viable']
-                     and assistance_evaluated)
-        self.emit('DNF_EVALUATION', runner['player_id'], {**reasons, 'dnf': exhausted})
-        if exhausted:
-            runner.update(race_status='DNF', dnf=True, dnf_reason='continuation_exhausted',
-                          dnf_round=self.round, dnf_turn=runner['race_turn_number'])
-            self.emit('DNF', runner['player_id'], {'reason': runner['dnf_reason'],
-                      'round': self.round, 'turn': runner['dnf_turn'],
-                      'distance': runner['distance_completed'], 'energy': runner['energy'],
-                      'will_available': runner['will_available'],
-                      'conditions': copy.deepcopy(runner['active_conditions'])})
-        return exhausted
+        self.emit('DNF_EVALUATION', runner['player_id'], {**reasons,
+                  'dnf': False, 'status': runner['race_status'],
+                  'stage2r_resolution': 'energy_recovery_turn'})
+        return False
+
+    def ordinary_movement_plan(self, runner, allow_treat=True, allow_will=False):
+        """Find a payable Movement-phase card action; Event effects remain legal."""
+        probe = copy.deepcopy(runner)
+        if probe['pace'] is None:
+            probe['pace'] = self.maximum_legal_pace(probe)
+        if not allow_will:
+            probe['will_available'] = False
+        capture = {}
+        self.choose_turn_plan(probe, capture, allow_treat=allow_treat)
+        plans = [row for row in capture['candidates'] if row['movement_cards']]
+        return max(plans, key=lambda row: (row['score'], row['movement_quarters'],
+                   tuple(row['movement_cards'])), default=None)
+
+    def stop_for_energy(self, runner, phase):
+        former_pack = runner['pack_state']
+        if former_pack:
+            runner['stats']['pack_exits'] += 1
+            self.emit('PACK_EXIT', runner['player_id'], {'from': former_pack,
+                      'to': None, 'members': [], 'leader': None, 'pace_preservation': 0})
+        runner['race_status'] = 'STOPPED'
+        runner['energy_recovery'] = phase
+        runner['pace'] = None
+        runner['pack_state'] = None
+        runner['pack_members_snapshot'] = []
+        runner['pack_leader'] = None
+        self.emit('ENERGY_STOP', runner['player_id'], {'phase': phase,
+                  'energy': runner['energy'], 'will_available': runner['will_available'],
+                  'pace_token_removed': True})
+
+    def energy_dnf(self, runner):
+        runner.update(race_status='DNF', dnf=True, dnf_reason='energy_exhaustion',
+                      dnf_round=self.round, dnf_turn=runner['race_turn_number'],
+                      pace=None, energy_recovery=None)
+        self.emit('DNF', runner['player_id'], {'reason': 'energy_exhaustion',
+                  'round': self.round, 'turn': runner['dnf_turn'],
+                  'distance': runner['distance_completed'], 'energy': runner['energy'],
+                  'will_available': runner['will_available'],
+                  'conditions': copy.deepcopy(runner['active_conditions'])})
+
+    def end_stopped_turn(self, runner, phase):
+        runner['stats']['zero_movement_turns'] += 1
+        self.expire_temporary(runner)
+        self.consume_staged_events(runner)
+        self.locate(runner)
+        self.turn_records.append({'round': self.round, 'player_id': runner['player_id'],
+                                  'movement_quarters': 0, 'movement_result': 0,
+                                  'cards_played': 0, 'pace': None, 'boundaries': [],
+                                  'energy_recovery_phase': phase})
+        self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
+                  'energy': runner['energy'], 'hand': [c['id'] for c in runner['hand']],
+                  'race_status': runner['race_status'], 'energy_recovery_phase': phase})
 
     def form_packs(self):
         old = {runner['player_id']: runner['pack_state'] for runner in self.runners}
@@ -1472,7 +1545,7 @@ class Sim:
             runner['pack_leader'] = None
         pack_number = 0
         for pace in PACE_ORDER:
-            available = sorted((runner for runner in self.runners if self.round >= 2 and not runner['finished'] and not runner.get('dnf') and runner['pace'] == pace
+            available = sorted((runner for runner in self.runners if self.round >= 2 and runner['race_status'] == 'RUNNING' and not runner['finished'] and not runner.get('dnf') and runner['pace'] == pace
                                 and not any(event['card']['id'] == 'EV-030'
                                             for event in self.active_staged(runner))),
                                key=lambda runner: (-runner['quarter_mile_space'], runner['player_id']))
@@ -1539,6 +1612,10 @@ class Sim:
                 continue
             runner['round_start_position'] = runner['quarter_mile_space']
             runner['previous_pace'] = runner['pace']
+            if runner['race_status'] == 'STOPPED':
+                runner['round_start_pace'] = None
+                runner['pace'] = None
+                continue
             options, selected = self.choose_pace(runner)
             if scripted_paces and runner['player_id'] in scripted_paces:
                 selected = scripted_paces[runner['player_id']]
@@ -1546,6 +1623,7 @@ class Sim:
                 if PACE_ORDER.index(selected) > PACE_ORDER.index(maximum):
                     selected = maximum
             runner['pace'] = selected
+            runner['round_start_pace'] = selected
             self.emit('PACE_SELECT', runner['player_id'], {'options': options, 'selected': selected,
                       'maximum_legal': self.maximum_legal_pace(runner)})
         self.form_packs()
@@ -1578,14 +1656,14 @@ class Sim:
         return {'base': base, 'condition_extra': condition_extra, 'staged_extra': staged_extra,
                 'preservation_sources': sources, 'final': final}
 
-    def pay_pace(self, runner, movement_cost=0):
+    def pay_pace(self, runner, movement_cost=0, allow_will=True):
         runner['pace'] = self.payable_pace(runner)
         cost = self.pace_cost(runner, runner['pace'])
         will_used = False
         total = cost['final'] + movement_cost
         shortfall = max(0, total - runner['energy'])
         if shortfall:
-            if runner['will_available']:
+            if allow_will and runner['will_available']:
                 will_used = True
                 runner['will_available'] = False
                 runner['stats']['will_used'] += 1
@@ -1598,7 +1676,9 @@ class Sim:
                 if cost['final'] > runner['energy']:
                     affordable = [pace for pace in PACE_ORDER[:PACE_ORDER.index(runner['pace']) + 1]
                                   if self.pace_cost(runner, pace)['final'] <= runner['energy']]
-                    runner['pace'] = affordable[-1] if affordable else 'Easy'
+                    if not affordable:
+                        raise ValueError('Movement Energy unavailable')
+                    runner['pace'] = affordable[-1]
                     cost = self.pace_cost(runner, runner['pace'])
                 if cost['final'] + movement_cost > runner['energy']:
                     raise ValueError('Movement Energy unavailable')
@@ -2047,8 +2127,10 @@ class Sim:
         assistance_evaluated = False
         assisted = False
         recovery_plays = 0
+        gut_recovered = False
         if runner.get('gut_stall') and self.cfg['race_format'] == 'marathon':
             recovery_plays, assisted, recovered, assistance_evaluated = self.recover_gut(runner, script)
+            gut_recovered = recovered
             if not recovered:
                 runner['stats']['zero_movement_turns'] += 1
                 self.expire_temporary(runner)
@@ -2065,14 +2147,45 @@ class Sim:
                           'energy': runner['energy'], 'hand': [c['id'] for c in runner['hand']],
                           'gut_stall': copy.deepcopy(runner['gut_stall']), 'dnf': runner['dnf']})
                 return None
-        if (not assisted and runner['energy'] == 0 and not runner['will_available'] and
-                not self.continuation_paths(runner)['viable']):
-            assistance_evaluated = True
-            assisted = True
-            self.request_assistance(runner)
-        capture = {} if self.ai_rationale_enabled and not script else None
-        ai_plan = self.choose_turn_plan(runner, capture, allow_treat=not assisted,
-                                        card_plays_used=recovery_plays) if not script else None
+        recovery_phase = runner.get('energy_recovery')
+        payment_allow_will = True
+        forced_plan = None
+        if not runner.get('gut_stall') and not gut_recovered:
+            if recovery_phase:
+                # A stopped token has no Pace and cannot carry Pack preservation.
+                forced_plan = self.ordinary_movement_plan(runner, allow_will=False)
+                payment_allow_will = False
+                if forced_plan is None and recovery_phase == 'ordinary':
+                    forced_plan = self.ordinary_movement_plan(runner, allow_will=True)
+                    payment_allow_will = forced_plan is not None
+                if forced_plan is None:
+                    if recovery_phase == 'assisted_final':
+                        self.energy_dnf(runner)
+                    else:
+                        # The helper must accept a useful legal exchange. The received
+                        # card is available on the one subsequent assisted turn.
+                        accepted = self.request_assistance(runner, emergency=True,
+                            acceptance=script.get('assistance_accept'))
+                        if accepted:
+                            self.stop_for_energy(runner, 'assisted_final')
+                        else:
+                            self.energy_dnf(runner)
+                    self.end_stopped_turn(runner, recovery_phase)
+                    return None
+                runner['race_status'] = 'RUNNING'
+                runner['energy_recovery'] = None
+                runner['pace'] = self.maximum_legal_pace(runner)
+                self.emit('ENERGY_RESTART', runner['player_id'], {'after': recovery_phase,
+                          'round_start_pace': runner['round_start_pace'],
+                          'pack_preservation': False})
+            elif not self.ordinary_movement_plan(runner, allow_will=False):
+                self.stop_for_energy(runner, 'ordinary')
+                self.end_stopped_turn(runner, 'initial')
+                return None
+        capture = {} if self.ai_rationale_enabled and not script and not forced_plan else None
+        ai_plan = (forced_plan if forced_plan and not script else
+                   self.choose_turn_plan(runner, capture, allow_treat=not assisted,
+                                         card_plays_used=recovery_plays) if not script else None)
         plan = (None if assisted else script['treat_prepare'] if 'treat_prepare' in script else
                 None if 'movement_cards' in script else
                 ai_plan['treat_prepare'] if ai_plan else self.choose_treat_prepare(runner))
@@ -2092,6 +2205,8 @@ class Sim:
                 self.emit('AI_TURN_RATIONALE', runner['player_id'], copy.deepcopy(decision))
         if assisted and plan:
             raise ValueError('second Treat/Prepare action after assistance')
+        if 'movement_cards' in script and not script['movement_cards'] and not gut_recovered:
+            raise ValueError('Movement-phase card required')
         used_plays = recovery_plays + (0 if assisted else self.resolve_treat_prepare(runner, plan))
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
@@ -2134,6 +2249,8 @@ class Sim:
                       for card in chosen]
         if len(modes) != len(played) or any(mode not in ('MOVEMENT', 'EFFECT') for mode in modes):
             raise ValueError('invalid card use modes')
+        if not played and not gut_recovered:
+            raise ValueError('Movement-phase card required')
         if any(mode == 'EFFECT' and card['family'] != 'Event' for card, mode in zip(played, modes)):
             raise ValueError('non-Event Effects use Treat/Prepare')
         if any(source != 'hand' and mode != 'MOVEMENT' for source, mode in zip(sources, modes)):
@@ -2144,7 +2261,8 @@ class Sim:
                         if mode == 'MOVEMENT')
         preview_cards = [{**card, 'source': source, 'use_mode': mode}
                          for card, source, mode in zip(played, sources, modes)]
-        if self.preview_payment(self.preview_slot_sacrifice(runner, preview_cards), card_cost) is None:
+        if self.preview_payment(self.preview_slot_sacrifice(runner, preview_cards), card_cost,
+                                allow_will=payment_allow_will) is None:
             raise ValueError('Movement Energy unavailable')
         for card, source in zip(played, sources):
             if source != 'hand':
@@ -2154,9 +2272,13 @@ class Sim:
                           'effect_ended_before_movement': True})
         # Installed triggers and payment must use the same legal Pace as the AI
         # preview, including Conditions revealed on this turn's draw.
-        runner['pace'] = self.payable_pace(runner)
+        selected = self.resolve_payment_pace(runner, card_cost, payment_allow_will)
+        if selected is None:
+            raise ValueError('Movement Energy unavailable')
+        runner['pace'] = selected
+        self.drop_adjusted_pack(runner, log=True)
         self.apply_installed_energy(runner)
-        _, will_used = self.pay_pace(runner, card_cost)
+        _, will_used = self.pay_pace(runner, card_cost, allow_will=payment_allow_will)
         for card, source in zip(played, sources):
             if source == 'hand':
                 runner['hand'].remove(card)
@@ -2290,9 +2412,6 @@ class Sim:
         self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
                   'energy': runner['energy'], 'hand': [card['id'] for card in runner['hand']],
                   'finish_pending': runner['finish_pending']})
-        if (not runner['finish_pending'] and not runner.get('gut_stall') and
-                runner['energy'] == 0 and not runner['will_available']):
-            self.evaluate_dnf(runner, assistance_evaluated, treat_available=not assisted)
         return resolved
 
     def resolve_same_round_finishers(self):

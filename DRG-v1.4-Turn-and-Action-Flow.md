@@ -12,6 +12,8 @@ Follow steps in order. The table identifies whether a step is mandatory, optiona
 
 Pace locks at Round Start; the normal draw is at most one below six; one Treat/Prepare and two card plays are different budgets; slot Movement pays and counts like hand Movement.
 
+**Stage 2R candidate:** The active Pace choices are Steady (+1 Effort, 1 Energy), Race (+2, 2), and Push (+3, 3). If no ordinary payable Movement combination exists after Replenish and eligible Treat + Movement, remove the Pace token and mark Stopped; the initial stop is not a recovery turn. On the next eligible turn, Replenish and try ordinary Movement, then exact-shortfall Will, then one voluntarily accepted useful one-for-one exchange. Assistance is an exception to the ordinary Treat/Prepare budget after the failed attempt and grants exactly one final assisted turn. That turn can Treat + Move, but cannot use another Will or assistance cycle; failure gives DNF — Energy Exhaustion. A restarted runner chooses a payable legal Pace without retroactive Pack preservation. Gut recovery retains its distinct 4/3/2 windows. No normal Treat-only turn is legal.
+
 ## Two separate budgets
 
 | Action | Treat/Prepare (one per turn) | Race-card plays (maximum two per turn) | Normal remaining plays |
@@ -28,7 +30,7 @@ Each new-card Treat/Prepare play has **zero Movement Effort**. No second Treat/P
 
 ## Before the turn: same-time round setup
 
-1. Activate staged Global effects. Each active runner selects one legal Pace simultaneously; record Round Start positions and Pace. From round 2 onward, form same-Pace Packs within 0.5 mile of a leader; no Pack forms in round 1. Pace selection is **mandatory once per round** and is not a Race-card play.
+1. Activate staged Global effects. Each Running runner selects one legal Pace simultaneously; a Stopped runner has no Pace. Record Round Start positions and selected Paces. From round 2 onward, form same-Pace Packs within 0.5 mile of a leader; no Pack forms in round 1. Pace selection for a Running runner is **mandatory once per round** and is not a Race-card play.
 2. Resolve each runner’s turn sequentially; this administrative order does not make their race times sequential. FINISHED and DNF runners have no turn.
 
 ## Your turn in order

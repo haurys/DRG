@@ -45,7 +45,7 @@ class AILegalityRegression(unittest.TestCase):
         runner['active_conditions'] = [condition('CO-012'), condition('CO-002'),
                                        condition('CO-011')]
         opponent['hand'] = [card('TR-001')]
-        sim.start_round({'P1': 'Race', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Race', 'P2': 'Steady'})
         selected = sim.choose_treat_prepare(runner)
         self.assertTrue(sim.legal_treat_prepare(runner, selected))
         self.assertFalse(sim.legal_treat_prepare(runner, {'card_id': 'FU-019', 'action': 'fuel',
@@ -99,7 +99,7 @@ class AILegalityRegression(unittest.TestCase):
         self.assertTrue(any(event['type'] == 'MOVE' for event in sim.events))
 
     def test_condition_pace_caps_filter_before_scoring(self):
-        for condition_id, maximum in (('CO-015', 'Steady'), ('CO-016', 'Easy'),
+        for condition_id, maximum in (('CO-015', 'Steady'), ('CO-016', 'Steady'),
                                       ('CO-001', 'Race')):
             with self.subTest(condition=condition_id):
                 sim = fixture()
@@ -151,7 +151,7 @@ class AILegalityRegression(unittest.TestCase):
         selected = sim.choose_movement_cards(giver, 2)
         self.assertLessEqual(len(selected), 2)
         self.assertLessEqual(sum(c['family'] == 'Event' for c in selected), 1)
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         recipient['energy'] = 5
         sim.turn(giver, {'treat_prepare': None, 'movement_cards': ['EV-020'],
                          'card_modes': ['EFFECT']})

@@ -77,20 +77,20 @@ class AssistanceAndDNF(unittest.TestCase):
         helper = add_helper(sim, helper_hand, helper_position)
         return sim, p4, helper
 
-    def test_recoverable_p4_swap_and_action_budgets(self):
+    def test_unusable_p4_swap_is_refused_without_card_play(self):
         sim, p4, helper = self.stranded()
         before = copy.deepcopy(helper)
         self.assertFalse(sim.continuation_paths(p4)['viable'])
-        self.assertTrue(sim.request_assistance(p4))
-        self.assertIn('EV-021', [c['id'] for c in p4['hand']])
+        self.assertFalse(sim.request_assistance(p4))
+        self.assertNotIn('EV-021', [c['id'] for c in p4['hand']])
         self.assertEqual(p4['stats']['treat_prepare_actions'], 1)
         self.assertEqual(p4['stats']['cards_played'], 0)
         self.assertEqual(helper['stats'], before['stats'])
         self.assertEqual(helper['race_turn_number'], before['race_turn_number'])
-        self.assertEqual(sum(e['type'] == 'ASSISTANCE_SWAP' for e in sim.events), 1)
+        self.assertEqual(sum(e['type'] == 'ASSISTANCE_SWAP' for e in sim.events), 0)
         self.assertEqual([e['payload']['card_plays_used'] for e in sim.events
-                          if e['type'] == 'ASSISTANCE_SWAP'], [0])
-        self.assertFalse(sim.evaluate_dnf(p4, True, treat_available=False))
+                          if e['type'] == 'ASSISTANCE_SWAP'], [])
+        self.assertEqual([c['id'] for c in helper['hand']], [c['id'] for c in before['hand']])
 
     def test_helper_selection_and_stable_ties(self):
         sim, p4, leader = self.stranded()
@@ -111,7 +111,12 @@ class AssistanceAndDNF(unittest.TestCase):
         self.assertEqual(len(evaluation['legal_swaps']), 7)
         self.assertEqual(evaluation['rescue_capable_count'], 0)
         self.assertEqual([c['id'] for c in helper['hand']], [FUEL[7]])
-        self.assertTrue(sim.evaluate_dnf(p4, True, treat_available=False))
+        self.assertFalse(sim.evaluate_dnf(p4, True, treat_available=False))
+        self.assertFalse(p4['dnf'])
+        sim.turn(p4)
+        self.assertEqual(p4['race_status'], 'STOPPED')
+        sim.round += 1
+        sim.turn(p4)
         self.assertEqual(p4['race_status'], 'DNF')
         self.assertIsNone(p4['finish_order'])
         self.assertEqual((p4['distance_completed'], p4['energy']), (9.5, 0))
@@ -123,42 +128,44 @@ class AssistanceAndDNF(unittest.TestCase):
                 p4.update(energy=energy, will_available=will)
                 self.assertFalse(sim.evaluate_dnf(p4, True))
 
-    def test_zero_cost_movement_and_recovery_block_dnf(self):
+    def test_zero_cost_card_does_not_create_free_pace_or_premature_dnf(self):
         for cid, nausea in (('FU-001', False), ('EV-021', True), ('FU-001', True)):
             with self.subTest(card=cid, nausea=nausea):
                 sim, p4 = fixture(position=0, hand=(cid,))
                 if nausea:
                     p4['active_conditions'] = [m.make_condition(card('CO-012'))]
-                self.assertFalse(sim.evaluate_dnf(p4, True))
+                sim.turn(p4)
+                self.assertEqual(p4['race_status'], 'STOPPED')
+                self.assertFalse(p4['dnf'])
 
-    def test_replenishment_and_reachable_station_block_dnf(self):
+    def test_future_draw_and_station_do_not_bypass_initial_stop(self):
         sim, p4 = fixture(position=15, hand=())
         sim.draw = [card('EV-021')]
-        self.assertFalse(sim.evaluate_dnf(p4, True))
+        sim.turn(p4)
+        self.assertEqual(p4['race_status'], 'STOPPED')
+        self.assertFalse(p4['dnf'])
         sim, p4 = fixture(position=15, hand=('FU-001',))
         p4['active_conditions'] = [m.make_condition(card('CO-010'))]
-        self.assertFalse(sim.evaluate_dnf(p4, True))
+        sim.turn(p4)
+        self.assertEqual(p4['race_status'], 'STOPPED')
+        self.assertFalse(p4['dnf'])
 
     def test_assistance_must_be_evaluated_first(self):
         sim, p4, _ = self.stranded(helper_hand=(FUEL[7],))
         self.assertFalse(sim.evaluate_dnf(p4, False))
         self.assertFalse(p4['dnf'])
 
-    def test_received_fuel_next_turn_no_second_treat(self):
+    def test_nausea_prevents_received_fuel_rescue(self):
         sim, p4, _ = self.stranded(helper_hand=('FU-001',))
         p4['quarter_mile_space'] = 4  # Mile 2 Difficulty 2: Effort 3 advances.
         p4['distance_completed'] = 1.0
         self.assertFalse(sim.fuel_available(p4))
         self.assertEqual(m.movement_energy_cost(card('FU-001')), 0)
-        self.assertTrue(sim.request_assistance(p4))
-        self.assertIn('FU-001', [c['id'] for c in p4['hand']])
-        self.assertEqual(sim.continuation_paths(p4, allow_treat=False)['kind'],
-                         'forward_movement')
-        self.assertFalse(sim.evaluate_dnf(p4, True, treat_available=False))
+        self.assertFalse(sim.request_assistance(p4))
+        self.assertNotIn('FU-001', [c['id'] for c in p4['hand']])
+        self.assertFalse(sim.continuation_paths(p4, allow_treat=False)['viable'])
         sim, p4 = fixture(position=0, hand=('FU-002',))
-        self.assertTrue(sim.continuation_paths(p4, allow_treat=False)['viable'])
-        self.assertEqual(sim.continuation_paths(p4, allow_treat=False)['kind'],
-                         'next_turn_treat_recovery')
+        self.assertFalse(sim.continuation_paths(p4, allow_treat=False)['viable'])
 
     def test_nausea_blocks_fuel_effect_only_rescue(self):
         sim, p4, helper = self.stranded(helper_hand=('FU-002',))
@@ -166,14 +173,21 @@ class AssistanceAndDNF(unittest.TestCase):
         self.assertEqual(m.movement_energy_cost(card('FU-002')), 1)
         self.assertFalse(sim.request_assistance(p4))
         self.assertEqual([c['id'] for c in helper['hand']], ['FU-002'])
-        self.assertTrue(sim.evaluate_dnf(p4, True, treat_available=False))
+        self.assertFalse(sim.evaluate_dnf(p4, True, treat_available=False))
+        sim.turn(p4)
+        sim.round += 1
+        sim.turn(p4)
+        self.assertEqual(p4['dnf_reason'], 'energy_exhaustion')
 
     def test_dnf_skips_future_turn_and_mixed_termination(self):
         sim, p4, helper = self.stranded(helper_hand=(FUEL[7],))
         sim.request_assistance(p4)
-        sim.evaluate_dnf(p4, True, treat_available=False)
+        self.assertFalse(sim.evaluate_dnf(p4, True, treat_available=False))
+        sim.turn(p4)
+        sim.round += 1
+        sim.turn(p4)
         self.assertIsNone(sim.turn(p4))
-        self.assertEqual(p4['race_turn_number'], 0)
+        self.assertEqual(p4['race_turn_number'], 2)
         helper.update(finish_pending=True, finish_round=sim.round, finish_turn=1)
         sim.pending_finishers = [helper]
         sim.end_round()

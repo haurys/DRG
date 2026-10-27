@@ -47,9 +47,9 @@ class FinalRules(unittest.TestCase):
   cfg=json.loads((ROOT/'simulation/config.json').read_text());sim=m.Sim(ROOT,cfg);sim.build_course()
   giver=sim.new_runner(0,'Balanced',[copy.deepcopy(card('EV-020'))]);recipient=sim.new_runner(1,'Balanced',[copy.deepcopy(card('TR-001')) for _ in range(7)])
   giver['energy']=recipient['energy']=4;sim.runners=[giver,recipient]
-  sim.start_round({'P1':'Easy','P2':'Easy'})
+  sim.start_round({'P1':'Steady','P2':'Steady'})
   sim.turn(giver,{'movement_cards':['EV-020'],'card_modes':['EFFECT']})
-  self.assertEqual((giver['energy'],recipient['energy'],len(recipient['hand'])),(4,5,7))
+  self.assertEqual((giver['energy'],recipient['energy'],len(recipient['hand'])),(3,5,7))
   self.assertIn('EV-020',[c['id'] for c in sim.discard])
  def test_gut_check_hand_total_thresholds_empty_and_modifiers(self):
   hand=[card('TR-001'),card('FU-001')];x=m.gut_check(hand,['Strength Training','Mental Toughness'],['Pace Band'],16);self.assertEqual((x['hand_effort'],x['modifiers'],x['total']),(10,6,16));self.assertTrue(x['passed'])

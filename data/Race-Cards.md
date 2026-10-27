@@ -8,7 +8,7 @@ Movement cost: Effort 1–3 = 0; 4–6 = ⚡ (1); 7+ = ⚡⚡ (2). Condition car
 |---|---|---|---:|---:|---|
 | TR-001 | Training | Long Run | 7 | ⚡⚡ (2) | ▶▶: No -⚡; Dead Legs: -2 |
 | TR-002 | Training | Long Run | 7 | ⚡⚡ (2) | ▶▶: No -⚡; Dead Legs: -2 |
-| TR-003 | Training | Base Miles | 6 | ⚡ (1) | ▷: +⚡; Dead Legs/Tight Calf: -1 |
+| TR-003 | Training | Base Miles | 6 | ⚡ (1) | Steady: +⚡; Dead Legs/Tight Calf: -1 |
 | TR-004 | Training | Negative Split | 8 | ⚡⚡ (2) | ▶▶: +⚡ |
 | TR-005 | Training | Tempo Run | 6 | ⚡ (1) | ▶: +⚡ |
 | TR-006 | Training | Tempo Run | 6 | ⚡ (1) | ▶: +⚡ |
@@ -113,4 +113,4 @@ Movement cost: Effort 1–3 = 0; 4–6 = ⚡ (1); 7+ = ⚡⚡ (2). Condition car
 | CO-013 | Condition | Gashed Knee | 5 | — | -→ |
 | CO-014 | Condition | Side Stitch | 3 | — | ▶▶/▶▶▶: -→ |
 | CO-015 | Condition | Twisted Ankle | 7 | — | Max ▶ |
-| CO-016 | Condition | Heat Exhaustion | 8 | — | Max ▷ |
+| CO-016 | Condition | Heat Exhaustion | 8 | — | Maximum Steady |

@@ -52,7 +52,7 @@ def budget_fixture(recovery_play=True):
                            'fuel_used': False, 'will_used': False,
                            'arrival_round': 0, 'arrival_turn': 0}
     sim.draw = []
-    sim.start_round({'P1': 'Easy'})
+    sim.start_round({'P1': 'Steady'})
     return sim, runner
 
 
@@ -121,7 +121,7 @@ class GutRecovery(unittest.TestCase):
                                'assistance_used': False, 'fuel_used': False,
                                'will_used': False, 'arrival_round': 0, 'arrival_turn': 0}
         sim.draw = [card('EV-023')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(runner, {'gut_treat_prepare': None, 'gut_exchange': 'FU-001',
                           'movement_cards': []})
         self.assertEqual(len(events(sim, 'GUT_EXCHANGE')), 1)
@@ -138,7 +138,7 @@ class GutRecovery(unittest.TestCase):
                                'recovery_turns_allowed': 4, 'exchange_used': False,
                                'assistance_used': False, 'fuel_used': False,
                                'will_used': False, 'arrival_round': 0, 'arrival_turn': 0}
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         sim.turn(runner, {'gut_treat_prepare': None, 'movement_cards': []})
         self.assertEqual(len(events(sim, 'GUT_ASSISTANCE_SWAP')), 1)
         self.assertEqual(sim.turn_records[-1]['cards_played'], 0)
@@ -162,17 +162,17 @@ class GutRecovery(unittest.TestCase):
         runner = sim.runners[0]
         runner['quarter_mile_space'] = 39
         runner['hand'] = [card('TR-001')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         result = sim.turn(runner, {'movement_cards': ['TR-001']})
         self.assertEqual(result['to_space'], 40)
         self.assertGreater(result['gut_movement_lost_quarters'], 0)
-        self.assertEqual(runner['energy'], 13)
+        self.assertEqual(runner['energy'], 12)
         self.assertEqual(runner['gut_stall']['recovery_turns_used'], 0)
         self.assertEqual(runner['gut_stall']['failure_type'], 'effort_only')
         self.assertFalse(events(sim, 'DNF'))
         for index in range(4):
             sim.end_round()
-            sim.start_round({'P1': 'Easy'})
+            sim.start_round({'P1': 'Steady'})
             sim.turn(runner, {'movement_cards': []})
             self.assertEqual(runner['gut_stall']['recovery_turns_used'], index + 1)
             self.assertEqual(runner['dnf'], index == 3)
@@ -185,7 +185,7 @@ class GutRecovery(unittest.TestCase):
         runner = sim.runners[0]
         runner['quarter_mile_space'] = 39
         runner['hand'] = [card('TR-001'), card('FU-001')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         result = sim.turn(runner, {'movement_cards': ['TR-001']})
         self.assertGreater(result['to_space'], 40)
         self.assertEqual(runner['gut_cleared'], [10])
@@ -215,7 +215,7 @@ class GutRecovery(unittest.TestCase):
               'exchange_used': False, 'assistance_used': False, 'fuel_used': False,
               'will_used': False, 'arrival_round': 1, 'arrival_turn': 1}
         sim.draw = [card('EV-023')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(runner, {'gut_exchange': 'FU-001', 'movement_cards': []})
         self.assertEqual(len(events(sim, 'GUT_EXCHANGE')), 1)
         self.assertTrue((runner['gut_stall'] or runner['gut_history'][-1])['exchange_used'])
@@ -232,7 +232,7 @@ class GutRecovery(unittest.TestCase):
               'failure_type': 'energy_only', 'prepared_effort': 7, 'energy': 1,
               'exchange_used': False, 'assistance_used': False, 'fuel_used': False,
               'will_used': False, 'arrival_round': 1, 'arrival_turn': 1}
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         result = sim.turn(runner, {'gut_treat_prepare': None, 'movement_cards': ['FU-001']})
         self.assertIsNone(runner['gut_stall'])
         self.assertFalse(runner['will_available'])
@@ -242,14 +242,14 @@ class GutRecovery(unittest.TestCase):
 
     def test_preview_live_parity_for_consumed_cards_slots_fuel_and_pace(self):
         shapes = [
-            ('one', ['TR-001'], ['EV-023'], None, None, 'Easy', None),
-            ('two', ['TR-001', 'FU-001'], ['EV-023'], None, None, 'Easy', None),
-            ('hand_slot', ['TR-001'], ['EV-023'], 'TR-019', None, 'Easy', None),
-            ('slot_sacrifice', ['TR-019'], ['EV-023'], 'TR-019', None, 'Easy', None),
-            ('fuel_before', ['TR-001'], ['EV-023', 'FU-001'], None, None, 'Easy', 'FU-001'),
+            ('one', ['TR-001'], ['EV-023'], None, None, 'Steady', None),
+            ('two', ['TR-001', 'FU-001'], ['EV-023'], None, None, 'Steady', None),
+            ('hand_slot', ['TR-001'], ['EV-023'], 'TR-019', None, 'Steady', None),
+            ('slot_sacrifice', ['TR-019'], ['EV-023'], 'TR-019', None, 'Steady', None),
+            ('fuel_before', ['TR-001'], ['EV-023', 'FU-001'], None, None, 'Steady', 'FU-001'),
             ('pace', ['TR-001'], ['EV-023'], None, None, 'Push', None),
-            ('specialist', ['TR-001'], ['EV-023'], 'TR-019', 'GE-018', 'Easy', None),
-            ('attachment', ['TR-001'], ['EV-023'], None, 'GE-003', 'Easy', None),
+            ('specialist', ['TR-001'], ['EV-023'], 'TR-019', 'GE-018', 'Steady', None),
+            ('attachment', ['TR-001'], ['EV-023'], None, 'GE-003', 'Steady', None),
         ]
         for name, played_ids, kept_ids, training_id, gear_id, pace, fuel_id in shapes:
             with self.subTest(name=name):
@@ -311,7 +311,7 @@ class GutRecovery(unittest.TestCase):
                     'assistance_used': False, 'fuel_used': False, 'will_used': False,
                     'arrival_round': 1, 'arrival_turn': 1}
                 for turn in range(allowed):
-                    sim.start_round({'P1': 'Easy'})
+                    sim.start_round({'P1': 'Steady'})
                     sim.turn(runner, {'movement_cards': []})
                     self.assertEqual(runner['dnf'], turn == allowed - 1)
                     self.assertFalse(events(sim, 'DNF_EVALUATION'))
@@ -331,7 +331,7 @@ class GutRecovery(unittest.TestCase):
         # A normal slot means the received 7-Effort card completes the check.
         runner['active_training'] = [{'card': card('TR-019'),
                                      'remaining_turns': None, 'installed_turn': -2}]
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         before_ids = {c['id'] for c in runner['hand'] + helper['hand']}
         self.assertTrue(sim.request_gut_assistance(runner))
         self.assertEqual({c['id'] for c in runner['hand'] + helper['hand']}, before_ids)
@@ -352,10 +352,10 @@ class GutRecovery(unittest.TestCase):
                     'prepared_effort': 10, 'energy': 0, 'exchange_used': False,
                     'assistance_used': False, 'fuel_used': False, 'will_used': False,
                     'arrival_round': 1, 'arrival_turn': 1}
-                sim.start_round({'P1': 'Easy'})
+                sim.start_round({'P1': 'Steady'})
                 sim.turn(runner, {'gut_treat_prepare': {'action': 'fuel',
                          'card_id': 'FU-001', 'choice': 'energy'}, 'movement_cards': []})
-                self.assertEqual(runner['energy'], 2)
+                self.assertEqual(runner['energy'], 1 if should_pass else 2)
                 self.assertEqual(events(sim, 'FUEL_USE')[0]['card'], 'FU-001')
                 self.assertEqual(runner['gut_stall'] is None, should_pass)
                 self.assertEqual(events(sim, 'GUT_EVALUATION')[-1]['prepared_effort'], 7)
@@ -374,7 +374,7 @@ class GutRecovery(unittest.TestCase):
              'prepared_effort': 15, 'energy': 0, 'exchange_used': False,
              'assistance_used': False, 'fuel_used': False, 'will_used': False,
              'arrival_round': 1, 'arrival_turn': 1}
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         sim.turn(runner, {'gut_treat_prepare': None, 'movement_cards': []})
         self.assertIsNone(runner['gut_stall'])
         self.assertEqual(runner['hand'][0]['id'], 'TR-001')
@@ -399,7 +399,7 @@ class GutRecovery(unittest.TestCase):
         runner['quarter_mile_space'] = 39
         runner['hand'] = [card('TR-001'), card('EV-023'), card('FU-001')]
         runner['energy'] = 10
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         selection = sim.choose_turn_plan(runner)
         self.assertFalse({'TR-001', 'EV-023'} <= set(selection['movement_cards']))
         sim.turn(runner, {'treat_prepare': selection['treat_prepare'],

@@ -37,21 +37,21 @@ class IntegratedRaceLoop(unittest.TestCase):
         self.assertEqual(sim.round, 1)
         self.assertEqual(sim.round_pack_snapshot, {'P1': [], 'P2': []})
         self.assertFalse(event_payloads(sim, 'PACK_ENTER'))
-        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 2)
+        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 3)
         sim.turn(sim.runners[0], {'movement_cards': ['FU-001']})
         first_payment = event_payloads(sim, 'PACE_PAYMENT', 'P1')[-1]
-        self.assertEqual((first_payment['base'], first_payment['final'], first_payment['paid']), (2, 2, 2))
+        self.assertEqual((first_payment['base'], first_payment['final'], first_payment['paid']), (3, 3, 3))
         self.assertNotIn('Pack', first_payment['preservation_sources'])
         sim.end_round()
         sim.runners[1]['quarter_mile_space'] = sim.runners[0]['quarter_mile_space']
         sim.start_round({'P1': 'Push', 'P2': 'Push'})
         self.assertEqual(sim.round, 2)
         self.assertEqual(sim.round_pack_snapshot, {'P1': ['P1', 'P2'], 'P2': ['P1', 'P2']})
-        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 1)
+        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 2)
         self.assertEqual([e['round'] for e in sim.events if e['type'] == 'PACK_ENTER'], [2, 2])
         sim.turn(sim.runners[0], {'movement_cards': ['FU-002']})
         second_payment = event_payloads(sim, 'PACE_PAYMENT', 'P1')[-1]
-        self.assertEqual((second_payment['base'], second_payment['final'], second_payment['paid']), (2, 1, 1))
+        self.assertEqual((second_payment['base'], second_payment['final'], second_payment['paid']), (3, 2, 2))
         self.assertIn('Pack', second_payment['preservation_sources'])
 
     def test_single_normal_draw_below_six_and_condition_chain(self):
@@ -71,7 +71,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         sim.course[1].update({'difficulty': 4, 'elevation': 'Incline', 'surface': 'Asphalt'})
         first, second = sim.runners
         first['quarter_mile_space'] = second['quarter_mile_space'] = 3
-        first['energy'] = 0
+        first['energy'] = 1
         first['hand'] = [card('TR-009'), card('EV-003')]
         second['hand'] = [card('TR-001')]
         sim.start_round({'P1': 'Push', 'P2': 'Push'})
@@ -93,8 +93,8 @@ class IntegratedRaceLoop(unittest.TestCase):
         sim.runners[0]['quarter_mile_space'] = sim.runners[1]['quarter_mile_space'] = 0
         sim.runners[2]['quarter_mile_space'] = 8
         sim.start_round({'P1': 'Push', 'P2': 'Push', 'P3': 'Push'})
-        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 1)
-        self.assertEqual(sim.pace_cost(sim.runners[2], 'Push')['final'], 2)
+        self.assertEqual(sim.pace_cost(sim.runners[0], 'Push')['final'], 2)
+        self.assertEqual(sim.pace_cost(sim.runners[2], 'Push')['final'], 3)
         sim.runners[2]['energy'] = 1
         _, used = sim.pay_pace(sim.runners[2])
         self.assertTrue(used)
@@ -112,7 +112,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         sim.start_round({'P1': 'Push'})
         self.assertEqual(runner['energy'], 5)
         self.assertEqual(event_payloads(sim, 'GLOBAL_WEATHER', 'P1')[-1]['protected_by'], 'Tech Shirt')
-        self.assertEqual(sim.pace_cost(runner, 'Push')['final'], 2)
+        self.assertEqual(sim.pace_cost(runner, 'Push')['final'], 3)
         sim.resolve_milestones(runner, 15, 16)
         self.assertEqual(runner['energy'], 6)
 
@@ -157,11 +157,11 @@ class IntegratedRaceLoop(unittest.TestCase):
         runner['active_conditions'] = [dehydrated]
         runner['energy'] = 5
         runner['hand'] = [card('FU-016'), card('TR-001')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(runner, {'treat_prepare': {'card_id': 'FU-016', 'action': 'fuel', 'choice': 'remedy'},
                           'movement_cards': ['TR-001']})
         self.assertIsNone(sim.condition_by_title(runner, 'Dehydrated'))
-        self.assertEqual(runner['energy'], 3)  # E7 Movement card costs 2 after remedy.
+        self.assertEqual(runner['energy'], 2)  # E7 Movement costs 2; Steady costs 1.
 
         second = make_sim(1)
         target = second.runners[0]
@@ -185,7 +185,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         runner['active_training'] = [{'card': card('TR-019'), 'remaining_turns': None}]
         runner['equipped_gear'] = [{'card': card('GE-018'), 'remaining_turns': None}]
         runner['hand'] = [card('EV-003'), card('EV-022'), card('EV-025'), card('TR-011')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(runner, {'treat_prepare': None, 'movement_cards': ['EV-003']})
         check = [payload['gut_check'] for payload in event_payloads(sim, 'MILESTONE', 'P1')
                  if payload['kind'] == 'Gut Check'][0]
@@ -217,7 +217,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         first, second = staged.runners
         first['hand'] = [card('EV-001')]
         second['hand'] = [card('TR-001')]
-        staged.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        staged.start_round({'P1': 'Steady', 'P2': 'Steady'})
         staged.turn(first, {'treat_prepare': None, 'movement_cards': ['EV-001'],
                             'card_modes': ['EFFECT'], 'event_target': 'P2'})
         self.assertEqual(second['staged_events'][0]['card']['id'], 'EV-001')
@@ -229,29 +229,29 @@ class IntegratedRaceLoop(unittest.TestCase):
 
         course = make_sim(1)
         course.runners[0]['hand'] = [card('EV-005')]
-        course.start_round({'P1': 'Easy'})
+        course.start_round({'P1': 'Steady'})
         course.turn(course.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-005'],
                                         'card_modes': ['EFFECT']})
         self.assertEqual(course.course_events[0]['remaining_duration'], 4)
 
         global_sim = make_sim(1)
         global_sim.runners[0]['hand'] = [card('EV-006')]
-        global_sim.start_round({'P1': 'Easy'})
+        global_sim.start_round({'P1': 'Steady'})
         global_sim.turn(global_sim.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-006'],
                                                 'card_modes': ['EFFECT']})
         global_sim.end_round()
         global_sim.start_round({'P1': 'Push'})
-        self.assertEqual(global_sim.runners[0]['energy'], 14)
+        self.assertEqual(global_sim.runners[0]['energy'], 13)
         self.assertEqual(event_payloads(global_sim, 'GLOBAL_WEATHER', 'P1')[-1]['actual_loss'], 1)
-        self.assertEqual(global_sim.pace_cost(global_sim.runners[0], 'Push')['final'], 2)
+        self.assertEqual(global_sim.pace_cost(global_sim.runners[0], 'Push')['final'], 3)
 
         after = make_sim(2)
         after.runners[0]['energy'] = 5
         after.runners[0]['hand'] = [card('EV-007')]
-        after.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        after.start_round({'P1': 'Steady', 'P2': 'Steady'})
         after.turn(after.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-007'],
                                       'card_modes': ['EFFECT']})
-        self.assertEqual(after.runners[0]['energy'], 6)
+        self.assertEqual(after.runners[0]['energy'], 5)
         self.assertLess(next(e['sequence'] for e in after.events
                              if e['type'] == 'ENERGY_CHANGE' and e['payload']['source'] == 'Cool Breeze'),
                         next(e['sequence'] for e in after.events if e['type'] == 'MOVE'))
@@ -260,12 +260,12 @@ class IntegratedRaceLoop(unittest.TestCase):
         transfer.runners[0]['energy'] = 5
         transfer.runners[1]['energy'] = 5
         transfer.runners[0]['hand'] = [card('EV-020')]
-        transfer.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        transfer.start_round({'P1': 'Steady', 'P2': 'Steady'})
         transfer.turn(transfer.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-020'],
                                             'card_modes': ['EFFECT']})
         self.assertFalse(any(item['id'] == 'EV-020' for item in transfer.runners[1]['hand']))
         self.assertIn('EV-020', [item['id'] for item in transfer.discard])
-        self.assertEqual(transfer.runners[0]['energy'], 5)
+        self.assertEqual(transfer.runners[0]['energy'], 4)
         self.assertEqual(transfer.runners[1]['energy'], 6)
 
     def test_high_five_uses_pack_snapshot_and_immediate_award(self):
@@ -274,7 +274,7 @@ class IntegratedRaceLoop(unittest.TestCase):
         for runner in sim.runners:
             runner['energy'] = 5
         sim.runners[0]['hand'] = [card('EV-018')]
-        sim.start_round({'P1': 'Easy', 'P2': 'Easy'})
+        sim.start_round({'P1': 'Steady', 'P2': 'Steady'})
         sim.turn(sim.runners[0], {'treat_prepare': None, 'movement_cards': ['EV-018'],
                                   'card_modes': ['EFFECT']})
         self.assertEqual([runner['energy'] for runner in sim.runners], [6, 6])
@@ -298,7 +298,7 @@ class IntegratedRaceLoop(unittest.TestCase):
                 runner['active_training'] = [{'card': card(training_id), 'remaining_turns': None}]
                 runner['quarter_mile_space'] = 3
                 runner['hand'] = [card('EV-023')]
-                sim.start_round({'P1': 'Easy'})
+                sim.start_round({'P1': 'Steady'})
                 sim.turn(runner, {'treat_prepare': None, 'movement_cards': ['EV-023']})
                 boundary = event_payloads(sim, 'MOVE_BOUNDARY', 'P1')[0]
                 self.assertEqual(boundary['previous_difficulty'], old_effective)
@@ -332,16 +332,16 @@ class IntegratedRaceLoop(unittest.TestCase):
             'P1': {'treat_prepare': None, 'movement_cards': ['FU-010']},
             'P2': {'treat_prepare': None, 'movement_cards': ['FU-021']},
         }
-        sim.run_round(scripts, {'P1': 'Easy', 'P2': 'Easy'})
+        sim.run_round(scripts, {'P1': 'Steady', 'P2': 'Steady'})
         return sim
 
     def test_finish_requires_positive_movement_beyond_course_endpoint(self):
         sim = make_sim(1)
         runner = sim.runners[0]
-        sim.course[-1]['difficulty'] = 0
+        sim.course[-1]['difficulty'] = 1
         runner['quarter_mile_space'] = len(sim.course) * 4 - 1
         runner['hand'] = [card('FU-010')]
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(runner, {'treat_prepare': None, 'movement_cards': ['FU-010']})
         self.assertEqual(runner['quarter_mile_space'], len(sim.course) * 4)
         self.assertFalse(runner['finish_pending'])

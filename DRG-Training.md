@@ -6,7 +6,7 @@
 |---|---|---:|---:|---|
 | TR-001 | Long Run | 7 | ⚡⚡ (2) | ▶▶: No -⚡; Dead Legs: -2 |
 | TR-002 | Long Run | 7 | ⚡⚡ (2) | ▶▶: No -⚡; Dead Legs: -2 |
-| TR-003 | Base Miles | 6 | ⚡ (1) | ▷: +⚡; Dead Legs/Tight Calf: -1 |
+| TR-003 | Base Miles | 6 | ⚡ (1) | Steady: +⚡; Dead Legs/Tight Calf: -1 |
 | TR-004 | Negative Split | 8 | ⚡⚡ (2) | ▶▶: +⚡ |
 | TR-005 | Tempo Run | 6 | ⚡ (1) | ▶: +⚡ |
 | TR-006 | Tempo Run | 6 | ⚡ (1) | ▶: +⚡ |

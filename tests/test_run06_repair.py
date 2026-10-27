@@ -19,7 +19,7 @@ def card(cid):
     return copy.deepcopy(CARDS[cid])
 
 
-def fixture(energy=15, hand=(), pace='Easy', position=0, profile='Balanced'):
+def fixture(energy=15, hand=(), pace='Steady', position=0, profile='Balanced'):
     cfg = copy.deepcopy(CFG)
     cfg['seed'] = 20260930
     sim = m.Sim(ROOT, cfg)
@@ -80,14 +80,19 @@ class Run06Repair(unittest.TestCase):
         self.assertGreater(plan['movement_energy_cost'], 0)
         before = copy.deepcopy(runner)
         sim.turn(runner)
-        self.assertGreater(runner['quarter_mile_space'], before['quarter_mile_space'])
+        self.assertEqual(runner['race_status'], 'STOPPED')
+        self.assertTrue(runner['will_available'])
+        sim.round += 1
+        sim.turn(runner)
+        self.assertEqual(runner['quarter_mile_space'], before['quarter_mile_space'])
+        self.assertEqual(runner['race_status'], 'RUNNING')  # Paid Movement can be stopped by terrain.
         self.assertEqual(runner['energy'], 0)
         self.assertFalse(runner['will_available'])
-        self.assertEqual([e['type'] for e in sim.events if e['type'] == 'TURN_END'], ['TURN_END'])
-        self.assertEqual([e['payload']['card_modes'] for e in sim.events
-                          if e['type'] == 'AI_TURN_PLAN'], [plan['card_modes']])
+        self.assertEqual([e['type'] for e in sim.events if e['type'] == 'TURN_END'],
+                         ['TURN_END', 'TURN_END'])
+        self.assertEqual(len([e for e in sim.events if e['type'] == 'AI_TURN_PLAN']), 1)
         self.assertEqual(sum(e['payload']['covered_by_will'] for e in sim.events
-                             if e['type'] == 'MOVEMENT_ENERGY_PAYMENT'), plan['movement_energy_cost'])
+                             if e['type'] == 'MOVEMENT_ENERGY_PAYMENT'), 1)
 
     def test_true_fallback_when_will_spent(self):
         sim, runner = p4_fixture()
@@ -121,7 +126,9 @@ class Run06Repair(unittest.TestCase):
                     self.assertGreater(plan['score'], -1000)
                 else:
                     self.assertEqual(plan['movement_cards'], [])
-        sim, runner = fixture(0, ('FU-001',))
+        sim, runner = fixture(0, ('FU-001', 'EV-029'))
+        runner['will_available'] = False
+        sim.course[0]['difficulty'] = 0
         self.assertTrue(any(p and p['action'] == 'fuel' for p in sim.treat_candidates(runner)))
         self.assertTrue(sim.choose_turn_plan(runner)['treat_prepare'])
 
@@ -162,7 +169,7 @@ class Run06Repair(unittest.TestCase):
     def test_zero_energy_finish_is_legal_and_equivalent_energy_is_secondary(self):
         outputs = []
         for _ in range(2):
-            sim, runner = fixture(energy=2, hand=('TR-001',), position=103)
+            sim, runner = fixture(energy=3, hand=('TR-001',), position=103)
             plan = sim.choose_turn_plan(runner)
             self.assertEqual(plan['movement_cards'], ['TR-001'])
             sim.turn(runner)
@@ -177,8 +184,9 @@ class Run06Repair(unittest.TestCase):
         self.assertGreater(scored(sim2, r2, 4, 5), scored(sim2, r2, 4, 0))
 
     def test_fuel_requires_progress_benefit_and_setup_pays_opportunity_cost(self):
-        sim, runner = fixture(0, ('FU-001', 'TR-001'))
+        sim, runner = fixture(0, ('FU-001', 'EV-029'))
         runner['will_available'] = False
+        sim.course[0]['difficulty'] = 0
         plan = sim.choose_turn_plan(runner)
         self.assertEqual(plan['treat_prepare']['action'], 'fuel')
         self.assertGreater(plan['movement_quarters'], 0)
@@ -192,7 +200,7 @@ class Run06Repair(unittest.TestCase):
         options, pace = sim.choose_pace(runner)
         self.assertEqual(pace, max(options, key=lambda x: (x['score'],
                          -m.PACE_ORDER.index(x['pace'])))['pace'])
-        self.assertNotEqual(pace, 'Easy')
+        self.assertNotIn('Easy', [option['pace'] for option in options])
 
     def test_run06_seed_p1_round_one_uses_v14_six_card_opening(self):
         cfg = copy.deepcopy(CFG)

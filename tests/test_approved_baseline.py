@@ -90,9 +90,9 @@ class ApprovedBaseline(unittest.TestCase):
         sim, r = fixture()
         r['hand'] = [card('FU-001')]
         r['energy'] = 4
-        sim.start_round({'P1': 'Easy'})
+        sim.start_round({'P1': 'Steady'})
         sim.turn(r, {'treat_prepare': None, 'movement_cards': ['FU-001']})
-        self.assertEqual(r['energy'], 4)
+        self.assertEqual(r['energy'], 3)
         self.assertEqual([e['payload']['card']['effort'] for e in sim.events if e['type'] == 'PLAY'], [3])
         sim, r = fixture()
         r['energy'] = 4

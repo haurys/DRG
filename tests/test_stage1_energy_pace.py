@@ -41,7 +41,7 @@ class StageOnePayment(unittest.TestCase):
         sim.turn(runner)
         decision = events(sim, 'AI_TURN_RATIONALE')[0]['selected_plan']
         paid = events(sim, 'PACE_PAYMENT')[0]
-        self.assertEqual((decision['selected_pace'], paid['selected_pace']), ('Easy', 'Easy'))
+        self.assertEqual((decision['selected_pace'], paid['selected_pace']), ('Steady', 'Steady'))
         self.assertEqual(decision['projected_energy_cost'],
                          paid['paid'] + sum(e['paid'] for e in events(sim, 'MOVEMENT_ENERGY_PAYMENT')))
         self.assertEqual(decision['projected_energy_after_action'], runner['energy'])
@@ -50,7 +50,7 @@ class StageOnePayment(unittest.TestCase):
 
     def test_each_drawn_pace_limit_is_priced_before_ai_scoring(self):
         for condition_id, expected_pace in [('CO-001', 'Race'), ('CO-015', 'Steady'),
-                                            ('CO-016', 'Easy')]:
+                                            ('CO-016', 'Steady')]:
             with self.subTest(condition=condition_id):
                 sim, runner = fixture(20, 'Push')
                 sim.draw = [card('FU-014'), card(condition_id)]
@@ -70,11 +70,11 @@ class StageOnePayment(unittest.TestCase):
         prepared = sim.preview_preparation(runner, plan)
         self.assertEqual(prepared['pace'], 'Push')
         expected = sim.preview_payment(prepared, 2)
-        self.assertEqual((expected['pace'], expected['energy']), ('Push', 2))
+        self.assertEqual((expected['pace'], expected['energy']), ('Push', 1))
         runner['race_turn_number'] = 0
         sim.turn(runner, {'treat_prepare': plan, 'movement_cards': ['TR-001']})
         self.assertEqual((runner['pace'], runner['energy']), ('Push', expected['energy']))
-        self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['paid'], 2)
+        self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['paid'], 3)
 
     def test_pack_and_training_preservation_stack_to_zero(self):
         sim, runner = fixture(18, 'Race', ('FU-001',))
@@ -97,30 +97,33 @@ class StageOnePayment(unittest.TestCase):
         self.assertIsNone(sim.preview_payment(runner, 3))
         runner['energy'] = 1
         actual = sim.preview_payment(runner, 0)
-        self.assertEqual((actual['pace'], actual['energy']), ('Race', 0))
+        self.assertEqual((actual['pace'], actual['energy']), ('Steady', 0))
         later, other = fixture(0, 'Race', ('TR-001', 'EV-021'))
         other['will_available'] = False
         # This Event gains Energy after Movement; it cannot fund the payment.
-        with self.assertRaisesRegex(ValueError, 'Movement Energy unavailable'):
-            later.turn(other, {'movement_cards': ['TR-001', 'EV-021'],
-                               'card_modes': ['MOVEMENT', 'EFFECT']})
+        later.turn(other, {'movement_cards': ['TR-001', 'EV-021'],
+                           'card_modes': ['MOVEMENT', 'EFFECT']})
+        self.assertEqual(other['race_status'], 'STOPPED')
 
     def test_will_covers_exact_combined_shortfall_once(self):
         sim, runner = fixture(1, 'Push', ('TR-001',))
         expected = sim.preview_payment(runner, 2)
         self.assertEqual((expected['energy'], expected['will_available']), (0, False))
         sim.turn(runner, {'movement_cards': ['TR-001']})
-        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 3)
+        self.assertEqual(runner['race_status'], 'STOPPED')
+        sim.round += 1
+        sim.turn(runner, {'movement_cards': ['TR-001']})
+        self.assertEqual(events(sim, 'WILL_USE')[0]['shortfall'], 4)
         self.assertEqual((runner['energy'], runner['will_available']), (0, False))
 
     def test_fuel_gain_over_fifteen_matches_preview(self):
-        sim, runner = fixture(20, 'Easy', ('FU-001', 'TR-001'))
+        sim, runner = fixture(20, 'Steady', ('FU-001', 'TR-001'))
         plan = {'action': 'fuel', 'card_id': 'FU-001'}
         prepared = sim.preview_preparation(runner, plan)
         self.assertEqual(prepared['energy'], 22)
         expected = sim.preview_payment(prepared, 2)
         sim.turn(runner, {'treat_prepare': plan, 'movement_cards': ['TR-001']})
-        self.assertEqual((runner['energy'], expected['energy']), (20, 20))
+        self.assertEqual((runner['energy'], expected['energy']), (19, 19))
         self.assertEqual(events(sim, 'FUEL_USE')[0]['energy_after'], 22)
 
     def test_installed_gain_over_fifteen_matches_payment(self):
@@ -128,7 +131,7 @@ class StageOnePayment(unittest.TestCase):
         runner['equipped_gear'] = [{'card': card('GE-016'), 'remaining_turns': 2,
                                     'installed_turn': 0}]
         expected = sim.preview_payment(runner, 0)
-        self.assertEqual(expected['energy'], 20)  # +1 installed, -1 Pace
+        self.assertEqual(expected['energy'], 19)  # +1 installed, -2 Race Pace
         sim.turn(runner, {'movement_cards': ['FU-001']})
         self.assertEqual(events(sim, 'ENERGY_CHANGE')[0]['to'], 21)
         self.assertEqual(runner['energy'], expected['energy'])
@@ -139,10 +142,10 @@ class StageOnePayment(unittest.TestCase):
         runner['active_training'] = [{'card': card('TR-003'), 'remaining_turns': None,
                                       'installed_turn': 0}]
         expected = sim.preview_payment(runner, 0)
-        self.assertEqual((expected['pace'], expected['energy']), ('Easy', 21))
+        self.assertEqual((expected['pace'], expected['energy']), ('Steady', 20))
         sim.turn(runner, {'movement_cards': ['FU-001']})
         self.assertEqual(events(sim, 'ENERGY_CHANGE')[0]['to'], 21)
-        self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['selected_pace'], 'Easy')
+        self.assertEqual(events(sim, 'PACE_PAYMENT')[0]['selected_pace'], 'Steady')
         self.assertEqual(runner['energy'], expected['energy'])
 
     def test_general_gain_and_loss_have_no_upper_cap_and_a_zero_floor(self):
@@ -153,7 +156,7 @@ class StageOnePayment(unittest.TestCase):
         self.assertEqual(runner['energy'], 0)
 
     def test_water_gut_preview_retains_energy_above_fifteen(self):
-        sim, runner = fixture(16, 'Easy')
+        sim, runner = fixture(16, 'Steady')
         runner['quarter_mile_space'] = 31  # Water at 8, then Gut at 10.
         runner['equipped_gear'] = [{'card': card('GE-012'), 'remaining_turns': None,
                                     'installed_turn': 0}]
@@ -164,19 +167,19 @@ class StageOnePayment(unittest.TestCase):
         self.assertEqual(result['gut_preview']['energy'], 17)
 
     def test_continuation_recognizes_installed_gain_above_fifteen(self):
-        sim, runner = fixture(16, 'Easy', ())
+        sim, runner = fixture(16, 'Steady', ())
         runner['equipped_gear'] = [{'card': card('GE-016'), 'remaining_turns': 2,
                                     'installed_turn': 0}]
         path = sim.continuation_paths(runner, future_replenish=False)
         self.assertEqual((path['viable'], path['kind']), (True, 'installed_energy'))
 
     def test_zero_energy_can_continue_with_a_legal_zero_cost_move(self):
-        sim, runner = fixture(0, 'Easy', ('FU-001',))
+        sim, runner = fixture(0, 'Steady', ('FU-001',))
         runner['will_available'] = False
-        self.assertTrue(sim.continuation_paths(runner)['viable'])
+        self.assertFalse(sim.continuation_paths(runner)['viable'])
         sim.turn(runner, {'movement_cards': ['FU-001']})
         self.assertEqual(runner['energy'], 0)
-        self.assertFalse(runner.get('dnf'))
+        self.assertEqual(runner['race_status'], 'STOPPED')
 
     def test_preview_matches_live_payment_across_bounded_states(self):
         sim, base = fixture()
@@ -191,13 +194,14 @@ class StageOnePayment(unittest.TestCase):
                         active_training=[{'card': card('TR-003'), 'remaining_turns': None,
                                           'installed_turn': 0}] if installed else [])
             expected = sim.preview_payment(live, card_cost)
-            live['pace'] = sim.payable_pace(live)
-            sim.apply_installed_energy(live)
             case = (pace, condition, energy, will, pack, installed, card_cost)
             if expected is None:
                 with self.assertRaisesRegex(ValueError, 'Movement Energy unavailable', msg=case):
                     sim.pay_pace(live, card_cost)
                 continue
+            live['pace'] = sim.resolve_payment_pace(live, card_cost)
+            sim.drop_adjusted_pack(live)
+            sim.apply_installed_energy(live)
             _, used_will = sim.pay_pace(live, card_cost)
             if card_cost > live['energy']:
                 self.assertTrue(used_will, case)

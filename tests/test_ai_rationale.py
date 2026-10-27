@@ -33,7 +33,7 @@ class Rationale(unittest.TestCase):
     def test_projection_energy_and_justification(self):
         _, _, d = self.live()
         p = d['selected_plan']
-        self.assertEqual(p['projected_movement_miles'], 1.0)
+        self.assertEqual(p['projected_movement_miles'], 1.5)
         self.assertIsInstance(p['projected_energy_cost'], int)
         self.assertIn('Projected Pace plus Movement-card cost', d['reason'])
         self.assertEqual(p['projected_movement_energy_cost'], 3)
@@ -51,7 +51,7 @@ class Rationale(unittest.TestCase):
     def test_setup_records_opportunity_cost_and_rejection(self):
         sim, _, d = self.live()
         setup = next(x for x in d['rejected_alternatives'] if x['plan_type'] ==
-                     'Training install/replace + Move' and x['projected_movement_quarters'] == 0)
+                     'Training install/replace + Move')
         self.assertGreater(setup['immediate_movement_opportunity_cost_quarters'], 0)
         self.assertIsNotNone(setup['remaining_distance_discount'])
         self.assertIsNotNone(setup['estimated_turns_to_recover_setup'])

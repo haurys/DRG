@@ -54,7 +54,7 @@ After modifiers convert result ≤0→0, 1–2→0.25, 3–4→0.50, 5–6→0.7
 
 ## K. Pace
 
-Easy +0 Effort/base 0 Energy; Steady +1/1; Race +2/1; Push +3/2. Select simultaneously at Round Start and lock for the round, subject to Conditions and affordability. An unaffordable Pace may step down; selecting a Pace is not a card play.
+Steady +1 Effort/base 1 Energy; Race +2/2; Push +3/3. Select simultaneously at Round Start and lock for the round, subject to Conditions and affordability. An unaffordable Pace may step down; selecting a Pace is not a card play.
 
 ## L. Energy
 
@@ -142,7 +142,7 @@ Course endpoint is 26.0/13.0, not Finish. A positive remaining legal quarter-mil
 
 ## AG. DNF
 
-Outside a Marathon Gut stall: only after Energy 0, Will spent, no meaningful legal hand or eligible-slot forward Movement, no legal self-recovery, cycling, reachable Water/Aid route, or successful final assistance path. A received card that can legally recover next turn prevents premature DNF. Inside a Marathon Gut stall, generic DNF is deferred; final failed recovery turn produces separate `failed_gut_check` DNF. Mark explicit DNF, preserve position/resources/Conditions/reason, stop turns, assign no place.
+Outside a Marathon Gut stall: if no ordinary affordable Movement combination exists after Replenish and legal Treat + Movement evaluation, remove the Pace token and enter Stopped. The initial stop consumes no recovery turn. On the next turn, Replenish, attempt ordinary Movement, then exact-shortfall Will if necessary, then one useful voluntary one-for-one rescue exchange with an accepting eligible helper. A successful exchange permits one final assisted turn; failure then causes DNF — Energy Exhaustion. Stopped has no Pack preservation. Reaching zero Energy or paying for zero distance due to terrain alone does not stop a runner. Inside a Marathon Gut stall, generic DNF is deferred; final failed recovery turn produces separate `failed_gut_check` DNF. Mark explicit DNF, preserve position/resources/Conditions/reason, stop turns, assign no place.
 
 ## AH. Race end / placing
 
@@ -170,7 +170,7 @@ Round Start choose Pace and form Packs from round 2 onward; on your turn draw on
 | Nausea `Cannot use Fuel` text | CLARIFICATION | Printed wording changes; Fuel Effect blocked, Fuel Movement legal. |
 | Gear category/footwear metadata | CLARIFICATION | `is_footwear` enforces existing one-shoe rule; broad category descriptive. |
 | Course physical layout | CLARIFICATION | 13 two-mile cards out and back; simulation stores 26 one-mile lanes. |
-| Four Paces, printed costs, Will, stations, Pack benefit after formation, Finish, assistance, targeted Event legality, three pre-race exchanges | UNCHANGED / REAFFIRMED | Prior frozen rules continue except Pack formation now begins in round 2. |
+| Three Paces and essential Stopped recovery | STAGE 2R CANDIDATE | Supersedes the four-Pace frozen baseline for this candidate only; other frozen mechanics remain. |
 | Course inventory and visibility | UNCHANGED / REAFFIRMED | No Course-side mechanics or title field changed. |
 
 The full old/new title ledger is in **DRG-v1.4-Race-Card-Family-Lists.md**; implementation specifics and known open review items are in the report and Rules Review.

@@ -128,10 +128,10 @@ class ActionCosts(unittest.TestCase):
         r['hand']=[card('FU-002')]
         helper['hand']=[card('FU-001')]
         helper['quarter_mile_space']=1
-        self.assertTrue(sim.request_assistance(r))
+        self.assertFalse(sim.request_assistance(r))  # Neither card funds a payable Pace.
         self.assertEqual(r['stats']['treat_prepare_actions'],1)
         self.assertEqual(r['stats']['cards_played'],0)
-        self.assertIn('FU-001',[c['id'] for c in r['hand']])
+        self.assertIn('FU-002',[c['id'] for c in r['hand']])
         self.assertEqual(helper['stats']['treat_prepare_actions'],0)
 
     def test_slot_movement_uses_play_without_treat(self):

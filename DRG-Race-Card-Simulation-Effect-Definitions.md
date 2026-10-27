@@ -11,7 +11,6 @@
 | Meaning | Symbol |
 |---|---|
 | Movement | `→` |
-| Easy Pace | `▷` |
 | Steady Pace | `▶` |
 | Race Pace | `▶▶` |
 | Push Pace | `▶▶▶` |
@@ -83,7 +82,7 @@ Training cards are installed through the existing Training setup action. Their p
 | Qty | Effort | Move Cost | Title | Printed Effect | Simulation Definition |
 |---:|---:|---:|---|---|---|
 | 2 | 7 | 2 | Long Run | `▶▶: No -⚡; Dead Legs: -2` | While installed, at Race Pace prevent 1 Pace-related Energy cost once per runner-turn. On installation/acquisition, if Dead Legs is active, reduce its Current Severity by 2. |
-| 1 | 6 | 1 | Base Miles | `▷: +⚡; Dead Legs/Tight Calf: -1` | While installed, at Easy Pace gain 1 Energy once per runner-turn. On installation/acquisition, reduce Current Severity of one applicable active Dead Legs or Tight Calf by 1. |
+| 1 | 6 | 1 | Base Miles | `Steady: +⚡; Dead Legs/Tight Calf: -1` | While installed, at Steady Pace gain 1 Energy once per runner-turn. On installation/acquisition, reduce Current Severity of one applicable active Dead Legs or Tight Calf by 1. |
 | 1 | 8 | 2 | Negative Split | `▶▶: +⚡` | While installed, at Race Pace gain 1 Energy once per runner-turn. |
 | 2 | 6 | 1 | Tempo Run | `▶: +⚡` | While installed, at Steady Pace gain 1 Energy once per runner-turn. |
 | 2 | 8 | 2 | Intervals | `▶▶▶: +⚡` | While installed, at Push Pace gain 1 Energy once per runner-turn. |
@@ -242,7 +241,7 @@ Conditions remain active under the existing persistence/removal rules.
 | 1 | 5 | Gashed Knee | `-→` | While active with Effective Severity above 0, apply -1 Movement to every applicable Movement resolution. |
 | 1 | 3 | Side Stitch | `▶▶/▶▶▶: -→` | While active with Effective Severity above 0 and runner is at Race or Push Pace, apply -1 Movement to the runner's Movement resolution once per runner-turn. |
 | 1 | 7 | Twisted Ankle | `Max ▶` | While active with Effective Severity above 0, maximum legal Pace is Steady. |
-| 1 | 8 | Heat Exhaustion | `Max ▷` | While active with Effective Severity above 0, maximum legal Pace is Easy. |
+| 1 | 8 | Heat Exhaustion | `Maximum Steady` | While active with Effective Severity above 0, maximum legal Pace is Steady. |
 | 1 | 5 | Cold Chills | `▶▶/▶▶▶: -⚡` | While active with Effective Severity above 0 and runner is at Race or Push Pace, lose 1 additional Energy once per runner-turn. |
 
 ### Condition Quantity Check

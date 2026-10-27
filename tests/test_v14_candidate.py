@@ -102,6 +102,9 @@ class SlotMovement(unittest.TestCase):
         self.assertEqual(sim.preview_movement(r, [{**card('TR-009'), 'use_mode': 'MOVEMENT'}])[
             'quarter_miles'], 3)
         sim.turn(r, {'movement_cards': ['TR-009']})
+        self.assertEqual(r['race_status'], 'STOPPED')
+        sim.round += 1
+        sim.turn(r, {'movement_cards': ['TR-009']})
         self.assertFalse(r['active_training'])
         self.assertFalse(r['will_available'])
         self.assertEqual([e['payload']['card'] for e in events(sim, 'SLOT_SACRIFICE')], ['TR-009'])

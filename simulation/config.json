@@ -8,21 +8,17 @@
   "exchange_limit": 3,
   "starting_energy": 15,
   "pace": {
-    "Easy": {
-      "modifier": 0,
-      "energy_cost": 0
-    },
     "Steady": {
       "modifier": 1,
       "energy_cost": -1
     },
     "Race": {
       "modifier": 2,
-      "energy_cost": -1
+      "energy_cost": -2
     },
     "Push": {
       "modifier": 3,
-      "energy_cost": -2
+      "energy_cost": -3
     }
   },
   "movement_model": "A",

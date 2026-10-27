@@ -8,6 +8,8 @@ JSON Lines, chronological. Required keys: `event_id`, `sequence`, `type`, `round
 
 ## v1.3 assistance and DNF events
 
+For the Stage 2R candidate, `ENERGY_STOP` records the initial stop or accepted assistance phase and Pace-token removal. `PACK_EXIT` records lost preservation when stopping or adjusting to a different payable Pace. `ENERGY_RESTART` records the ordinary, Will, or final assisted restart without retroactive Pack membership. `TURN_END` and turn records identify the stopped phase. `DNF` with `reason: energy_exhaustion` follows a refused/impossible exchange after the ordinary recovery turn or a failed final assisted turn. `ASSISTANCE_SWAP_EVALUATE` records each useful exchange and the helper score loss; an automated helper accepts only nonnegative competitive outcomes for itself. The older continuation-exhausted evaluation below documents the earlier baseline and is not called by the Stage 2R runner-turn sequence.
+
 `ASSISTANCE_REQUEST` records requester position and hand; `ASSISTANCE_PARTNER_SELECT` records the simulation helper and position; `ASSISTANCE_SWAP_EVALUATE` records legal swaps, rescue viability, and scores; `ASSISTANCE_SWAP` records the exchange and continuation; `ASSISTANCE_FAIL` records no viable exchange. `DNF_EVALUATION` records exhaustion criteria; `DNF` preserves round, turn, distance, Energy, Will, Conditions, and reason. `CONDITION_REMEDY` is emitted for each station-eligible Condition independently.
 
 ## Marathon Gut recovery events
