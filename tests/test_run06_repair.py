@@ -11,7 +11,7 @@ from engine import simulate as m
 ROOT = Path(__file__).resolve().parents[1]
 CFG = json.loads((ROOT / 'simulation/config.json').read_text())
 CARDS = {c['id']: c for c in json.loads((ROOT / 'data/race_cards.json').read_text())}
-PLAN_KEYS = {'treat_prepare', 'movement_cards', 'card_modes', 'card_sources', 'movement_energy_cost',
+PLAN_KEYS = {'treat_prepare', 'treat_timing', 'movement_cards', 'card_modes', 'card_sources', 'movement_energy_cost',
              'movement_quarters', 'score', 'expected_turns_remaining'}
 
 

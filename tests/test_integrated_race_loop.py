@@ -54,14 +54,14 @@ class IntegratedRaceLoop(unittest.TestCase):
         self.assertEqual((second_payment['base'], second_payment['final'], second_payment['paid']), (3, 2, 2))
         self.assertIn('Pack', second_payment['preservation_sources'])
 
-    def test_single_normal_draw_below_six_and_condition_chain(self):
+    def test_two_normal_draws_below_six_and_condition_chain(self):
         sim = make_sim(1)
         runner = sim.runners[0]
         runner['hand'] = [card('TR-001'), card('TR-002'), card('TR-003'), card('TR-004')]
         sim.draw = [card('FU-001'), card('FU-002'), card('CO-014')]
         drawn = sim.replenish(runner)
-        self.assertEqual(drawn, 1)
-        self.assertEqual(len(runner['hand']), 5)
+        self.assertEqual(drawn, 2)
+        self.assertEqual(len(runner['hand']), 6)
         self.assertEqual(runner['active_conditions'][0]['title'], 'Side Stitch')
 
     def test_turn_integrates_install_pack_will_event_boundary_and_direct_movement(self):

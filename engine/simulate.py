@@ -551,9 +551,11 @@ class Sim:
 
     def replenish(self, runner):
         normal_draws, before = 0, len(runner['hand'])
-        if len(runner['hand']) < self.cfg['starting_hand']:
+        for _ in range(min(self.cfg['normal_draw_count'], self.cfg['starting_hand'] - before)):
             card = self.draw_one(runner)
-            normal_draws = int(card is not None)
+            if card is None:
+                break
+            normal_draws += 1
         self.emit('REPLENISH', runner['player_id'], {'hand_before': before,
                   'normal_cards_drawn': normal_draws, 'hand_after': len(runner['hand'])})
         return normal_draws
@@ -1294,15 +1296,50 @@ class Sim:
                 resolved = self.preview_movement(after_cards, cards)
                 resolved = self.preview_gut_progress(after_cards, resolved)
                 score, turns = self.plan_score(runner, liquidated, after_cards, plan, cards, resolved)
-                candidates.append({'treat_prepare': plan,
+                candidates.append({'treat_prepare': plan, 'treat_timing': 'before',
                                    'movement_cards': [c['id'] for c in cards],
                                    'card_modes': [c['use_mode'] for c in cards],
                                    'card_sources': [c['source'] for c in cards],
                                    'movement_energy_cost': cost,
                                    'movement_quarters': resolved['quarter_miles'],
                                    'expected_turns_remaining': turns, 'score': score})
+        # A post-Movement preparation sees the depleted hand and vacated slots.
+        # Its effects are excluded from payment and Movement previews above.
+        if allow_treat:
+            for cards in self.movement_candidates(runner, self.remaining_card_plays(card_plays_used)):
+                if not cards:
+                    continue
+                liquidated = self.preview_slot_sacrifice(runner, cards)
+                consumed = {c['id'] for c in cards if c['source'] == 'hand'}
+                liquidated['hand'] = [c for c in liquidated['hand'] if c['id'] not in consumed]
+                cost = sum(movement_energy_cost(c) for c in cards if c['use_mode'] == 'MOVEMENT')
+                paid = self.preview_payment(liquidated, cost)
+                if paid is None:
+                    continue
+                resolved = self.preview_gut_progress(paid, self.preview_movement(paid, cards))
+                if (resolved['to_space'] >= len(self.course) * 4 and
+                        resolved['positive_finish_movement']) or resolved.get('gut_preview', {}).get('passed') is False:
+                    continue
+                for plan in self.treat_candidates(liquidated):
+                    if not plan or (plan['action'] != 'relocate' and
+                                    len(cards) >= self.remaining_card_plays(card_plays_used)):
+                        continue
+                    post = copy.deepcopy(liquidated)
+                    post['energy'] = paid['energy']
+                    post['quarter_mile_space'] = resolved['to_space']
+                    post = self.preview_preparation(post, plan)
+                    score, turns = self.plan_score(runner, post, paid, plan, cards, resolved)
+                    if plan['action'] == 'fuel' and plan.get('choice', 'energy') == 'energy':
+                        score += min(2, post['energy'] - paid['energy']) * 2
+                    candidates.append({'treat_prepare': plan, 'treat_timing': 'after',
+                                       'movement_cards': [c['id'] for c in cards],
+                                       'card_modes': [c['use_mode'] for c in cards],
+                                       'card_sources': [c['source'] for c in cards],
+                                       'movement_energy_cost': cost,
+                                       'movement_quarters': resolved['quarter_miles'],
+                                       'expected_turns_remaining': turns, 'score': score})
         if not candidates:
-            fallback = {'treat_prepare': None, 'movement_cards': [], 'card_modes': [],
+            fallback = {'treat_prepare': None, 'treat_timing': 'before', 'movement_cards': [], 'card_modes': [],
                         'card_sources': [],
                         'movement_energy_cost': 0, 'movement_quarters': 0,
                         'expected_turns_remaining': len(self.course) * 2, 'score': -1000}
@@ -2189,9 +2226,14 @@ class Sim:
         plan = (None if assisted else script['treat_prepare'] if 'treat_prepare' in script else
                 None if 'movement_cards' in script else
                 ai_plan['treat_prepare'] if ai_plan else self.choose_treat_prepare(runner))
+        timing = script.get('treat_timing', 'before') if script else (
+            ai_plan.get('treat_timing', 'before') if ai_plan else 'before')
+        if timing not in ('before', 'after'):
+            raise ValueError('invalid Treat/Prepare timing')
         planned_cards = ai_plan['movement_cards'] if ai_plan else None
         if ai_plan:
             self.emit('AI_TURN_PLAN', runner['player_id'], {'treat_prepare': plan,
+                      'treat_timing': timing,
                       'movement_cards': planned_cards, 'predicted_movement_quarters':
                       ai_plan['movement_quarters'], 'score': ai_plan['score'],
                       'card_modes': ai_plan['card_modes'],
@@ -2207,7 +2249,8 @@ class Sim:
             raise ValueError('second Treat/Prepare action after assistance')
         if 'movement_cards' in script and not script['movement_cards'] and not gut_recovered:
             raise ValueError('Movement-phase card required')
-        used_plays = recovery_plays + (0 if assisted else self.resolve_treat_prepare(runner, plan))
+        used_plays = recovery_plays + (0 if assisted or timing == 'after' else
+                                      self.resolve_treat_prepare(runner, plan))
         if 'pace' in script and script['pace'] != runner['pace']:
             raise ValueError('Pace is locked at Round Start')
         available = self.remaining_card_plays(used_plays)
@@ -2249,6 +2292,16 @@ class Sim:
                       for card in chosen]
         if len(modes) != len(played) or any(mode not in ('MOVEMENT', 'EFFECT') for mode in modes):
             raise ValueError('invalid card use modes')
+        if timing == 'after' and plan:
+            post_card_plays = 0 if plan['action'] == 'relocate' else 1
+            if len(played) + used_plays + post_card_plays > self.cfg['max_voluntary_plays']:
+                raise ValueError('card-play budget exceeded by post-Movement Treat/Prepare')
+            projected = self.preview_slot_sacrifice(runner, [
+                {**card, 'source': source} for card, source in zip(played, sources)])
+            consumed = {card['id'] for card, source in zip(played, sources) if source == 'hand'}
+            projected['hand'] = [card for card in projected['hand'] if card['id'] not in consumed]
+            if not self.legal_treat_prepare(projected, plan):
+                raise ValueError('illegal post-Movement Treat/Prepare')
         if not played and not gut_recovered:
             raise ValueError('Movement-phase card required')
         if any(mode == 'EFFECT' and card['family'] != 'Event' for card, mode in zip(played, modes)):
@@ -2396,6 +2449,17 @@ class Sim:
         elif runner['quarter_mile_space'] >= course_end:
             self.emit('COURSE_ENDPOINT', runner['player_id'], {'finished': False,
                       'reason': 'no positive legal movement remaining for Finish extension'})
+        if timing == 'after' and plan and not runner['finish_pending'] and stopped_at is None:
+            if self.legal_treat_prepare(runner, plan):
+                used_plays += self.resolve_treat_prepare(runner, plan)
+                self.emit('POST_MOVEMENT_TREAT', runner['player_id'], {'action': plan['action'],
+                          'card': plan.get('card_id'), 'movement_already_resolved': True})
+            elif ai_plan:
+                # A station or Event can change the target after planning.
+                self.emit('POST_MOVEMENT_TREAT_SKIP', runner['player_id'],
+                          {'plan': plan, 'reason': 'no_longer_legal'})
+            else:
+                raise ValueError('post-Movement Treat/Prepare no longer legal')
         self.expire_temporary(runner)
         self.consume_staged_events(runner)
         self.locate(runner)

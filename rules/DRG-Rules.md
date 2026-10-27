@@ -7,7 +7,7 @@ See [`DRG-Canonical-Playtest-Rules.md`](../DRG-Canonical-Playtest-Rules.md). The
 ## Encoded
 
 - Six-card concealed starting hands; Conditions auto-enter play by Severity and draw replacement cards.
-- One normal draw below the six-card hand maximum per turn; no minimum and no automatic refill. Empty draw recycles eligible discard; if both are empty, skip draw.
+- Up to two normal draws without exceeding the six-card hand maximum per turn; no minimum and no automatic refill. Empty draw recycles eligible discard; if both are empty, skip draw.
 - Eligible installed Training/Gear may move directly from a slot after two complete runner turns, ending its Effect before Movement. Attached Gear cannot move or be reassigned and discards when its Condition is removed.
 - One Treat/Prepare opportunity per runner turn. Playing a new Training/Gear/Fuel/treatment card from hand uses that opportunity **and one of two card plays**; relocation or assistance uses the opportunity without a new card play. Direct Slot Movement uses a card play and no Treat/Prepare.
 - One equipped footwear maximum, enforced by the Gear `is_footwear` flag; broad `category` labels are descriptive only. Nausea prints `Cannot use Fuel`, meaning Fuel Effect use is blocked but legal Fuel Movement remains available.

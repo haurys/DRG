@@ -403,6 +403,7 @@ class GutRecovery(unittest.TestCase):
         selection = sim.choose_turn_plan(runner)
         self.assertFalse({'TR-001', 'EV-023'} <= set(selection['movement_cards']))
         sim.turn(runner, {'treat_prepare': selection['treat_prepare'],
+                         'treat_timing': selection['treat_timing'],
                          'movement_cards': selection['movement_cards'],
                          'card_modes': selection['card_modes'],
                          'card_sources': selection['card_sources']})

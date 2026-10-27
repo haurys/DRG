@@ -14,8 +14,8 @@ The mode, zone, action, and Energy checks are separate; DNF is evaluated after v
 
 | What happens if… | Legal? | What happens? | Why? |
 |---|---|---|---|
-| Hand = 0 | Yes | Replenish one normal card if available, otherwise consider eligible slot, future draw, legal recovery or assistance. | No minimum and no synthetic refill. |
-| Hand = 1 | Yes | Draw one if below six; one or two legal cards may be committed. | Six is maximum, not a target reached in one turn. |
+| Hand = 0 | Yes | Replenish up to two normal cards if available, otherwise consider eligible slot, future draw, legal recovery or assistance. | No minimum and no synthetic refill. |
+| Hand = 1 | Yes | Draw up to two without exceeding six; one or two legal cards may be committed. | Six is maximum, not a target reached in one turn. |
 | Draw pile empty | Yes | Shuffle eligible discard for the required normal draw. | Exclude all occupied and staged zones. |
 | Draw and eligible discard empty | Yes | Skip required draw; no card appears. | Committed cards remain committed. |
 | Newly installed slot | Install yes; sacrifice no | Effect starts now; first slot Movement eligibility is installation turn +2. | Two complete runner turns must elapse. |

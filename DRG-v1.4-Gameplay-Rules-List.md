@@ -26,15 +26,15 @@ For a marathon, connect 13 physical two-mile Course cards long-side to long-side
 
 ## D. Hand / draw
 
-Six normal Race cards maximum, no minimum. At Replenish, if below six, draw exactly one normal card, skipping any revealed Condition into play and continuing for the one replacement. No automatic refill, return of slotted cards, or End-turn draw. If at six, skip normal draw.
+Six normal Race cards maximum, no minimum. At Replenish, draw up to two normal cards without exceeding six, resolving revealed Conditions into play and continuing each replacement draw. No automatic refill, return of slotted cards, or End-turn draw. If at six, skip normal draw.
 
 ## E. Round structure
 
-Round Start activates staged Global effects, locks simultaneous Pace choices and Round Start positions, forms Packs from round 2 onward, and snapshots public state. Runners resolve Replenish → Treat/Prepare → Movement → End sequentially in the same race-time interval. Round End observes cohesion, assigns simultaneous Finish places, expires effects, and cleans up.
+Round Start activates staged Global effects, locks simultaneous Pace choices and Round Start positions, forms Packs from round 2 onward, and snapshots public state. Runners resolve Replenish → Treat/Prepare → Movement → End or Replenish → Movement → Treat/Prepare → End sequentially in the same race-time interval. Round End observes cohesion, assigns simultaneous Finish places, expires effects, and cleans up.
 
 ## F. Runner turn structure
 
-Draw if eligible; optionally take one Treat/Prepare action; then normally play one or two Race cards, with at least one used for Movement. A Move may be hand or eligible slot. A Treat/Prepare card itself gives no Effort. Two Treat/Prepare actions or a normal zero-card turn are illegal absent a specific override; simulator forced fallback is recorded when no legal path exists.
+Draw if eligible; normally play one or two Race cards, with at least one used for Movement, and optionally take one Treat/Prepare action before or after the combined Movement. A Move may be hand or eligible slot. A Treat/Prepare card itself gives no Effort. A post-Movement Effect cannot finance or change completed Movement, Events, milestones, or Gut Checks. Finish or failed Marathon Gut Check prevents post-Movement Treat/Prepare. Two Treat/Prepare actions or a normal zero-card turn are illegal absent a specific override; simulator forced fallback is recorded when no legal path exists.
 
 ## G. Race-card use
 
@@ -154,7 +154,7 @@ When a normal draw requires a card and draw pile is empty, shuffle eligible Race
 
 ## AJ. Player-facing quick reference
 
-Round Start choose Pace and form Packs from round 2 onward; on your turn draw one if below six, optionally Treat/Prepare once, play up to two cards with normally one Movement, pay Energy/Will, resolve Course/stations/Gut Checks/Finish, End. Decide before installation whether the card can wait through two full turns. Keep attached cards committed until Condition removal.
+Round Start choose Pace and form Packs from round 2 onward; on your turn draw up to two without exceeding six, optionally Treat/Prepare once before or after combined Movement, play up to two cards with normally one Movement, pay Energy/Will, resolve Course/stations/Gut Checks/Finish, End. Decide before installation whether the card can wait through two full turns. Keep attached cards committed until Condition removal.
 
 ## v1.3.2 → v1.4 rule change ledger
 

@@ -1,5 +1,7 @@
 # Simulation State
 
+**Stage 3 candidate:** Replenishment draws up to two normal cards without exceeding six, including on eligible Stopped and Marathon Gut recovery turns. `AI_TURN_PLAN.treat_timing` identifies preparation before or after Movement. Post-Movement preparation cannot affect payment or completed Movement, and Finish or a failed Marathon Gut Check prevents it.
+
 Global state includes seed/RNG, format, course mapping, draw/discard piles, round, active player, events, finish order, and configuration. Runner state includes every field requested by the foundation specification plus cumulative statistics. Events contain pre/post state snapshots sufficient to audit state changes; `config_hash` and `data_hash` bind outputs to inputs.
 
 Stage 2R candidate: `race_status` is RUNNING, STOPPED, FINISHED, or DNF. `energy_recovery` is `ordinary` after the initial unaffordable turn and `assisted_final` after a useful accepted exchange; the initial stopped turn consumes no recovery attempt. A stopped runner has `pace: null` and no Pack preservation. `round_start_pace` records the intended selection separately from the payable post-Replenish/Prepare Pace. A newly revealed cap or a cheaper payable Pace clears the old Pack without creating retroactive membership. A restart restores a payable Pace but no Pack for the current round.

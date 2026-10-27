@@ -37,16 +37,16 @@ class HandAndDeck(unittest.TestCase):
         self.assertTrue(all(len(r['hand']) == 6 for r in sim.runners))
         self.assertEqual(sim.cfg['exchange_limit'], 3)
 
-    def test_one_draw_below_max_no_refill_and_zero_hand_legal(self):
+    def test_two_draws_below_max_no_refill_and_zero_hand_legal(self):
         sim, r = fixture()
         sim.draw = [card('FU-001'), card('FU-002'), card('FU-003')]
-        self.assertEqual(sim.replenish(r), 1)
-        self.assertEqual(len(r['hand']), 1)
-        self.assertEqual(sim.replenish(r), 1)
+        self.assertEqual(sim.replenish(r), 2)
         self.assertEqual(len(r['hand']), 2)
+        self.assertEqual(sim.replenish(r), 1)
+        self.assertEqual(len(r['hand']), 3)
         r['hand'] = [card('TR-001') for _ in range(6)]
         self.assertEqual(sim.replenish(r), 0)
-        self.assertEqual(len(sim.draw), 1)
+        self.assertEqual(len(sim.draw), 0)
         r['hand'] = []
         sim.draw = []
         sim.discard = []

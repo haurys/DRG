@@ -1,5 +1,7 @@
 # v1.4 Card Economy and Zone Model
 
+**Stage 3 candidate:** Replenishment draws up to two normal cards without exceeding six. The one Treat/Prepare opportunity may occur before or after a combined Movement action. Slot Movement vacates the slot and ends its Effect before payment; a later legal replacement starts its Effect only after Movement and begins a new installation waiting period. A normal turn needs at least one Movement card and remains limited to two Race-card plays.
+
 ## What this document is
 
 A location map for every physical Race card and its effect on circulation.
