@@ -1114,7 +1114,56 @@ class Sim:
             if 'Hydration Belt' in self.installed_titles(runner, 'gear') else 0)
         return resolved
 
-    def preview_gut_progress(self, runner, resolved):
+    def known_event_energy(self, cards):
+        """Self Energy from selected Event Effects; no hidden draws or other-runner choices."""
+        ids = {card['id'] for card in active_effect_cards(cards) if card['family'] == 'Event'}
+        return sum(AFTER_ENERGY.get(card_id, 0) for card_id in ids) + (
+            2 if 'EV-026' in ids else 1 if 'EV-018' in ids else 0)
+
+    def preview_post_movement_state(self, paid, cards, resolved):
+        """Known state when post-Movement Treat begins, before concealed replacements."""
+        projected = copy.deepcopy(paid)
+        projected['energy'] += self.known_event_energy(cards)
+        start, end = paid['quarter_mile_space'], resolved['to_space']
+        for mile in range(start // 4 + 1, end // 4 + 1):
+            for station in ('Water', 'Aid'):
+                key = 'Aid/Fuel' if station == 'Aid' else station
+                if mile not in MILESTONES[self.cfg['race_format']][key]:
+                    continue
+                if station == 'Water':
+                    projected['energy'] += sum(item['card']['title'] == 'Hydration Belt'
+                                               for item in projected['equipped_gear'])
+                for condition in list(projected['active_conditions']):
+                    title = condition['title']
+                    if title in self.station_zero_remedies[station]:
+                        condition['current_severity'] = 0
+                    elif station == 'Aid' and title in self.station_aid_reductions:
+                        condition['current_severity'] = max(
+                            0, condition['current_severity'] - self.station_aid_reductions[title])
+                    else:
+                        continue
+                    update_effective_severity(condition)
+                    if condition['current_severity'] == 0 and not condition['persistent']:
+                        projected['active_conditions'].remove(condition)
+                        projected['attached_gear'][:] = [item for item in projected['attached_gear']
+                            if item['condition_id'] != condition['id']]
+            if self.cfg['race_format'] == 'half' and mile in MILESTONES['half']['Gut Check']:
+                check = gut_check(projected['hand'], self.installed_titles(projected, 'training'),
+                    self.installed_titles(projected, 'gear'), GUT_CHECK_THRESHOLDS['half'][mile])
+                projected['energy'] = max(0, projected['energy'] - check['energy_loss'])
+        if resolved.get('gut_preview', {}).get('will_used'):
+            projected['will_available'] = False
+        # Tough Decision cycles the first two held cards after Movement. Which
+        # replacements arrive is concealed and must not be read from self.draw.
+        if any(card['id'] == 'EV-017' for card in active_effect_cards(cards)):
+            cycled = tough_decision_cycle(projected['hand'])
+            cycled_ids = {card['id'] for card in cycled}
+            projected['hand'] = [card for card in projected['hand']
+                                 if card['id'] not in cycled_ids]
+        projected['quarter_mile_space'] = end
+        return projected
+
+    def preview_gut_progress(self, runner, resolved, cards=()):
         """Apply the same counted-zone checkpoint test to a paid candidate plan."""
         if self.cfg['race_format'] != 'marathon':
             return resolved
@@ -1126,7 +1175,8 @@ class Sim:
                         MILESTONES['marathon']['Water']) if 'Hydration Belt' in self.installed_titles(
                             runner, 'gear') else 0
             check = prepared_gut_check(runner['hand'], runner['active_training'],
-                        runner['equipped_gear'], runner['energy'] + water,
+                        runner['equipped_gear'], runner['energy'] + water +
+                        self.known_event_energy(cards),
                         self.marathon_gut[mile]['prepared_effort'],
                         self.marathon_gut[mile]['energy'], runner['will_available'])
             resolved['gut_preview'] = {'mile': mile, **check}
@@ -1139,7 +1189,8 @@ class Sim:
                 return resolved
         return resolved
 
-    def plan_score(self, runner, prepared, paid, plan, cards, movement_result):
+    def plan_score(self, runner, prepared, paid, plan, cards, movement_result,
+                   condition_reference=None):
         moved = movement_result['quarter_miles']
         remaining = max(0, len(self.course) * 4 - movement_result['to_space'])
         opponents = [r['quarter_mile_space'] for r in self.runners if r['player_id'] != runner['player_id']
@@ -1150,6 +1201,7 @@ class Sim:
         score = progress_weight * moved - remaining / 8 - turns * 0.15
         if movement_result['to_space'] >= len(self.course) * 4 and movement_result['positive_finish_movement']:
             score += 1000
+        setup_baseline = condition_reference if condition_reference is not None else runner
         # Setup pays only over the visible remaining Course. Its card's lost Effort is
         # already charged through the full Movement comparison; replacement removes
         # the old installed effect from this projection.
@@ -1160,19 +1212,19 @@ class Sim:
                 setup_card['title'])
             if duration:
                 horizon *= min(1, duration / 6)
-            current = copy.deepcopy(runner)
+            current = copy.deepcopy(setup_baseline)
             current['pace'] = self.payable_pace(current)
             cost_delta = self.pace_cost(current, current['pace'])['final'] - self.pace_cost(prepared, prepared['pace'])['final']
             energy_delta = sum(amount for _, amount in self.installed_energy(prepared)) - sum(
                 amount for _, amount in self.installed_energy(current))
-            visible = self.course[min(runner['quarter_mile_space'] // 4, len(self.course) - 1):]
+            visible = self.course[min(setup_baseline['quarter_mile_space'] // 4, len(self.course) - 1):]
             visible = visible[:min(6, len(visible))]
             effort_delta = (sum(self.movement_effort_bonus(prepared, s)[0]
-                                - self.movement_effort_bonus(runner, s)[0]
+                                - self.movement_effort_bonus(setup_baseline, s)[0]
                                 for s in visible) / len(visible)) if visible else 0
-            old_titles = self.installed_titles(runner, 'training')
+            old_titles = self.installed_titles(setup_baseline, 'training')
             new_titles = self.installed_titles(prepared, 'training')
-            difficulty_delta = (sum(effective_difficulty(s, runner['active_conditions'], old_titles)
+            difficulty_delta = (sum(effective_difficulty(s, setup_baseline['active_conditions'], old_titles)
                                     - effective_difficulty(s, prepared['active_conditions'], new_titles)
                                     for s in visible) / len(visible)) if visible else 0
             future_sides = visible[1:]
@@ -1182,7 +1234,7 @@ class Sim:
             # Already-staged next-round weather is public; unseen weather draws are not.
             water_delta = sum(
                 ('Hydration Belt' in self.installed_titles(prepared, 'gear'))
-                - ('Hydration Belt' in self.installed_titles(runner, 'gear'))
+                - ('Hydration Belt' in self.installed_titles(setup_baseline, 'gear'))
                 for side in future_sides
                 if side['mile'] in MILESTONES[self.cfg['race_format']]['Water'])
             weather_next = [e for e in self.global_events if e['activate_round'] == self.round + 1
@@ -1193,7 +1245,7 @@ class Sim:
                     for entry in prepared['equipped_gear'] for ef in entry['card'].get('effect_components', []))
                 - any(ef['type'] == 'weather_protection' and
                       {'EV-006': 'Heat', 'EV-010': 'Cold'}.get(event['card']['id']) in ef['weather']
-                      for entry in runner['equipped_gear'] for ef in entry['card'].get('effect_components', []))
+                      for entry in setup_baseline['equipped_gear'] for ef in entry['card'].get('effect_components', []))
                 for event in weather_next)
             score += horizon * (max(-3, min(3, effort_delta)) * 2
                                 + max(-3, min(3, difficulty_delta)) * 2
@@ -1206,31 +1258,27 @@ class Sim:
                 new_resistance = sum(sum(TRAINING_RESISTANCE.get(title, {}).values()) for title in new_titles)
                 score += horizon * max(-2, min(2, (new_resistance - old_resistance) / 2))
             gut_miles = [mile for mile in MILESTONES[self.cfg['race_format']]['Gut Check']
-                         if runner['quarter_mile_space'] < mile * 4]
+                         if setup_baseline['quarter_mile_space'] < mile * 4]
             if gut_miles:
-                old_mod = gut_check([], old_titles, self.installed_titles(runner, 'gear'))['modifiers']
+                old_mod = gut_check([], old_titles, self.installed_titles(setup_baseline, 'gear'))['modifiers']
                 new_mod = gut_check([], new_titles, self.installed_titles(prepared, 'gear'))['modifiers']
                 score += horizon * (new_mod - old_mod)
-            if setup_card['title'] == 'Anti-Chafe' and not self.anti_chafe_active(runner):
+            if setup_card['title'] == 'Anti-Chafe' and not self.anti_chafe_active(setup_baseline):
                 score += horizon * 0.5
         if plan and plan['action'] in ('fuel', 'attach'):
             future = {c['id']: c for c in prepared['active_conditions']}
             reduction = sum(max(0, c['effective_severity'] -
                                 (future[c['id']]['effective_severity'] if c['id'] in future else 0))
-                            for c in runner['active_conditions'])
-            caps_removed = sum(4 for c in runner['active_conditions']
+                            for c in setup_baseline['active_conditions'])
+            caps_removed = sum(4 for c in setup_baseline['active_conditions']
                                if c['effective_severity'] > 0 and c['title'] in
                                ('Cramp', 'Twisted Ankle', 'Heat Exhaustion', 'Nausea')
                                and (c['id'] not in future or future[c['id']]['effective_severity'] == 0))
             score += min(remaining, 24) / 24 * min(14, 2 * reduction + caps_removed)
-        energy = max(0, paid['energy'] - movement_result['staged_energy_cost'])
-        effect_ids = {c['id'] for c in active_effect_cards(cards)}
-        event_gain = sum(AFTER_ENERGY.get(c['id'], 0) for c in active_effect_cards(cards))
-        if 'EV-026' in effect_ids:
-            event_gain += 2
-        if 'EV-018' in effect_ids:
-            event_gain += 1
-        energy += event_gain + movement_result['milestone_energy_gain']
+        event_gain = self.known_event_energy(cards)
+        energy = (max(0, setup_baseline['energy']) if condition_reference is not None else
+                  max(0, paid['energy'] - movement_result['staged_energy_cost']) +
+                  event_gain + movement_result['milestone_energy_gain'])
         if movement_result.get('gut_preview'):
             check = movement_result['gut_preview']
             if not check['passed']:
@@ -1294,7 +1342,7 @@ class Sim:
                 if after_cards is None:
                     continue
                 resolved = self.preview_movement(after_cards, cards)
-                resolved = self.preview_gut_progress(after_cards, resolved)
+                resolved = self.preview_gut_progress(after_cards, resolved, cards)
                 score, turns = self.plan_score(runner, liquidated, after_cards, plan, cards, resolved)
                 candidates.append({'treat_prepare': plan, 'treat_timing': 'before',
                                    'movement_cards': [c['id'] for c in cards],
@@ -1316,21 +1364,20 @@ class Sim:
                 paid = self.preview_payment(liquidated, cost)
                 if paid is None:
                     continue
-                resolved = self.preview_gut_progress(paid, self.preview_movement(paid, cards))
+                resolved = self.preview_gut_progress(paid, self.preview_movement(paid, cards), cards)
                 if (resolved['to_space'] >= len(self.course) * 4 and
                         resolved['positive_finish_movement']) or resolved.get('gut_preview', {}).get('passed') is False:
                     continue
-                for plan in self.treat_candidates(liquidated):
+                post_before = self.preview_post_movement_state(paid, cards, resolved)
+                for plan in self.treat_candidates(post_before):
                     if not plan or (plan['action'] != 'relocate' and
                                     len(cards) >= self.remaining_card_plays(card_plays_used)):
                         continue
-                    post = copy.deepcopy(liquidated)
-                    post['energy'] = paid['energy']
-                    post['quarter_mile_space'] = resolved['to_space']
-                    post = self.preview_preparation(post, plan)
-                    score, turns = self.plan_score(runner, post, paid, plan, cards, resolved)
+                    post = self.preview_preparation(post_before, plan)
+                    score, turns = self.plan_score(runner, post, paid, plan, cards, resolved,
+                                                   condition_reference=post_before)
                     if plan['action'] == 'fuel' and plan.get('choice', 'energy') == 'energy':
-                        score += min(2, post['energy'] - paid['energy']) * 2
+                        score += min(2, post['energy'] - post_before['energy']) * 2
                     candidates.append({'treat_prepare': plan, 'treat_timing': 'after',
                                        'movement_cards': [c['id'] for c in cards],
                                        'card_modes': [c['use_mode'] for c in cards],
