@@ -90,7 +90,7 @@ class VictoryDirective(unittest.TestCase):
         self.assertIsNone(sim.condition_by_title(runner, 'Cramp'))
         self.assertGreater(runner['quarter_mile_space'], 0)
 
-    def test_setup_rejected_when_second_movement_card_reaches_cap(self):
+    def test_setup_rejected_when_second_movement_card_is_more_valuable(self):
         sim, runner = fixture(difficulty=1, elevation='Incline')
         for segment in sim.course:
             segment['difficulty'] = 1
@@ -101,10 +101,10 @@ class VictoryDirective(unittest.TestCase):
         plan = sim.choose_turn_plan(runner)
         self.assertIsNone(plan['treat_prepare'])
         self.assertEqual(plan['movement_cards'], ['TR-009', 'EV-023'])
-        self.assertEqual(plan['movement_quarters'], 8)
+        self.assertEqual(plan['movement_quarters'], 10)
         sim.turn(runner)
         self.assertNotIn('Hill Repeats', sim.installed_titles(runner, 'training'))
-        self.assertEqual(runner['quarter_mile_space'], 8)
+        self.assertEqual(runner['quarter_mile_space'], 10)
 
     def test_late_setup_discount_favors_immediate_finish(self):
         sim, runner = fixture(difficulty=1, elevation='Incline')

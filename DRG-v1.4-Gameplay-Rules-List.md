@@ -50,7 +50,7 @@ Printed Effort 1–3 costs 0 Energy, 4–6 costs 1, and 7+ costs 2 per Movement 
 
 ## J. Movement conversion
 
-After modifiers convert result ≤0→0, 1–2→0.25, 3–4→0.50, 5–6→0.75, 7–8→1.00, 9–10→1.25, 11–12→1.50, 13–14→1.75, ≥15→2.00 miles. Direct +/− Movement adjusts quarter-mile units. Floor zero, normal cap two miles. At a one-mile boundary carry only positive integer remainder after debiting 2 per completed quarter-mile and adjust by new minus old Difficulty; stop at nonpositive remainder. Do not start a fresh Movement calculation.
+After modifiers convert result ≤0→0, 1–2→0.25, 3–4→0.50, 5–6→0.75, 7–8→1.00, 9–10→1.25, 11–12→1.50, 13–14→1.75, 15–16→2.00, 17–18→2.25, 19–20→2.50 miles; each additional two Effort adds 0.25 mile. Direct +/− Movement adjusts quarter-mile units. Floor zero; no turn distance ceiling applies. At a one-mile boundary carry only positive integer remainder after debiting 2 per completed quarter-mile and adjust by new minus old Difficulty; stop at nonpositive remainder. Do not start a fresh Movement calculation.
 
 ## K. Pace
 

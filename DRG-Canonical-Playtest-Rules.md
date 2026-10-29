@@ -58,7 +58,7 @@ Starting and maximum Energy: **15**. Energy persists; Effort is immediate moveme
 Two Movement cards each pay their cost independently after Pace payment; EFFECT use pays no card Movement cost. A Movement card is payable if stored Energy plus an available Will can cover its cost after Pace and other legal reductions. Pace preservation applies to Pace cost, not a card’s printed Movement cost. Will pays only the resulting exact shortfall and does not replenish the track.
 
 
-**1 Movement = 0.25 mile.** Direct +1/−1 Movement adds/removes one quarter-mile after converting Effort. Approximately 2 Effort per Movement is a **design-valuation heuristic only**, never a gameplay conversion. Sum printed Effort from the one or two Movement cards (Treat/Prepare contributes zero); apply Effort modifiers; add Pace modifier; subtract starting Course Difficulty once; apply Condition/Effort penalties; convert final integer result through Movement Model A; apply direct signed Movement; floor at zero and cap at two miles unless an explicit override; traverse Course and resolve boundaries/milestones. Positive direct Movement can make a base-zero result advance 0.25 mile. Normal final turn movement never exceeds 2 miles. Porta-Potty Effect is −1 direct Movement and +2 Energy after Movement; the ordinary two-mile cap remains.
+**1 Movement = 0.25 mile.** Direct +1/−1 Movement adds/removes one quarter-mile after converting Effort. Approximately 2 Effort per Movement is a **design-valuation heuristic only**, never a gameplay conversion. Sum printed Effort from the one or two Movement cards (Treat/Prepare contributes zero); apply Effort modifiers; add Pace modifier; subtract starting Course Difficulty once; apply Condition/Effort penalties; convert final integer result through Movement Model A; apply direct signed Movement; floor at zero; traverse Course and resolve boundaries/milestones. Positive direct Movement can make a base-zero result advance 0.25 mile. There is no two-mile turn ceiling. Porta-Potty Effect remains −1 direct Movement and +2 Energy after Movement.
 
 | Calculated Effort result | Base miles |
 |---|---:|
@@ -70,9 +70,14 @@ Two Movement cards each pay their cost independently after Pace payment; EFFECT 
 | 9–10 | 1.25 |
 | 11–12 | 1.50 |
 | 13–14 | 1.75 |
-| ≥15 | 2.00 |
+| 15–16 | 2.00 |
+| 17–18 | 2.25 |
+| 19–20 | 2.50 |
+| 21–22 | 2.75 |
+| 23–24 | 3.00 |
+| Every additional two Effort | +0.25 |
 
-At each one-mile boundary, stop, debit **2 integer Movement Result per completed quarter-mile**, and carry only positive remainder. Difficulty change = new Difficulty − previous Difficulty. Adjusted remainder = remainder − Difficulty change; do not charge full new Difficulty again. A nonpositive adjusted remainder stops at the boundary. Easier terrain does not create movement if there was no positive remainder on arrival. Repeat across multiple boundaries without resetting Effort or the two-mile turn cap. Direct Movement enters available movement before traversal and uses the same boundary system. The exact representation of direct Movement in the carried integer remainder is [RULES REVIEW](DRG-Rules-Review.md) where the two accounting methods would differ.
+At each one-mile boundary, stop, debit **2 integer Movement Result per completed quarter-mile**, and carry only positive remainder. Difficulty change = new Difficulty − previous Difficulty. Adjusted remainder = remainder − Difficulty change; do not charge full new Difficulty again. A nonpositive adjusted remainder stops at the boundary. Easier terrain does not create movement if there was no positive remainder on arrival. Repeat across multiple boundaries without resetting Effort. Direct Movement is applied separately after Base Movement and is not changed by boundary Difficulty accounting. The exact representation of direct Movement in the carried integer remainder is [RULES REVIEW](DRG-Rules-Review.md) where the two accounting methods would differ.
 
 ## Events and targeting — FROZEN
 

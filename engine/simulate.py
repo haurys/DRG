@@ -63,8 +63,6 @@ def load_json(path):
 def movement(result):
     if result <= 0:
         return 0
-    if result >= 15:
-        return 8
     return (result + 1) // 2
 
 
@@ -267,21 +265,21 @@ def recycle_discard(draw, discard, rng, in_play_ids=(), audit=None):
 
 
 def resolve_movement(start_space, movement_result, difficulties, course_quarters,
-                     turn_cap=8, direct_movement=0):
+                     direct_movement=0):
     """Resolve Base Movement with boundary deltas, then distinct Direct Movement."""
     pos, remaining, moved, boundaries = start_space, movement_result, 0, []
-    while remaining > 0 and moved < turn_cap and pos < course_quarters:
+    while remaining > 0 and pos < course_quarters:
         segment = min(pos // 4, len(difficulties) - 1)
         boundary = min((segment + 1) * 4, course_quarters)
         distance_to_boundary = boundary - pos
         possible = movement(remaining)
         if possible < distance_to_boundary:
-            step = min(possible, turn_cap - moved, course_quarters - pos)
+            step = min(possible, course_quarters - pos)
             pos += step
             moved += step
             remaining -= step * 2
             break
-        step = min(distance_to_boundary, turn_cap - moved, course_quarters - pos)
+        step = min(distance_to_boundary, course_quarters - pos)
         pos += step
         moved += step
         remaining -= step * 2
@@ -289,7 +287,7 @@ def resolve_movement(start_space, movement_result, difficulties, course_quarters
             break
         previous, new = difficulties[segment], difficulties[segment + 1]
         change, before = new - previous, remaining
-        adjustment_applied = remaining > 0 and moved < turn_cap
+        adjustment_applied = remaining > 0
         if adjustment_applied:
             remaining -= change
         boundaries.append({
@@ -301,26 +299,26 @@ def resolve_movement(start_space, movement_result, difficulties, course_quarters
             'stopped': adjustment_applied and remaining <= 0,
             'stop_reason': ('harder_terrain' if adjustment_applied and remaining <= 0 and change > 0
                             else 'movement_result_exhausted' if not adjustment_applied and remaining <= 0
-                            else 'turn_cap' if not adjustment_applied and moved >= turn_cap else None),
+                            else None),
         })
-        if remaining <= 0 or moved >= turn_cap:
+        if remaining <= 0:
             break
     base_moved = moved
     direct = max(-base_moved, direct_movement)
-    direct_applied = max(-base_moved, min(direct, turn_cap - base_moved, course_quarters - pos))
+    direct_applied = max(-base_moved, min(direct, course_quarters - pos))
     pos += direct_applied
     moved += direct_applied
     unused_direct = max(0, direct_movement - max(0, direct_applied))
-    cap_prevented = moved >= turn_cap and pos < course_quarters and remaining > 0
+    finish_crossed = pos >= course_quarters and (remaining > 0 or unused_direct > 0)
     return {
         'from_space': start_space, 'to_space': pos, 'quarter_miles': moved,
         'base_quarter_miles': base_moved, 'direct_quarter_miles': direct_applied,
         'direct_requested': direct_movement, 'direct_remaining': unused_direct,
-        'movement_result': movement_result, 'remaining_result': remaining,
-        'positive_finish_movement': pos >= course_quarters and (remaining > 0 or unused_direct > 0),
-        'boundaries': boundaries, 'cap_prevented': cap_prevented,
-        'cap_prevented_quarters': movement(remaining) if cap_prevented else 0,
-        'result_wasted_above_cap': max(0, remaining) if cap_prevented else 0,
+        'movement_result': movement_result, 'converted_movement_quarters': movement(movement_result),
+        'remaining_result': remaining, 'positive_finish_movement': finish_crossed,
+        'finish_discarded_quarters': max(0, movement(remaining) + unused_direct - 1)
+                                     if finish_crossed else 0,
+        'boundaries': boundaries,
     }
 
 
@@ -1106,7 +1104,7 @@ class Sim:
                   + self.cfg['pace'][runner['pace']]['modifier'] - penalty
                   - (0 if runner['quarter_mile_space'] >= course_end else difficulties[index]))
         resolved = resolve_movement(runner['quarter_mile_space'], result, difficulties, course_end,
-                                    turn_cap=8, direct_movement=direct)
+                                    direct_movement=direct)
         resolved['staged_energy_cost'] = staged_energy_cost
         resolved['milestone_energy_gain'] = (sum(
             runner['quarter_mile_space'] < mile * 4 <= resolved['to_space']
@@ -1168,6 +1166,8 @@ class Sim:
         if self.cfg['race_format'] != 'marathon':
             return resolved
         start, end = runner['quarter_mile_space'], resolved['to_space']
+        will_available = runner['will_available']
+        will_used = False
         for mile in GUT_RECOVERY_TURNS:
             if not start < mile * 4 <= end or mile in runner['gut_cleared']:
                 continue
@@ -1178,13 +1178,16 @@ class Sim:
                         runner['equipped_gear'], runner['energy'] + water +
                         self.known_event_energy(cards),
                         self.marathon_gut[mile]['prepared_effort'],
-                        self.marathon_gut[mile]['energy'], runner['will_available'])
-            resolved['gut_preview'] = {'mile': mile, **check}
+                        self.marathon_gut[mile]['energy'], will_available)
+            will_available = will_available and not check['will_used']
+            will_used |= check['will_used']
+            resolved['gut_preview'] = {'mile': mile, **check, 'will_used': will_used}
             if not check['passed']:
                 resolved['to_space'] = mile * 4
                 resolved['quarter_miles'] = mile * 4 - start
                 resolved['gut_movement_lost_quarters'] = end - mile * 4
                 resolved['positive_finish_movement'] = False
+                resolved['finish_discarded_quarters'] = 0
                 resolved['milestone_energy_gain'] = water
                 return resolved
         return resolved
@@ -1845,7 +1848,7 @@ class Sim:
 
     def event_current_effects(self, runner, cards):
         event_ids = {card['id'] for card in active_effect_cards(cards) if card['family'] == 'Event'}
-        effort_bonus, direct, ignore_difficulty, cap = 0, 0, False, 8
+        effort_bonus, direct, ignore_difficulty = 0, 0, False
         direct += sum(2 if event_id == 'EV-023' else 1 for event_id in event_ids & DIRECT_PLUS)
         direct -= int('EV-009' in event_ids) + int('EV-026' in event_ids)
         if 'EV-014' in event_ids:
@@ -1858,7 +1861,7 @@ class Sim:
                 direct -= 1
             if event_id in ('EV-011', 'EV-012', 'EV-025'):
                 direct -= 1
-        return effort_bonus, direct, ignore_difficulty, cap
+        return effort_bonus, direct, ignore_difficulty
 
     def resolve_event_play(self, runner, card, target=None):
         event_id = card['id']
@@ -2222,9 +2225,10 @@ class Sim:
                 self.locate(runner)
                 self.turn_records.append({'round': self.round, 'player_id': runner['player_id'],
                        'movement_quarters': 0, 'movement_result': 0,
+                       'converted_movement_quarters': 0, 'finish_discarded_quarters': 0,
+                       'gut_movement_lost_quarters': 0,
                        'cards_played': recovery_plays, 'pace': runner['pace'], 'boundaries': [],
-                       'cap_prevented': False, 'cap_prevented_quarters': 0,
-                       'result_wasted_above_cap': 0, 'hand_size_at_decision': len(runner['hand']),
+                       'hand_size_at_decision': len(runner['hand']),
                        'effort_count': 0, 'energy_effect_count': 0,
                        'gut_recovery_turn': True})
                 self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
@@ -2415,7 +2419,7 @@ class Sim:
         start_index = min(runner['quarter_mile_space'] // 4, len(self.course) - 1)
         segment = self.course[start_index]
         installed_bonus, installed_sources = self.movement_effort_bonus(runner, segment)
-        event_effort_bonus, direct, ignore_difficulty, turn_cap = self.event_current_effects(runner, played)
+        event_effort_bonus, direct, ignore_difficulty = self.event_current_effects(runner, played)
         condition_penalty = sum(condition_effects(condition, runner['pace'], segment['surface'])['effort_penalty']
                                 for condition in runner['active_conditions'])
         training_titles = self.installed_titles(runner, 'training')
@@ -2431,7 +2435,7 @@ class Sim:
                         - start_difficulty)
         old_space = runner['quarter_mile_space']
         resolved = resolve_movement(old_space, result_value, difficulties, len(self.course) * 4,
-                                    turn_cap=turn_cap, direct_movement=direct)
+                                    direct_movement=direct)
         stopped_at = self.resolve_milestones(runner, old_space, resolved['to_space'])
         if stopped_at is not None:
             original_to = resolved['to_space']
@@ -2444,6 +2448,7 @@ class Sim:
             resolved['boundaries'] = [b for b in resolved['boundaries']
                                       if b['boundary_space'] <= stop_space]
             resolved['positive_finish_movement'] = False
+            resolved['finish_discarded_quarters'] = 0
             resolved['gut_movement_lost_quarters'] = original_quarters - resolved['quarter_miles']
             resolved['gut_original_destination'] = original_to
             self.emit('GUT_MOVEMENT_STOP', runner['player_id'], {'mile': stopped_at,
@@ -2513,10 +2518,10 @@ class Sim:
         self.turn_records.append({'round': self.round, 'player_id': runner['player_id'],
                                   'movement_quarters': resolved['quarter_miles'],
                                   'movement_result': result_value, 'cards_played': len(played) + used_plays,
+                                  'converted_movement_quarters': resolved['converted_movement_quarters'],
+                                  'finish_discarded_quarters': resolved['finish_discarded_quarters'],
+                                  'gut_movement_lost_quarters': resolved.get('gut_movement_lost_quarters', 0),
                                   'pace': runner['pace'], 'boundaries': resolved['boundaries'],
-                                  'cap_prevented': resolved['cap_prevented'],
-                                  'cap_prevented_quarters': resolved['cap_prevented_quarters'],
-                                  'result_wasted_above_cap': resolved['result_wasted_above_cap'],
                                   'hand_size_at_decision': len(runner['hand']) + sum(
                                       source == 'hand' for source in sources),
                                   'effort_count': len(played), 'energy_effect_count': 0})
@@ -2628,14 +2633,13 @@ def diagnostics(sim):
             'average_movement': statistics.mean(moves) if moves else 0,
             'median_movement': statistics.median(moves) if moves else 0,
             'maximum_movement': max(moves, default=0),
-            'movement_distribution': {f'{quarter / 4:.2f}': distribution.get(quarter / 4, 0)
-                                      for quarter in range(9)},
+            'movement_distribution': {f'{quarter:.2f}': count
+                                      for quarter, count in sorted(distribution.items())},
             'boundary_crossings': len(boundaries),
-            'turns_prevented_by_two_mile_cap': sum(record['cap_prevented'] for record in records),
-            'movement_prevented_by_two_mile_cap_miles': sum(record['cap_prevented_quarters']
-                                                             for record in records) / 4,
-            'movement_result_wasted_above_two_mile_cap': sum(record['result_wasted_above_cap']
-                                                              for record in records),
+            'movement_discarded_at_finish_miles': sum(record['finish_discarded_quarters']
+                                                      for record in records) / 4,
+            'movement_interrupted_at_gut_miles': sum(record['gut_movement_lost_quarters']
+                                                     for record in records) / 4,
             'first_finisher_turn': min(finish_turns) if finish_turns else None,
             'final_finisher_turn': max(finish_turns) if finish_turns else None,
             'finishing_spread_turns': (max(finish_turns) - min(finish_turns)) if finish_turns else None}

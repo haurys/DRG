@@ -27,8 +27,8 @@ class MovementBoundaryRules(unittest.TestCase):
   x=resolve(19,15,[2]*5+[6,2]+[2]*3);self.assertEqual([b['difficulty_change'] for b in x['boundaries']],[4,-4])
  def test_i_easier_then_harder(self):
   x=resolve(19,15,[6]*5+[2,6]+[6]*3);self.assertEqual([b['difficulty_change'] for b in x['boundaries']],[-4,4])
- def test_j_two_mile_cap_across_boundaries(self):
-  x=resolve(19,30,[2]*10);self.assertEqual(x['quarter_miles'],8);self.assertTrue(x['cap_prevented']);self.assertEqual(x['result_wasted_above_cap'],14)
+ def test_j_unrestricted_across_boundaries(self):
+  x=resolve(19,30,[2]*10);self.assertEqual(x['quarter_miles'],15);self.assertEqual(x['to_space'],34);self.assertEqual(len(x['boundaries']),4)
  def test_k_one_effort_card(self):
   self.assertEqual(m.calculate_total_effort([{'effort':8}],['EFFORT']),8)
  def test_l_two_effort_cards(self):
