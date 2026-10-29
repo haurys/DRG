@@ -1618,7 +1618,12 @@ class Sim:
         self.locate(runner)
         self.turn_records.append({'round': self.round, 'player_id': runner['player_id'],
                                   'movement_quarters': 0, 'movement_result': 0,
+                                  'converted_movement_quarters': 0,
+                                  'finish_discarded_quarters': 0,
+                                  'gut_movement_lost_quarters': 0,
                                   'cards_played': 0, 'pace': None, 'boundaries': [],
+                                  'hand_size_at_decision': len(runner['hand']),
+                                  'effort_count': 0, 'energy_effect_count': 0,
                                   'energy_recovery_phase': phase})
         self.emit('TURN_END', runner['player_id'], {'position': runner['quarter_mile_space'],
                   'energy': runner['energy'], 'hand': [c['id'] for c in runner['hand']],
