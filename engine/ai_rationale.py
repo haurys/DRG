@@ -54,7 +54,10 @@ def _position(sim, runner):
 
 def _detail(sim, runner, row, baseline, before_quarters):
     plan = row['treat_prepare']
-    prepared = sim.preview_preparation(runner, plan)
+    # A post-Movement action cannot remove its card or replace installed
+    # preservation before the Movement payment being explained.
+    post_movement = row.get('treat_timing') == 'after'
+    prepared = sim.preview_preparation(runner, None if post_movement else plan)
     sources = row.get('card_sources', ['hand'] * len(row['movement_cards']))
     cards = []
     for cid, mode, source in zip(row['movement_cards'],
@@ -63,9 +66,18 @@ def _detail(sim, runner, row, baseline, before_quarters):
                     else next(item['card'] for item in prepared[source] if item['card']['id'] == cid))
         cards.append({**original, 'use_mode': mode, 'source': source})
     liquidated = sim.preview_slot_sacrifice(prepared, cards)
+    consumed = {card['id'] for card in cards if card['source'] == 'hand'}
+    liquidated['hand'] = [card for card in liquidated['hand'] if card['id'] not in consumed]
     paid = sim.preview_payment(liquidated)
     after_cards = sim.preview_payment(liquidated, row.get('movement_energy_cost', 0))
+    if paid is None or after_cards is None:
+        raise ValueError('rationale candidate payment disagrees with legal AI plan')
     result = sim.preview_movement(after_cards, cards)
+    if post_movement:
+        result = sim.preview_gut_progress(after_cards, result, cards)
+    setup_prepared = (sim.preview_preparation(
+        sim.preview_post_movement_state(after_cards, cards, result), plan)
+        if post_movement and plan else prepared)
     remaining_after = max(0, len(sim.course) * 4 - result['to_space'])
     rate = max(2, row['movement_quarters'] or 2)
     roles = ([{'id': plan['card_id'], 'title': sim.card(plan['card_id'])['title'],
@@ -75,7 +87,7 @@ def _detail(sim, runner, row, baseline, before_quarters):
                'role': c['use_mode'], 'source': c['source'], 'movement_energy_cost':
                c['movement_energy_cost'] if c['use_mode'] == 'MOVEMENT' else 0} for c in cards]
     old_conditions = {c['id']: c['effective_severity'] for c in runner['active_conditions']}
-    new_conditions = {c['id']: c['effective_severity'] for c in prepared['active_conditions']}
+    new_conditions = {c['id']: c['effective_severity'] for c in setup_prepared['active_conditions']}
     condition_impact = {cid: {'before': sev, 'after': new_conditions.get(cid, 0)}
                         for cid, sev in old_conditions.items() if new_conditions.get(cid, 0) != sev}
     setup = bool(plan and plan['action'] in ('training', 'gear', 'attach'))
@@ -90,28 +102,29 @@ def _detail(sim, runner, row, baseline, before_quarters):
     if setup:
         visible = sim.course[min(runner['quarter_mile_space'] // 4, len(sim.course) - 1):][:6]
         current = sim.preview_preparation(runner, None)
-        effort_delta = (sum(sim.movement_effort_bonus(prepared, side)[0]
+        effort_delta = (sum(sim.movement_effort_bonus(setup_prepared, side)[0]
                             - sim.movement_effort_bonus(current, side)[0]
                             for side in visible) / len(visible)) if visible else 0
         old_titles = sim.installed_titles(runner, 'training')
-        new_titles = sim.installed_titles(prepared, 'training')
+        new_titles = sim.installed_titles(setup_prepared, 'training')
         difficulty_delta = (sum(effective_difficulty(side, runner['active_conditions'], old_titles)
-                                - effective_difficulty(side, prepared['active_conditions'], new_titles)
+                                - effective_difficulty(side, setup_prepared['active_conditions'], new_titles)
                                 for side in visible) / len(visible)) if visible else 0
         setup_estimate = {
             'visible_segments_sampled': len(visible),
             'mean_effort_gain': effort_delta,
             'mean_difficulty_reduction': difficulty_delta,
             'pace_energy_cost_reduction': sim.pace_cost(current, current['pace'])['final']
-                                          - sim.pace_cost(prepared, prepared['pace'])['final'],
-            'installed_energy_this_turn': sum(amount for _, amount in sim.installed_energy(prepared))
-                                          - sum(amount for _, amount in sim.installed_energy(current)),
+                                          - sim.pace_cost(setup_prepared, setup_prepared['pace'])['final'],
+            'installed_energy_this_turn': (0 if post_movement else
+                sum(amount for _, amount in sim.installed_energy(setup_prepared))
+                - sum(amount for _, amount in sim.installed_energy(current))),
             'future_visible_energy_gain_at_current_pace':
-            (sum(sum(amount for _, amount in sim.energy_gains_on_side(prepared, side))
+            (sum(sum(amount for _, amount in sim.energy_gains_on_side(setup_prepared, side))
                  - sum(amount for _, amount in sim.energy_gains_on_side(current, side))
                  for side in visible[1:]) / len(visible[1:])) if len(visible) > 1 else 0,
             'future_visible_water_opportunity_delta':
-            sum(('Hydration Belt' in sim.installed_titles(prepared, 'gear'))
+            sum(('Hydration Belt' in sim.installed_titles(setup_prepared, 'gear'))
                 - ('Hydration Belt' in sim.installed_titles(runner, 'gear'))
                 for side in visible[1:]
                 if side['mile'] in MILESTONES[sim.cfg['race_format']]['Water']),

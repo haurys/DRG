@@ -5,7 +5,8 @@ import json
 import unittest
 from pathlib import Path
 
-from engine.simulate import Sim, diagnostics
+from engine.ai_rationale import describe_decision
+from engine.simulate import Sim, diagnostics, make_condition
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -93,6 +94,41 @@ class TurnRecordSchema(unittest.TestCase):
         result = diagnostics(combined)
         self.assertEqual(result['turns'], 3)
         self.assertGreater(result['movement_discarded_at_finish_miles'], 0)
+
+
+class Seed101Rationale(unittest.TestCase):
+    def test_post_movement_gear_replacement_does_not_remove_payment_source_early(self):
+        config = copy.deepcopy(CFG)
+        config['seed'] = 101
+        sim = Sim(ROOT, config)
+        sim.build_course()
+        sim.round = 11
+        runner = sim.new_runner(4, 'Pack Runner', [card(cid) for cid in
+            ('FU-007', 'TR-014', 'FU-008', 'GE-005', 'TR-013', 'TR-005')])
+        runner.update(energy=0, pace='Steady', will_available=False, race_turn_number=11,
+                      quarter_mile_space=37, pack_state='PACK-R11-1',
+                      pack_members_snapshot=['P3', 'P6', 'P2', 'P7', 'P5'])
+        runner['equipped_gear'] = [{'card': card('GE-004'), 'installed_turn': 8,
+                                     'remaining_turns': None}]
+        runner['active_conditions'] = [make_condition(card(cid)) for cid in
+                                       ('CO-005', 'CO-006', 'CO-007', 'CO-009')]
+        positions = {2: 38, 3: 39, 4: 36, 6: 39, 7: 38, 8: 39}
+        sim.runners = [sim.new_runner(i - 1, 'Balanced', []) for i in positions] + [runner]
+        for other in sim.runners[:-1]:
+            other['quarter_mile_space'] = positions[int(other['player_id'][1:])]
+        capture = {}
+        selected = sim.choose_turn_plan(runner, capture)
+        self.assertEqual((selected['movement_cards'], selected['treat_prepare']['card_id']),
+                         (['TR-014'], 'TR-005'))
+        post = next(row for row in capture['candidates'] if row['treat_timing'] == 'after'
+                    and row['movement_cards'] == ['TR-014'] and row['treat_prepare']
+                    and row['treat_prepare'].get('card_id') == 'GE-005'
+                    and row['treat_prepare'].get('replace_id') == 'GE-004')
+        self.assertEqual(post['movement_quarters'], 1)
+        before = copy.deepcopy(runner)
+        rationale = describe_decision(sim, runner, capture)
+        self.assertEqual(runner, before)
+        self.assertEqual(rationale['selected_plan']['projected_movement_quarters'], 1)
 
 
 if __name__ == '__main__':
