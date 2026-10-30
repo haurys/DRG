@@ -2352,11 +2352,23 @@ class Sim:
             post_card_plays = 0 if plan['action'] == 'relocate' else 1
             if len(played) + used_plays + post_card_plays > self.cfg['max_voluntary_plays']:
                 raise ValueError('card-play budget exceeded by post-Movement Treat/Prepare')
+            # Check the proposed card and action now; Conditions, Event Effects,
+            # and stations can change eligibility before the action resolves.
             projected = self.preview_slot_sacrifice(runner, [
                 {**card, 'source': source} for card, source in zip(played, sources)])
             consumed = {card['id'] for card, source in zip(played, sources) if source == 'hand'}
             projected['hand'] = [card for card in projected['hand'] if card['id'] not in consumed]
-            if not self.legal_treat_prepare(projected, plan):
+            treatment_card = next((card for card in projected['hand']
+                                   if card['id'] == plan.get('card_id')), None)
+            action = plan['action']
+            if not treatment_card or not (
+                action == 'fuel' and treatment_card['family'] == 'Fuel' or
+                action == 'training' and treatment_card['family'] == 'Training' or
+                action == 'gear' and treatment_card['family'] == 'Gear'
+                and treatment_card['title'] not in ATTACHMENT or
+                action == 'attach' and treatment_card['family'] == 'Gear'
+                and treatment_card['title'] in ATTACHMENT
+            ):
                 raise ValueError('illegal post-Movement Treat/Prepare')
         if not played and not gut_recovered:
             raise ValueError('Movement-phase card required')
