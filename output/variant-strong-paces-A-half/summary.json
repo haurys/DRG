@@ -1,0 +1,299 @@
+{
+  "4": {
+    "races": 50,
+    "errors": 0,
+    "error_messages": [],
+    "rounds_to_first_finish": {
+      "mean": 14.42,
+      "median": 14.5,
+      "p10": 12.0,
+      "p90": 16.0,
+      "min": 11,
+      "max": 18
+    },
+    "rounds_to_last_finish": {
+      "mean": 19.74,
+      "median": 19.5,
+      "p10": 17.0,
+      "p90": 23.0,
+      "min": 16,
+      "max": 32
+    },
+    "total_rounds": {
+      "mean": 19.78,
+      "median": 20.0,
+      "p10": 17.0,
+      "p90": 23.0,
+      "min": 16,
+      "max": 32
+    },
+    "finish_gap_rounds": {
+      "mean": 5.32,
+      "median": 4.0,
+      "max": 19
+    },
+    "finish_rate": 0.975,
+    "races_with_no_finisher": 0,
+    "dnf_reasons": {
+      "failed_gut_check": 5
+    },
+    "avg_miles_per_turn": 1.549,
+    "zero_move_turn_share": 0.171,
+    "deck_reshuffles_per_race": 1,
+    "energy_stops_per_runner": 0.0,
+    "gut_stops_per_runner": 0.25,
+    "will_uses_per_runner": 0.99,
+    "pace_share": {
+      "Easy": 0.582,
+      "Steady": 0.227,
+      "Push": 0.127,
+      "Race": 0.063
+    },
+    "winner_profiles": {
+      "Balanced": 18,
+      "Energy Conservative": 16,
+      "Aggressive": 8,
+      "Course Planner": 8
+    },
+    "never_played_cards": [
+      "CO-001",
+      "CO-002",
+      "CO-003",
+      "CO-004",
+      "CO-005",
+      "CO-006",
+      "CO-007",
+      "CO-008",
+      "CO-009",
+      "CO-010",
+      "CO-011",
+      "CO-012",
+      "CO-013",
+      "CO-014",
+      "CO-015",
+      "CO-016"
+    ],
+    "most_played_cards": [
+      [
+        "EV-028",
+        84
+      ],
+      [
+        "EV-023",
+        79
+      ],
+      [
+        "EV-014",
+        79
+      ],
+      [
+        "EV-022",
+        75
+      ],
+      [
+        "TR-013",
+        74
+      ]
+    ]
+  },
+  "6": {
+    "races": 50,
+    "errors": 0,
+    "error_messages": [],
+    "rounds_to_first_finish": {
+      "mean": 13.56,
+      "median": 14.0,
+      "p10": 12.0,
+      "p90": 15.0,
+      "min": 11,
+      "max": 16
+    },
+    "rounds_to_last_finish": {
+      "mean": 19.46,
+      "median": 19.0,
+      "p10": 17.0,
+      "p90": 23.0,
+      "min": 15,
+      "max": 34
+    },
+    "total_rounds": {
+      "mean": 19.52,
+      "median": 19.0,
+      "p10": 17.0,
+      "p90": 23.0,
+      "min": 15,
+      "max": 34
+    },
+    "finish_gap_rounds": {
+      "mean": 5.9,
+      "median": 5.0,
+      "max": 20
+    },
+    "finish_rate": 0.99,
+    "races_with_no_finisher": 0,
+    "dnf_reasons": {
+      "failed_gut_check": 3
+    },
+    "avg_miles_per_turn": 1.633,
+    "zero_move_turn_share": 0.144,
+    "deck_reshuffles_per_race": 2.12,
+    "energy_stops_per_runner": 0.0,
+    "gut_stops_per_runner": 0.34,
+    "will_uses_per_runner": 1.0,
+    "pace_share": {
+      "Easy": 0.552,
+      "Steady": 0.24,
+      "Push": 0.137,
+      "Race": 0.07
+    },
+    "winner_profiles": {
+      "Pack Runner": 10,
+      "Energy Conservative": 6,
+      "Balanced": 11,
+      "Course Planner": 7,
+      "Opportunist": 8,
+      "Aggressive": 8
+    },
+    "never_played_cards": [
+      "CO-001",
+      "CO-002",
+      "CO-003",
+      "CO-004",
+      "CO-005",
+      "CO-006",
+      "CO-007",
+      "CO-008",
+      "CO-009",
+      "CO-010",
+      "CO-011",
+      "CO-012",
+      "CO-013",
+      "CO-014",
+      "CO-015",
+      "CO-016"
+    ],
+    "most_played_cards": [
+      [
+        "EV-023",
+        127
+      ],
+      [
+        "EV-014",
+        119
+      ],
+      [
+        "EV-022",
+        118
+      ],
+      [
+        "EV-027",
+        117
+      ],
+      [
+        "TR-020",
+        113
+      ]
+    ]
+  },
+  "8": {
+    "races": 50,
+    "errors": 0,
+    "error_messages": [],
+    "rounds_to_first_finish": {
+      "mean": 12.88,
+      "median": 13.0,
+      "p10": 11.9,
+      "p90": 14.0,
+      "min": 11,
+      "max": 15
+    },
+    "rounds_to_last_finish": {
+      "mean": 20.14,
+      "median": 19.0,
+      "p10": 17.0,
+      "p90": 23.1,
+      "min": 17,
+      "max": 37
+    },
+    "total_rounds": {
+      "mean": 20.14,
+      "median": 19.0,
+      "p10": 17.0,
+      "p90": 23.1,
+      "min": 17,
+      "max": 37
+    },
+    "finish_gap_rounds": {
+      "mean": 7.26,
+      "median": 6.5,
+      "max": 23
+    },
+    "finish_rate": 0.973,
+    "races_with_no_finisher": 0,
+    "dnf_reasons": {
+      "failed_gut_check": 11
+    },
+    "avg_miles_per_turn": 1.658,
+    "zero_move_turn_share": 0.151,
+    "deck_reshuffles_per_race": 3.78,
+    "energy_stops_per_runner": 0.0,
+    "gut_stops_per_runner": 0.45,
+    "will_uses_per_runner": 0.99,
+    "pace_share": {
+      "Easy": 0.528,
+      "Steady": 0.256,
+      "Push": 0.144,
+      "Race": 0.072
+    },
+    "winner_profiles": {
+      "Opportunist": 10,
+      "Pack Runner": 5,
+      "Adaptive": 7,
+      "Balanced": 11,
+      "Front Runner": 4,
+      "Course Planner": 6,
+      "Aggressive": 4,
+      "Energy Conservative": 3
+    },
+    "never_played_cards": [
+      "CO-001",
+      "CO-002",
+      "CO-003",
+      "CO-004",
+      "CO-005",
+      "CO-006",
+      "CO-007",
+      "CO-008",
+      "CO-009",
+      "CO-010",
+      "CO-011",
+      "CO-012",
+      "CO-013",
+      "CO-014",
+      "CO-015",
+      "CO-016"
+    ],
+    "most_played_cards": [
+      [
+        "EV-023",
+        187
+      ],
+      [
+        "EV-022",
+        165
+      ],
+      [
+        "TR-019",
+        161
+      ],
+      [
+        "EV-008",
+        156
+      ],
+      [
+        "EV-014",
+        154
+      ]
+    ]
+  }
+}

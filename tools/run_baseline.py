@@ -33,8 +33,9 @@ def card_id(payload):
 
 
 def run_race(args):
-    player_count, seed, config_path = args
+    player_count, seed, config_path, overrides = args
     cfg = load_json(ROOT / config_path)
+    cfg.update(overrides)
     cfg['player_count'] = player_count
     cfg['seed'] = seed
     started = time.time()
@@ -78,6 +79,8 @@ def run_race(args):
         'pack_entries': counts['PACK_ENTER'],
         'events': len(sim.events),
         'card_plays': dict(card_plays),
+        'pace_counts': dict(collections.Counter(e['payload'].get('selected_pace') for e in sim.events
+                                                if e['type'] == 'PACE_PAYMENT')),
         'winner_profile': next((r['profile'] for r in sim.runners if r.get('finish_order') == 1), None),
         'seconds': round(time.time() - started, 2),
     }
@@ -114,6 +117,10 @@ def summarize(rows, all_card_ids):
         plays = collections.Counter()
         for r in ok:
             plays.update(r['card_plays'])
+        paces = collections.Counter()
+        for r in ok:
+            paces.update(r.get('pace_counts', {}))
+        pace_total = sum(paces.values()) or 1
         per_runner = lambda key: round(sum(r[key] for r in ok) / total_runners, 2) if total_runners else None
         out[players] = {
             'races': len(group), 'errors': len(group) - len(ok),
@@ -133,6 +140,7 @@ def summarize(rows, all_card_ids):
             'energy_stops_per_runner': per_runner('energy_stops'),
             'gut_stops_per_runner': per_runner('gut_stops'),
             'will_uses_per_runner': per_runner('will_uses'),
+            'pace_share': {k: round(v / pace_total, 3) for k, v in sorted(paces.items(), key=lambda kv: -kv[1])},
             'winner_profiles': dict(collections.Counter(r['winner_profile'] for r in ok)),
             'never_played_cards': sorted(set(all_card_ids) - set(plays)),
             'most_played_cards': plays.most_common(5),
@@ -142,7 +150,7 @@ def summarize(rows, all_card_ids):
 
 def render(summary, seeds, config_path):
     lines = ['# DRG Baseline Simulation Summary', '',
-             f'Config: `{config_path}` with in-memory player_count and seed only. '
+             f'Config: `{config_path}`; player_count and seed set in memory. '
              f'Seeds {FIRST_SEED}–{FIRST_SEED + seeds - 1} at every player count.', '']
     header = '| Metric | ' + ' | '.join(f'{p} players' for p in summary) + ' |'
     lines += [header, '|---|' + '---|' * len(summary)]
@@ -171,6 +179,7 @@ def render(summary, seeds, config_path):
     row('Energy stops per runner', lambda s: f"{s['energy_stops_per_runner']:.2f}")
     row('Gut Check stops per runner', lambda s: f"{s['gut_stops_per_runner']:.2f}")
     row('Will uses per runner', lambda s: f"{s['will_uses_per_runner']:.2f}")
+    row('Pace choices', lambda s: ', '.join(f'{k} {v:.0%}' for k, v in s['pace_share'].items()))
     row('Cards never played', lambda s: str(len(s['never_played_cards'])))
     return '\n'.join(lines) + '\n'
 
@@ -182,12 +191,18 @@ def main():
     parser.add_argument('--config', default='simulation/config.json')
     parser.add_argument('--output', default='output/baseline')
     parser.add_argument('--workers', type=int, default=None)
+    parser.add_argument('--set', action='append', default=[], metavar='KEY=JSON',
+                        help='override a top-level config value, e.g. --set quarters_per_space=2')
     args = parser.parse_args()
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
     out = ROOT / args.output
     out.mkdir(parents=True, exist_ok=True)
-    jobs = [(p, FIRST_SEED + i, args.config) for p in args.players for i in range(args.seeds)]
+    overrides = {}
+    for item in args.set:
+        key, _, value = item.partition('=')
+        overrides[key] = json.loads(value)
+    jobs = [(p, FIRST_SEED + i, args.config, overrides) for p in args.players for i in range(args.seeds)]
     rows = []
     started = time.time()
     with ProcessPoolExecutor(max_workers=args.workers) as pool, open(out / 'races.jsonl', 'w') as stream:
@@ -202,8 +217,9 @@ def main():
     all_ids = [card['id'] for card in load_json(ROOT / 'data/race_cards.json')]
     summary = summarize(rows, all_ids)
     (out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
-    (out / 'Baseline-Summary.md').write_text(render(summary, args.seeds, args.config), encoding='utf-8')
-    print(render(summary, args.seeds, args.config))
+    label = args.config + (' with ' + ', '.join(args.set) if args.set else '')
+    (out / 'Baseline-Summary.md').write_text(render(summary, args.seeds, label), encoding='utf-8')
+    print(render(summary, args.seeds, label))
 
 
 if __name__ == '__main__':

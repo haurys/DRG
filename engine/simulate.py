@@ -3,7 +3,12 @@
 from pathlib import Path
 import argparse, collections, copy, hashlib, itertools, json, random, statistics
 
+ALL_PACES = ['Easy', 'Steady', 'Race', 'Push']
+# Active Pace order, slowest first. Sim() narrows it in place to the Paces in its config,
+# so the optional playtest Easy Pace exists only when the config defines it.
 PACE_ORDER = ['Steady', 'Race', 'Push']
+# Highest card Effort that costs no Energy for Movement (playtest option; printed rule is 3).
+MOVEMENT_COST_TIERS = {'free_max': 3, 'one_max': 6}
 MILESTONES = {
     'marathon': {'Water': [4, 8, 12, 16, 20, 24], 'Aid/Fuel': [8, 16, 24], 'Gut Check': [10, 18, 23]},
     'half': {'Water': [3, 6, 9], 'Aid/Fuel': [6], 'Gut Check': [6, 11]},
@@ -71,7 +76,8 @@ def movement_energy_cost(card):
     effort = card.get('effort')
     if effort is None:
         raise ValueError('Condition cannot be used for Movement')
-    return 0 if effort <= 3 else 1 if effort <= 6 else 2
+    free_max = MOVEMENT_COST_TIERS['free_max']
+    return 0 if effort <= free_max else 1 if effort <= MOVEMENT_COST_TIERS['one_max'] else 2
 
 
 def card_effort(card):
@@ -265,24 +271,37 @@ def recycle_discard(draw, discard, rng, in_play_ids=(), audit=None):
 
 
 def resolve_movement(start_space, movement_result, difficulties, course_quarters,
-                     direct_movement=0):
-    """Resolve Base Movement with boundary deltas, then distinct Direct Movement."""
+                     direct_movement=0, quarters_per_space=1, result_per_space=2):
+    """Resolve Base Movement with boundary deltas, then distinct Direct Movement.
+
+    quarters_per_space=1 is the printed quarter-mile board. quarters_per_space=2 is the
+    half-mile-space playtest variant: each board space is half a mile, still costs 2
+    integer Movement Result, and Direct Movement moves whole spaces. Positions stay in
+    quarter-mile units so milestones, stations and Gut Checks are unchanged.
+    """
+    qps = quarters_per_space
+    rps = result_per_space  # Movement Result per space; 1 is the 1-for-1 playtest option.
+
+    def convert(result):
+        return movement(result) if rps == 2 else -(-result // rps)
+
     pos, remaining, moved, boundaries = start_space, movement_result, 0, []
+    direct_movement *= qps
     while remaining > 0 and pos < course_quarters:
         segment = min(pos // 4, len(difficulties) - 1)
         boundary = min((segment + 1) * 4, course_quarters)
         distance_to_boundary = boundary - pos
-        possible = movement(remaining)
+        possible = convert(remaining) * qps
         if possible < distance_to_boundary:
             step = min(possible, course_quarters - pos)
             pos += step
             moved += step
-            remaining -= step * 2
+            remaining -= -(-step // qps) * rps
             break
         step = min(distance_to_boundary, course_quarters - pos)
         pos += step
         moved += step
-        remaining -= step * 2
+        remaining -= -(-step // qps) * rps
         if step < distance_to_boundary or pos >= course_quarters:
             break
         previous, new = difficulties[segment], difficulties[segment + 1]
@@ -292,7 +311,7 @@ def resolve_movement(start_space, movement_result, difficulties, course_quarters
             remaining -= change
         boundaries.append({
             'boundary_space': pos, 'boundary_mile': pos / 4,
-            'movement_result_used': step * 2, 'remaining_before_adjustment': before,
+            'movement_result_used': -(-step // qps) * rps, 'remaining_before_adjustment': before,
             'previous_difficulty': previous, 'new_difficulty': new,
             'difficulty_change': change, 'adjustment_applied': adjustment_applied,
             'adjusted_remaining': remaining,
@@ -314,9 +333,10 @@ def resolve_movement(start_space, movement_result, difficulties, course_quarters
         'from_space': start_space, 'to_space': pos, 'quarter_miles': moved,
         'base_quarter_miles': base_moved, 'direct_quarter_miles': direct_applied,
         'direct_requested': direct_movement, 'direct_remaining': unused_direct,
-        'movement_result': movement_result, 'converted_movement_quarters': movement(movement_result),
+        'movement_result': movement_result,
+        'converted_movement_quarters': convert(movement_result) * qps,
         'remaining_result': remaining, 'positive_finish_movement': finish_crossed,
-        'finish_discarded_quarters': max(0, movement(remaining) + unused_direct - 1)
+        'finish_discarded_quarters': max(0, convert(remaining) * qps + unused_direct - 1)
                                      if finish_crossed else 0,
         'boundaries': boundaries,
     }
@@ -332,10 +352,23 @@ def public_runner(runner):
 class Sim:
     def __init__(self, root, cfg):
         self.root, self.cfg = root, cfg
+        PACE_ORDER[:] = [pace for pace in ALL_PACES if pace in cfg['pace']]
+        MOVEMENT_COST_TIERS['free_max'] = cfg.get('free_movement_effort_max', 3)
+        MOVEMENT_COST_TIERS['one_max'] = cfg.get('one_energy_effort_max', 6)
         self.rng = random.Random(cfg['seed'])
         self.events, self.seq, self.round = [], 0, 0
         self.cards = load_json(root / 'data/race_cards.json')
         self.course_cards = load_json(root / 'data/course_cards.json')
+        # Playtest options: scale printed Course Difficulty and shift printed card Effort.
+        divisor = cfg.get('difficulty_divisor')
+        if divisor:
+            for side in self.course_cards:
+                side['difficulty'] = -(-side['difficulty'] // divisor)
+        effort_add = cfg.get('effort_add', 0)
+        if effort_add:
+            for card in self.cards:
+                if card.get('effort') is not None:
+                    card['effort'] += effort_add
         self.profiles = load_json(root / 'simulation/players.json')
         self.draw, self.discard, self.course, self.runners = [], [], [], []
         self.finish, self.pending_finishers, self.turn_records = [], [], []
@@ -893,6 +926,12 @@ class Sim:
     def choose_pace(self, runner):
         maximum = self.maximum_legal_pace(runner)
         candidates = PACE_ORDER[:PACE_ORDER.index(maximum) + 1]
+        if (self.cfg.get('easy_no_repeat') and runner['previous_pace'] == 'Easy'
+                and len(candidates) > 1):
+            candidates = [pace for pace in candidates if pace != 'Easy']
+        easy_max = self.cfg.get('easy_max_energy')
+        if easy_max is not None and runner['energy'] > easy_max and len(candidates) > 1:
+            candidates = [pace for pace in candidates if pace != 'Easy']  # Easy as a low-Energy fail-safe.
         scored = []
         for pace in candidates:
             preview = copy.deepcopy(runner)
@@ -1104,7 +1143,9 @@ class Sim:
                   + self.cfg['pace'][runner['pace']]['modifier'] - penalty
                   - (0 if runner['quarter_mile_space'] >= course_end else difficulties[index]))
         resolved = resolve_movement(runner['quarter_mile_space'], result, difficulties, course_end,
-                                    direct_movement=direct)
+                                    direct_movement=direct,
+                                    quarters_per_space=self.cfg.get('quarters_per_space', 1),
+                                    result_per_space=self.cfg.get('movement_result_per_space', 2))
         resolved['staged_energy_cost'] = staged_energy_cost
         resolved['milestone_energy_gain'] = (sum(
             runner['quarter_mile_space'] < mile * 4 <= resolved['to_space']
@@ -1637,6 +1678,8 @@ class Sim:
             runner['pack_leader'] = None
         pack_number = 0
         for pace in PACE_ORDER:
+            if pace == 'Easy' and self.cfg.get('easy_breaks_pack'):
+                continue  # Optional playtest rule: Easy runners never form a Pack.
             available = sorted((runner for runner in self.runners if self.round >= 2 and runner['race_status'] == 'RUNNING' and not runner['finished'] and not runner.get('dnf') and runner['pace'] == pace
                                 and not any(event['card']['id'] == 'EV-030'
                                             for event in self.active_staged(runner))),
@@ -1740,13 +1783,19 @@ class Sim:
 
     def pace_cost(self, runner, pace):
         base = abs(self.cfg['pace'][pace]['energy_cost'])
+        # Optional playtest Easy Pace may recover Energy; a negative final cost is a gain.
+        gain = self.cfg['pace'][pace].get('energy_gain', 0)
         condition_extra = sum(condition_effects(condition, pace)['extra_energy']
                               for condition in runner['active_conditions'])
         staged_extra = 0
         sources = self.pace_preservation(runner, pace)
         final = max(0, base + condition_extra + staged_extra - len(sources))
+        recover_max = self.cfg.get('easy_recover_max_energy')
+        if gain and condition_extra == 0 and (recover_max is None or runner['energy'] <= recover_max):
+            final -= gain
         return {'base': base, 'condition_extra': condition_extra, 'staged_extra': staged_extra,
-                'preservation_sources': sources, 'final': final}
+                'preservation_sources': sources, 'energy_gain': gain if final < 0 else 0,
+                'final': final}
 
     def pay_pace(self, runner, movement_cost=0, allow_will=True):
         runner['pace'] = self.payable_pace(runner)
@@ -1779,16 +1828,33 @@ class Sim:
         else:
             paid = cost['final']
             runner['energy'] -= paid
-        runner['stats']['energy_spent'] += paid
+        if paid < 0:
+            runner['stats']['energy_gained'] -= paid
+        else:
+            runner['stats']['energy_spent'] += paid
         self.emit('PACE_PAYMENT', runner['player_id'], {**cost, 'selected_pace': runner['pace'],
                   'paid': paid, 'will_used': will_used, 'will_shortfall': shortfall if will_used else 0,
                   'movement_cost': movement_cost, 'energy_after': runner['energy']})
         return cost, will_used
 
     def movement_effort_bonus(self, runner, segment):
-        # The redesigned installed effects produce Energy or Difficulty changes,
-        # never generic Movement Effort.
-        return 0, []
+        # Printed rules: installed effects produce Energy or Difficulty changes, never
+        # generic Movement Effort. Tuning options (off by default) test stronger installs:
+        # training_effort_bonus = +N Effort per installed Training card;
+        # gear_difficulty_reduction = -N Difficulty per equipped Gear card on the current mile.
+        bonus, sources = 0, []
+        per_training = self.cfg.get('training_effort_bonus', 0)
+        if per_training:
+            for item in runner['active_training']:
+                bonus += per_training
+                sources.append({'card': item['card']['title'], 'value': per_training})
+        per_gear = self.cfg.get('gear_difficulty_reduction', 0)
+        if per_gear and runner['equipped_gear']:
+            relief = min(per_gear * len(runner['equipped_gear']), segment.get('difficulty', 0))
+            if relief:
+                bonus += relief
+                sources.append({'card': 'Gear', 'value': relief})
+        return bonus, sources
 
     def choose_movement_cards(self, runner, available_plays):
         choices = self.movement_candidates(runner, available_plays)
@@ -2452,7 +2518,9 @@ class Sim:
                         - start_difficulty)
         old_space = runner['quarter_mile_space']
         resolved = resolve_movement(old_space, result_value, difficulties, len(self.course) * 4,
-                                    direct_movement=direct)
+                                    direct_movement=direct,
+                                    quarters_per_space=self.cfg.get('quarters_per_space', 1),
+                                    result_per_space=self.cfg.get('movement_result_per_space', 2))
         stopped_at = self.resolve_milestones(runner, old_space, resolved['to_space'])
         if stopped_at is not None:
             original_to = resolved['to_space']
