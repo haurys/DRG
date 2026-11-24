@@ -5,18 +5,18 @@ Config: `simulation/config-working-candidate.json`; player_count and seed set in
 | Metric | 4 players | 6 players | 8 players |
 |---|---|---|---|
 | Races completed / errors | 50 / 0 | 50 / 0 | 50 / 0 |
-| Round of first finish, median | 12 (p10 11, p90 13) | 11 (p10 11, p90 12) | 11 (p10 10, p90 12) |
-| Round of last finish, median | 15 (p10 14, p90 16) | 15 (p10 14, p90 16) | 15 (p10 14, p90 17) |
-| Total rounds (all finished or DNF), median | 15 (p10 14, p90 16) | 15 (p10 14, p90 16) | 15 (p10 14, p90 17) |
-| Gap first→last finisher, mean rounds | 2.9 | 3.7 | 4.3 |
-| Finish rate | 98% | 99% | 99% |
+| Round of first finish, median | 11 (p10 10, p90 12) | 11 (p10 10, p90 11) | 10 (p10 10, p90 11) |
+| Round of last finish, median | 14 (p10 12, p90 16) | 13 (p10 12, p90 15) | 14 (p10 12, p90 15) |
+| Total rounds (all finished or DNF), median | 14 (p10 12, p90 16) | 13 (p10 12, p90 15) | 14 (p10 12, p90 15) |
+| Gap first→last finisher, mean rounds | 3.3 | 3.0 | 4.1 |
+| Finish rate | 100% | 99% | 100% |
 | Races with no finisher | 0 | 0 | 0 |
-| DNF reasons | failed_gut_check 3 | failed_gut_check 4 | failed_gut_check 5 |
-| Average miles per turn | 1.93 | 1.98 | 2.00 |
-| Turns with zero movement | 9% | 7% | 7% |
-| Deck reshuffles per race | 1.0 | 2.0 | 3.0 |
+| DNF reasons | failed_gut_check 1 | failed_gut_check 2 | failed_gut_check 1 |
+| Average miles per turn | 2.09 | 2.20 | 2.20 |
+| Turns with zero movement | 7% | 5% | 5% |
+| Deck reshuffles per race | 1.0 | 1.9 | 3.0 |
 | Energy stops per runner | 0.00 | 0.00 | 0.00 |
-| Gut Check stops per runner | 0.20 | 0.19 | 0.21 |
-| Will uses per runner | 1.00 | 1.00 | 1.00 |
-| Pace choices | Easy 65%, Push 16%, Steady 15%, Race 4% | Easy 66%, Push 15%, Steady 14%, Race 5% | Easy 64%, Steady 16%, Push 16%, Race 5% |
+| Gut Check stops per runner | 0.13 | 0.12 | 0.18 |
+| Will uses per runner | 0.98 | 0.99 | 0.97 |
+| Pace choices | Easy 42%, Steady 29%, Push 18%, Race 11% | Easy 40%, Steady 29%, Push 19%, Race 12% | Easy 37%, Steady 30%, Push 19%, Race 13% |
 | Cards never played | 16 | 16 | 16 |

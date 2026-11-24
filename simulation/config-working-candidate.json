@@ -16,15 +16,15 @@
     },
     "Steady": {
       "modifier": 1,
-      "energy_cost": -1
+      "energy_cost": 0
     },
     "Race": {
-      "modifier": 2,
-      "energy_cost": -2
+      "modifier": 3,
+      "energy_cost": -1
     },
     "Push": {
-      "modifier": 3,
-      "energy_cost": -3
+      "modifier": 4,
+      "energy_cost": -2
     }
   },
   "movement_model": "A",
