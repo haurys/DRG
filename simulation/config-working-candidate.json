@@ -57,5 +57,8 @@
   "gear_slots": 2,
   "movement_result_per_space": 1,
   "easy_max_energy": 3,
-  "free_movement_effort_max": 6
+  "free_movement_effort_max": 3,
+  "difficulty_divisor": 2,
+  "training_effort_bonus": 1,
+  "gear_difficulty_reduction": 1
 }
