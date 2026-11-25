@@ -84,8 +84,22 @@ def card_effort(card):
     return (card.get('effort') or 0) if card.get('use_mode', 'MOVEMENT') == 'MOVEMENT' else 0
 
 
+# Playtest options set per Sim: always_event_effect makes an Event played for Effort
+# also resolve its Effect; GENERIC_EVENTS holds data-driven Effects for redesigned cards.
+EVENT_OPTIONS = {'always_effect': False}
+GENERIC_EVENTS = {}
+# Rival Events: the printed attack still resolves, and the player who plays it pays this.
+EVENT_SELF_COSTS = {}
+
+
 def active_effect_cards(cards):
-    return [card for card in cards if card.get('use_mode', 'MOVEMENT') == 'EFFECT']
+    return [card for card in cards if card.get('use_mode', 'MOVEMENT') == 'EFFECT'
+            or (EVENT_OPTIONS['always_effect'] and card.get('family') == 'Event')]
+
+
+def generic_choice_takes_energy(energy):
+    # "Lose 1 Movement or 1 Energy": a runner with Energy to spare gives Energy.
+    return energy >= 4
 
 
 def calculate_total_effort(cards, modes):
@@ -357,7 +371,14 @@ class Sim:
         MOVEMENT_COST_TIERS['one_max'] = cfg.get('one_energy_effort_max', 6)
         self.rng = random.Random(cfg['seed'])
         self.events, self.seq, self.round = [], 0, 0
-        self.cards = load_json(root / 'data/race_cards.json')
+        self.cards = load_json(root / cfg.get('race_cards_path', 'data/race_cards.json'))
+        EVENT_OPTIONS['always_effect'] = bool(cfg.get('always_event_effect', False))
+        GENERIC_EVENTS.clear()
+        GENERIC_EVENTS.update({card['id']: card['generic_effect'] for card in self.cards
+                               if card.get('generic_effect')})
+        EVENT_SELF_COSTS.clear()
+        EVENT_SELF_COSTS.update({card['id']: card['self_cost'] for card in self.cards
+                                 if card.get('self_cost')})
         self.course_cards = load_json(root / 'data/course_cards.json')
         # Playtest options: scale printed Course Difficulty and shift printed card Effort.
         divisor = cfg.get('difficulty_divisor')
@@ -961,7 +982,7 @@ class Sim:
                 if sum(card['family'] == 'Event' for card in combo) > 1:
                     continue
                 choices.append(tuple({**card, 'use_mode': 'MOVEMENT'} for card in combo))
-                if any(card['family'] == 'Event' for card in combo):
+                if any(card['family'] == 'Event' for card in combo) and not EVENT_OPTIONS['always_effect']:
                     event = next(card for card in combo if card['family'] == 'Event')
                     if event['id'] in TARGET_REQUIRED_EVENTS and not self.eligible_event_target(runner, event['id']):
                         continue
@@ -1128,6 +1149,14 @@ class Sim:
                 direct -= 1
             if event_id in ('EV-011', 'EV-012', 'EV-025'):
                 direct -= 1
+        direct += sum(EVENT_SELF_COSTS[event_id].get('self_move', 0)
+                      for event_id in ids & EVENT_SELF_COSTS.keys()
+                      if not event_id in TARGET_REQUIRED_EVENTS or self.eligible_event_target(runner, event_id))
+        for event_id in ids & GENERIC_EVENTS.keys():
+            effect = GENERIC_EVENTS[event_id]
+            direct += effect.get('self_move', 0)
+            if effect.get('self_choice') and not generic_choice_takes_energy(runner['energy']):
+                direct -= 1
         ignored = 'EV-014' in ids
         rain = (sudden_rain('EV-005', segment['mile'], len(self.course), self.round)
                 if 'EV-005' in ids else None)
@@ -1156,7 +1185,12 @@ class Sim:
     def known_event_energy(self, cards):
         """Self Energy from selected Event Effects; no hidden draws or other-runner choices."""
         ids = {card['id'] for card in active_effect_cards(cards) if card['family'] == 'Event'}
-        return sum(AFTER_ENERGY.get(card_id, 0) for card_id in ids) + (
+        generic = sum(GENERIC_EVENTS[card_id].get('self_energy', 0)
+                      + GENERIC_EVENTS[card_id].get('field_energy', 0)
+                      for card_id in ids & GENERIC_EVENTS.keys())
+        generic += sum(EVENT_SELF_COSTS[card_id].get('self_energy', 0)
+                       for card_id in ids & EVENT_SELF_COSTS.keys())
+        return generic + sum(AFTER_ENERGY.get(card_id, 0) for card_id in ids) + (
             2 if 'EV-026' in ids else 1 if 'EV-018' in ids else 0)
 
     def preview_post_movement_state(self, paid, cards, resolved):
@@ -1922,6 +1956,14 @@ class Sim:
         effort_bonus, direct, ignore_difficulty = 0, 0, False
         direct += sum(2 if event_id == 'EV-023' else 1 for event_id in event_ids & DIRECT_PLUS)
         direct -= int('EV-009' in event_ids) + int('EV-026' in event_ids)
+        for card in active_effect_cards(cards):
+            if card.get('self_cost_paid'):
+                direct += EVENT_SELF_COSTS[card['id']].get('self_move', 0)
+            effect = GENERIC_EVENTS.get(card['id'])
+            if effect:
+                direct += effect.get('self_move', 0)
+                if effect.get('self_choice') and not card.get('choice_paid_energy'):
+                    direct -= 1
         if 'EV-014' in event_ids:
             ignore_difficulty = True
         for event in self.active_staged(runner):
@@ -1942,9 +1984,32 @@ class Sim:
         if event_id == 'EV-018' and target and self.round_pack_snapshot.get(runner['player_id']) and (
                 target['player_id'] not in self.round_pack_snapshot[runner['player_id']]):
             raise ValueError('High Five recipient must be an eligible Pack member')
+        if (EVENT_OPTIONS['always_effect'] and event_id in TARGET_REQUIRED_EVENTS
+                and not (target or self.eligible_event_target(runner, event_id))):
+            self.emit('EVENT_NO_TARGET', runner['player_id'], {'card': event_id})
+            return 'discard'
         if event_id in TARGET_REQUIRED_EVENTS and not (target or self.eligible_event_target(runner, event_id)):
             raise ValueError('Event requires another Runner')
         runner['stats']['events_played'] += 1
+        if event_id in EVENT_SELF_COSTS:
+            card['self_cost_paid'] = True
+            cost = EVENT_SELF_COSTS[event_id]
+            if cost.get('self_energy'):
+                self.apply_energy(runner, cost['self_energy'], f'{card["title"]} cost')
+        if event_id in GENERIC_EVENTS:
+            effect = GENERIC_EVENTS[event_id]
+            if effect.get('self_energy'):
+                self.apply_energy(runner, effect['self_energy'], card['title'])
+            if effect.get('self_choice'):
+                card['choice_paid_energy'] = generic_choice_takes_energy(runner['energy'])
+                if card['choice_paid_energy']:
+                    self.apply_energy(runner, -1, f'{card["title"]} choice')
+            if effect.get('field_energy'):
+                for other in self.runners:
+                    if (other['current_mile'] == runner['current_mile'] and not other['finished']
+                            and not other.get('dnf')):
+                        self.apply_energy(other, effect['field_energy'], card['title'])
+            return 'discard'
         if event_id in ('EV-011', 'EV-012', 'EV-025'):
             target = target or self.event_target(runner)
             if target and target['energy'] > 0:
@@ -2568,6 +2633,8 @@ class Sim:
         for card in played:
             state = event_states.get(card['id'])
             card.pop('use_mode', None)
+            card.pop('choice_paid_energy', None)
+            card.pop('self_cost_paid', None)
             if state in ('staged', 'course', 'global', 'transferred'):
                 continue
             self.discard.append(card)

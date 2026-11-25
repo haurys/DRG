@@ -1,0 +1,38 @@
+10/150 done (20s)
+20/150 done (36s)
+30/150 done (53s)
+40/150 done (67s)
+50/150 done (81s)
+60/150 done (101s)
+70/150 done (123s)
+80/150 done (146s)
+90/150 done (178s)
+100/150 done (196s)
+110/150 done (226s)
+120/150 done (251s)
+130/150 done (284s)
+140/150 done (317s)
+150/150 done (339s)
+# DRG Baseline Simulation Summary
+
+Config: `simulation/config-working-candidate.json with always_event_effect=true, race_cards_path="simulation/variants/race_cards-events-balanced.json"`; player_count and seed set in memory. Seeds 1001–1050 at every player count.
+
+| Metric | 4 players | 6 players | 8 players |
+|---|---|---|---|
+| Races completed / errors | 50 / 0 | 50 / 0 | 50 / 0 |
+| Round of first finish, median | 12 (p10 10, p90 12) | 11 (p10 10, p90 12) | 11 (p10 10, p90 11) |
+| Round of last finish, median | 14 (p10 13, p90 16) | 14 (p10 13, p90 16) | 14 (p10 13, p90 16) |
+| Total rounds (all finished or DNF), median | 14 (p10 13, p90 16) | 14 (p10 13, p90 16) | 14 (p10 13, p90 16) |
+| Gap first→last finisher, mean rounds | 3.0 | 3.9 | 3.8 |
+| Finish rate | 90% | 95% | 95% |
+| Races with no finisher | 0 | 0 | 0 |
+| DNF reasons | failed_gut_check 19 | failed_gut_check 16 | failed_gut_check 21 |
+| Average miles per turn | 1.98 | 2.05 | 2.11 |
+| Turns with zero movement | 7% | 6% | 5% |
+| Deck reshuffles per race | 1.0 | 2.0 | 3.0 |
+| Energy stops per runner | 0.00 | 0.00 | 0.00 |
+| Gut Check stops per runner | 0.98 | 0.80 | 0.82 |
+| Will uses per runner | 0.95 | 0.96 | 0.94 |
+| Pace choices | Easy 39%, Steady 29%, Push 21%, Race 12% | Easy 40%, Steady 28%, Push 21%, Race 11% | Easy 37%, Steady 29%, Push 22%, Race 12% |
+| Cards never played | 0 | 0 | 0 |
+

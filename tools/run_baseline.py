@@ -214,7 +214,11 @@ def main():
             if done % 10 == 0 or row['error']:
                 flag = f" ERROR {row['error']['message']}" if row['error'] else ''
                 print(f'{done}/{len(jobs)} done ({time.time() - started:.0f}s){flag}', flush=True)
-    all_ids = [card['id'] for card in load_json(ROOT / 'data/race_cards.json')]
+    # Condition cards are drawn and applied, never played, so they are left out of "never played".
+    cards_path = overrides.get('race_cards_path') or load_json(ROOT / args.config).get(
+        'race_cards_path', 'data/race_cards.json')
+    all_ids = [card['id'] for card in load_json(ROOT / cards_path)
+               if card.get('family') != 'Condition']
     summary = summarize(rows, all_ids)
     (out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     label = args.config + (' with ' + ', '.join(args.set) if args.set else '')
