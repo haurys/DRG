@@ -24,7 +24,9 @@ class FinalRules(unittest.TestCase):
   self.assertTrue(m.anti_chafe_prevents('Hot Spot',True));self.assertFalse(m.anti_chafe_prevents('Blister',True))
  def test_remedies_and_twisted_ankle(self):
   self.assertIsNone(m.apply_remedy(m.make_condition(card('CO-010')),'Water'))
-  persistent=m.make_condition(card('CO-003'));persistent['title']='Tight Calf';persistent['current_severity']=0;self.assertTrue(persistent['persistent'])
+  self.assertIsNone(m.apply_remedy(m.make_condition(card('CO-010')),'Water'))
+  knee=m.apply_remedy(m.make_condition(card('CO-013')),'Aid');self.assertTrue(knee['persistent']);self.assertEqual(knee['current_severity'],0)
+  self.assertTrue(m.make_condition(card('CO-003'))['persistent'])
   self.assertEqual(m.apply_remedy(m.make_condition(card('CO-015')),'Aid')['current_severity'],4)
  def test_tough_decision_zero_one_two(self):
   event=card('EV-017');a=card('TR-001');b=card('TR-002')

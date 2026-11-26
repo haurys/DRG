@@ -81,6 +81,7 @@ def run_race(args):
         'card_plays': dict(card_plays),
         'pace_counts': dict(collections.Counter(e['payload'].get('selected_pace') for e in sim.events
                                                 if e['type'] == 'PACE_PAYMENT')),
+        'forecast': sim.forecast['id'] if getattr(sim, 'forecast', None) else None,
         'winner_profile': next((r['profile'] for r in sim.runners if r.get('finish_order') == 1), None),
         'seconds': round(time.time() - started, 2),
     }

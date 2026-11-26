@@ -1,0 +1,16 @@
+[
+  {"id": "FC-01", "title": "Perfect Day", "text": "No weather.", "weather": null},
+  {"id": "FC-02", "title": "Cool & Clear", "text": "No weather.", "weather": null},
+  {"id": "FC-03", "title": "Warm & Sunny", "text": "Sun: -⚡ at each Water station. Heat Exhaustion +1 Severity.",
+   "weather": "Sun", "severity_bonus": {"Heat Exhaustion": 1}},
+  {"id": "FC-04", "title": "Hot & Humid", "text": "Heat: -⚡ at each Water station. Heat Exhaustion and Dehydrated +1 Severity.",
+   "weather": "Heat", "severity_bonus": {"Heat Exhaustion": 1, "Dehydrated": 1}},
+  {"id": "FC-05", "title": "Late-Day Heat", "text": "From mile 13, Heat: -⚡ at each Water station.",
+   "weather": "Heat", "start_mile": 13},
+  {"id": "FC-06", "title": "Cold & Rainy", "text": "Rain: -⚡ at each Water station. Cold Chills +1 Severity.",
+   "weather": "Rain", "severity_bonus": {"Cold Chills": 1}},
+  {"id": "FC-07", "title": "Frigid Start", "text": "Through mile 12, Cold: -⚡ at each Water station. Cold Chills +1 Severity.",
+   "weather": "Cold", "end_mile": 12, "severity_bonus": {"Cold Chills": 1}},
+  {"id": "FC-08", "title": "Blustery", "text": "Wind: -⚡ at each Water station. Runners in a Pack are sheltered.",
+   "weather": "Wind", "pack_shelters": true}
+]

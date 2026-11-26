@@ -224,7 +224,7 @@ class Attachments(unittest.TestCase):
 
     def test_station_removals_discard_attached_cards(self):
         from engine.simulate import make_condition
-        for station, cid in (('Water', 'CO-010'), ('Aid', 'CO-013')):
+        for station, cid in (('Water', 'CO-010'), ('Aid', 'CO-012')):
             with self.subTest(station=station):
                 sim, r = fixture()
                 condition = make_condition(card(cid))

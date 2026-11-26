@@ -18,14 +18,18 @@ GUT_RECOVERY_TURNS = {10: 4, 18: 3, 23: 2}
 CONDITION_DEFS = {
     'Cramp': (4, False), 'Tight Calf': (3, True), 'Dead Legs': (5, True),
     'Blister': (3, True), 'Hot Spot': (2, True), 'Sore Feet': (4, True),
-    'Dehydrated': (5, False), 'Nausea': (4, False), 'Gashed Knee': (5, False),
+    'Dehydrated': (5, False), 'Nausea': (4, False), 'Gashed Knee': (5, True),
     'Side Stitch': (3, False), 'Twisted Ankle': (7, True), 'Heat Exhaustion': (8, False),
     'Cold Chills': (5, False),
 }
 TRAINING_DURATION = {}
 GEAR_DURATION = {'Tempo Trainers': 5, 'Carbon Racers': 3, 'Pace Watch': 2}
-ATTACHMENT = {'Running Socks': ('Blister', 2), 'Compression Sleeves': ('Cramp', 2),
+ATTACHMENT = {'Running Socks': ('Blister', 2), 'Compression Sleeves': ('Tight Calf', 2),
               'Recovery Sleeves': ('Tight Calf', 1)}
+# Slotted (equipped) Gear that prevents a new Condition when it is drawn.
+SLOT_PREVENTS = {'Anti-Chafe': {'Hot Spot'}, 'Compression Sleeves': {'Cramp', 'Tight Calf'}}
+# Gear that may either be slotted or attached to its Condition.
+DUAL_USE_GEAR = {title for title in SLOT_PREVENTS if title in ATTACHMENT}
 TRAINING_RESISTANCE = {
     'Long Run': {'Dead Legs': 2},
     'Base Miles': {'Dead Legs': 1, 'Tight Calf': 1},
@@ -390,6 +394,12 @@ class Sim:
             for card in self.cards:
                 if card.get('effort') is not None:
                     card['effort'] += effort_add
+        # Playtest option: a Race Day Forecast card drawn at setup ('random' or a card id).
+        self.forecast = None
+        if cfg.get('forecast'):
+            deck = load_json(root / cfg.get('forecast_cards_path', 'simulation/variants/forecast_cards.json'))
+            self.forecast = (random.Random(cfg['seed'] * 7919 + 17).choice(deck) if cfg['forecast'] == 'random'
+                             else next(card for card in deck if card['id'] == cfg['forecast']))
         self.profiles = load_json(root / 'simulation/players.json')
         self.draw, self.discard, self.course, self.runners = [], [], [], []
         self.finish, self.pending_finishers, self.turn_records = [], [], []
@@ -406,6 +416,11 @@ class Sim:
         self.station_aid_reductions = rule_conditions['aid_severity_reduction']
         self.marathon_gut = {int(mile): values for mile, values in
                              cfg.get('marathon_gut_provisional_thresholds', {}).items()}
+        # Playtest option: scale every Gut Check hand-Effort threshold (rounded).
+        gut_scale = cfg.get('gut_effort_scale')
+        if gut_scale:
+            self.marathon_gut = {mile: {**values, 'prepared_effort': round(values['prepared_effort'] * gut_scale)}
+                                 for mile, values in self.marathon_gut.items()}
         if cfg['race_format'] == 'marathon' and set(self.marathon_gut) != set(GUT_RECOVERY_TURNS):
             raise ValueError('three provisional Marathon Gut thresholds required')
 
@@ -543,6 +558,10 @@ class Sim:
     def anti_chafe_active(self, runner):
         return 'Anti-Chafe' in self.installed_titles(runner, 'gear')
 
+    def preventing_gear(self, runner, condition_title):
+        return next((title for title in self.installed_titles(runner, 'gear')
+                     if condition_title in SLOT_PREVENTS.get(title, ())), None)
+
     def in_play_ids(self):
         ids = set()
         for runner in self.runners:
@@ -579,12 +598,17 @@ class Sim:
                    'discard_count': len(self.discard)})
         if card['family'] == 'Condition':
             runner['stats']['conditions_drawn'] += 1
-            if anti_chafe_prevents(card['title'], self.anti_chafe_active(runner)):
+            preventer = self.preventing_gear(runner, card['title'])
+            if preventer:
                 self.discard.append(card)
                 self.emit('CONDITION_PREVENT', runner['player_id'],
-                          {'condition': card['id'], 'source': 'Anti-Chafe'})
+                          {'condition': card['id'], 'source': preventer})
                 return self.draw_one(runner, True)
             condition = make_condition(card)
+            bonus = (self.forecast or {}).get('severity_bonus', {}).get(card['title'], 0)
+            if bonus:
+                condition['base_severity'] += bonus
+                condition['current_severity'] += bonus
             reductions = [{'card': item['card']['id'], 'title': item['card']['title'],
                            'amount': TRAINING_RESISTANCE.get(item['card']['title'], {}).get(card['title'], 0)}
                           for item in runner['active_training']]
@@ -810,7 +834,8 @@ class Sim:
             return any(item['card']['id'] == plan.get('replace_id')
                        for item in runner['active_training'])
         if action == 'gear':
-            if card['family'] != 'Gear' or card['title'] in ATTACHMENT:
+            if card['family'] != 'Gear' or (card['title'] in ATTACHMENT
+                                             and card['title'] not in DUAL_USE_GEAR):
                 return False
             footwear = next((item for item in runner['equipped_gear']
                              if item['card'].get('is_footwear', False)), None)
@@ -855,7 +880,7 @@ class Sim:
                                 if len(runner['active_training']) >= self.cfg['training_slots'] else [None])
                 candidates.extend({'card_id': card['id'], 'action': 'training', 'replace_id': old}
                                   for old in replacements)
-            if card['family'] == 'Gear' and card['title'] not in ATTACHMENT:
+            if card['family'] == 'Gear' and (card['title'] not in ATTACHMENT or card['title'] in DUAL_USE_GEAR):
                 footwear = next((item for item in runner['equipped_gear'] if item['card'].get('is_footwear', False)), None)
                 replacements = ([footwear['card']['id']] if card.get('is_footwear', False) and footwear
                                 else [item['card']['id'] for item in runner['equipped_gear']]
@@ -1315,6 +1340,13 @@ class Sim:
                 - ('Hydration Belt' in self.installed_titles(setup_baseline, 'gear'))
                 for side in future_sides
                 if side['mile'] in MILESTONES[self.cfg['race_format']]['Water'])
+            if self.forecast and self.forecast.get('weather'):
+                water_delta += sum(
+                    bool(self.forecast_protection(prepared, self.forecast['weather']))
+                    - bool(self.forecast_protection(setup_baseline, self.forecast['weather']))
+                    for side in future_sides
+                    if side['mile'] in MILESTONES[self.cfg['race_format']]['Water']
+                    and self.forecast_weather_at(side['mile']))
             weather_next = [e for e in self.global_events if e['activate_round'] == self.round + 1
                             and e['source'] == runner['player_id']]
             weather_preservation = sum(
@@ -1341,8 +1373,9 @@ class Sim:
                 old_mod = gut_check([], old_titles, self.installed_titles(setup_baseline, 'gear'))['modifiers']
                 new_mod = gut_check([], new_titles, self.installed_titles(prepared, 'gear'))['modifiers']
                 score += horizon * (new_mod - old_mod)
-            if setup_card['title'] == 'Anti-Chafe' and not self.anti_chafe_active(setup_baseline):
-                score += horizon * 0.5
+            old_prevented = set().union(*(SLOT_PREVENTS.get(t, set()) for t in self.installed_titles(setup_baseline, 'gear')))
+            new_prevented = set().union(*(SLOT_PREVENTS.get(t, set()) for t in self.installed_titles(prepared, 'gear')))
+            score += horizon * 0.5 * len(new_prevented - old_prevented)
         if plan and plan['action'] in ('fuel', 'attach'):
             future = {c['id']: c for c in prepared['active_conditions']}
             reduction = sum(max(0, c['effective_severity'] -
@@ -1902,6 +1935,10 @@ class Sim:
             resolved = self.preview_movement(after, cards)
             score, _ = self.plan_score(runner, liquidated, after, None, cards, resolved)
             ranked.append((score, resolved['quarter_miles'], tuple(c['id'] for c in cards), cards))
+        due = self.due_events(runner)
+        forced = [row for row in ranked if due & set(row[2])]
+        if forced:
+            ranked = forced
         return list(max(ranked, key=lambda row: row[:3])[-1]) if ranked else []
 
     def event_target(self, source):
@@ -2286,6 +2323,7 @@ class Sim:
                 for item in runner['equipped_gear']:
                     if item['card']['title'] == 'Hydration Belt':
                         self.apply_energy(runner, 1, 'Hydration Belt at Water')
+                self.apply_forecast_at_water(runner, mile)
                 self.emit('MILESTONE', runner['player_id'], {'mile': mile, 'kind': 'Water'})
             if mile in MILESTONES[self.cfg['race_format']]['Aid/Fuel']:
                 for condition in list(runner['active_conditions']):
@@ -2336,6 +2374,26 @@ class Sim:
             self.emit('EVENT_EXPIRE', runner['player_id'], {'card': event['card']['id'],
                       'target_lock': False})
 
+    def due_events(self, runner):
+        """Events held since an earlier turn: under event_play_by_next_turn they must be played now."""
+        if not self.cfg.get('event_play_by_next_turn'):
+            return set()
+        held = runner.get('event_held_since', {})
+        return {card['id'] for card in runner['hand'] if card['family'] == 'Event'
+                and held.get(card['id'], runner['race_turn_number']) < runner['race_turn_number']}
+
+    def expire_held_events(self, runner):
+        # An Event not played by the turn after it was drawn is discarded unplayed.
+        if not self.cfg.get('event_play_by_next_turn'):
+            return
+        held = runner.get('event_held_since', {})
+        for card in list(runner['hand']):
+            if card['family'] == 'Event' and held.get(card['id'], runner['race_turn_number']) < runner['race_turn_number'] - 1:
+                runner['hand'].remove(card)
+                held.pop(card['id'], None)
+                self.discard.append(card)
+                self.emit('EVENT_HELD_EXPIRE', runner['player_id'], {'card': card['id']})
+
     def turn(self, runner, script=None):
         script = script or {}
         if runner['finished'] or runner.get('dnf') or runner['finish_pending']:
@@ -2343,10 +2401,19 @@ class Sim:
         runner['race_turn_number'] += 1
         runner['round'] = self.round
         self.locate(runner)
+        self.expire_held_events(runner)
         self.emit('TURN_START', runner['player_id'], {'turn': runner['race_turn_number'],
                   'hand': [card['id'] for card in runner['hand']], 'energy': runner['energy'],
                   'pack': runner['pack_state']}, {'runner': public_runner(runner)})
         self.replenish(runner)
+        if self.cfg.get('event_play_by_next_turn'):
+            held = runner.setdefault('event_held_since', {})
+            ids = {card['id'] for card in runner['hand'] if card['family'] == 'Event'}
+            for card_id in list(held):
+                if card_id not in ids:
+                    del held[card_id]
+            for card_id in ids:
+                held.setdefault(card_id, runner['race_turn_number'])
         assistance_evaluated = False
         assisted = False
         recovery_plays = 0
@@ -2496,7 +2563,7 @@ class Sim:
                 action == 'fuel' and treatment_card['family'] == 'Fuel' or
                 action == 'training' and treatment_card['family'] == 'Training' or
                 action == 'gear' and treatment_card['family'] == 'Gear'
-                and treatment_card['title'] not in ATTACHMENT or
+                and (treatment_card['title'] not in ATTACHMENT or treatment_card['title'] in DUAL_USE_GEAR) or
                 action == 'attach' and treatment_card['family'] == 'Gear'
                 and treatment_card['title'] in ATTACHMENT
             ):
@@ -2744,8 +2811,39 @@ class Sim:
                 self.turn(runner, scripts.get(runner['player_id']))
         self.end_round()
 
+    def forecast_weather_at(self, mile):
+        forecast = self.forecast
+        if not forecast or not forecast.get('weather'):
+            return None
+        if mile < forecast.get('start_mile', 0) or mile > forecast.get('end_mile', 10 ** 6):
+            return None
+        return forecast['weather']
+
+    def forecast_protection(self, runner, weather):
+        """Slotted Gear (or a Pack, when the Forecast says so) that blocks this weather's Energy loss."""
+        protector = next((entry['card']['title'] for entry in runner['equipped_gear']
+                          if any(effect['type'] == 'weather_protection' and weather in effect['weather']
+                                 for effect in entry['card'].get('effect_components', []))), None)
+        if protector is None and self.forecast.get('pack_shelters') and runner.get('pack_state'):
+            protector = 'Pack'
+        return protector
+
+    def apply_forecast_at_water(self, runner, mile):
+        weather = self.forecast_weather_at(mile)
+        if not weather:
+            return
+        protector = self.forecast_protection(runner, weather)
+        before = runner['energy']
+        if not protector:
+            self.apply_energy(runner, -1, f'{self.forecast["title"]} weather')
+        self.emit('FORECAST_WEATHER', runner['player_id'], {'forecast': self.forecast['id'], 'mile': mile,
+                  'weather': weather, 'protected_by': protector, 'actual_loss': before - runner['energy']})
+
     def run(self):
         self.setup()
+        if self.forecast:
+            self.emit('FORECAST', payload={'card': self.forecast['id'], 'title': self.forecast['title'],
+                      'text': self.forecast['text']})
         while len(self.finish) + sum(r.get('dnf', False) for r in self.runners) < len(self.runners):
             if any(runner['race_turn_number'] >= self.cfg['max_turns_per_runner']
                    for runner in self.runners if not runner['finished'] and not runner.get('dnf')):

@@ -58,7 +58,9 @@ class PostMovementLegality(unittest.TestCase):
                           {'action': 'fuel', 'card_id': 'FU-019', 'choice': 'remedy'}))
         self.assertEqual((resolved['from_space'], resolved['to_space'], resolved['quarter_miles']),
                          (63, 64, 1))
-        self.assertEqual({condition['title'] for condition in runner['active_conditions']}, set())
+        # Aid fully treats Gashed Knee, which is permanent: it stays at Severity 0.
+        self.assertEqual({(c['title'], c['current_severity']) for c in runner['active_conditions']},
+                         {('Gashed Knee', 0)})
         self.assertEqual(runner['energy'], 0)
         self.assertEqual(runner['race_status'], 'RUNNING')
         self.assertEqual(len(events(sim, 'POST_MOVEMENT_TREAT')), 1)

@@ -1209,7 +1209,7 @@
     "category": "Support",
     "effort": 5,
     "energy": null,
-    "effect_text": "Cramp: -2",
+    "effect_text": "Slotted: Prevent Cramp/Tight Calf; Tight Calf: -2",
     "effect_type": "INSTALLED_EFFECT",
     "effect_value": null,
     "effect_target": null,
@@ -1221,8 +1221,16 @@
     "severity": null,
     "effect_components": [
       {
+        "type": "condition_prevention",
+        "condition": "Cramp"
+      },
+      {
+        "type": "condition_prevention",
+        "condition": "Tight Calf"
+      },
+      {
         "type": "condition_suppression",
-        "condition": "Cramp",
+        "condition": "Tight Calf",
         "severity_delta": -2
       }
     ],

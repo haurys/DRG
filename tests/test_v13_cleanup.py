@@ -45,7 +45,7 @@ class StationTreatment(unittest.TestCase):
         sim.resolve_milestones(p4, 31, 32)
         remaining = {c['title']: c['current_severity'] for c in p4['active_conditions']}
         self.assertNotIn('Nausea', remaining)
-        self.assertNotIn('Gashed Knee', remaining)
+        self.assertEqual(remaining['Gashed Knee'], 0)  # permanent: fully treated, not removed
         self.assertNotIn('Dehydrated', remaining)
         self.assertEqual(remaining['Twisted Ankle'], 4)
         self.assertEqual(remaining['Heat Exhaustion'], 4)
