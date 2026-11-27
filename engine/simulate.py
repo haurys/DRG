@@ -380,6 +380,12 @@ class Sim:
         GENERIC_EVENTS.clear()
         GENERIC_EVENTS.update({card['id']: card['generic_effect'] for card in self.cards
                                if card.get('generic_effect')})
+        # Slotted Gear prevention: the built-in table plus any condition_prevention components on cards.
+        self.slot_prevents = {title: set(conditions) for title, conditions in SLOT_PREVENTS.items()}
+        for card in self.cards:
+            for effect in card.get('effect_components') or []:
+                if card.get('family') == 'Gear' and effect.get('type') == 'condition_prevention':
+                    self.slot_prevents.setdefault(card['title'], set()).add(effect['condition'])
         EVENT_SELF_COSTS.clear()
         EVENT_SELF_COSTS.update({card['id']: card['self_cost'] for card in self.cards
                                  if card.get('self_cost')})
@@ -560,7 +566,7 @@ class Sim:
 
     def preventing_gear(self, runner, condition_title):
         return next((title for title in self.installed_titles(runner, 'gear')
-                     if condition_title in SLOT_PREVENTS.get(title, ())), None)
+                     if condition_title in self.slot_prevents.get(title, ())), None)
 
     def in_play_ids(self):
         ids = set()
@@ -1373,8 +1379,8 @@ class Sim:
                 old_mod = gut_check([], old_titles, self.installed_titles(setup_baseline, 'gear'))['modifiers']
                 new_mod = gut_check([], new_titles, self.installed_titles(prepared, 'gear'))['modifiers']
                 score += horizon * (new_mod - old_mod)
-            old_prevented = set().union(*(SLOT_PREVENTS.get(t, set()) for t in self.installed_titles(setup_baseline, 'gear')))
-            new_prevented = set().union(*(SLOT_PREVENTS.get(t, set()) for t in self.installed_titles(prepared, 'gear')))
+            old_prevented = set().union(*(self.slot_prevents.get(t, set()) for t in self.installed_titles(setup_baseline, 'gear')))
+            new_prevented = set().union(*(self.slot_prevents.get(t, set()) for t in self.installed_titles(prepared, 'gear')))
             score += horizon * 0.5 * len(new_prevented - old_prevented)
         if plan and plan['action'] in ('fuel', 'attach'):
             future = {c['id']: c for c in prepared['active_conditions']}
